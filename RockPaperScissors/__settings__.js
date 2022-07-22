@@ -1,0 +1,21 @@
+ASSET_PREFIX = "";
+SCRIPT_PREFIX = "";
+SCENE_PATH = "1472826.json";
+CONTEXT_OPTIONS = {
+    'antialias': true,
+    'alpha': false,
+    'preserveDrawingBuffer': false,
+    'preferWebGl2': true,
+    'powerPreference': "high-performance"
+};
+SCRIPTS = [ 94399624, 94399628, 94399630, 94399654, 94408232, 94449180 ];
+CONFIG_FILENAME = "config.json";
+INPUT_SETTINGS = {
+    useKeyboard: true,
+    useMouse: true,
+    useGamepads: false,
+    useTouch: true
+};
+pc.script.legacy = false;
+PRELOAD_MODULES = [
+];
