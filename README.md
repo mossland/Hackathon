@@ -2,7 +2,7 @@
 
 This repository introduces mini-services of Mossverse (Mossland Metaverse). Mini-services entail a service that runs within the metaverse and serves to provide various contents to the Mossverse. This repository is where anyone can suggest ideas and participate in the development.
 
-## Project
+## Mini-services
 1. [Rock Paper Scissors](RockPaperScissors/README.md)
   - The user selects one of rock, paper, or scissors.
   - The game proceeds and win or loss is confirmed.
