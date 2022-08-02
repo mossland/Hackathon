@@ -1,5 +1,6 @@
 # Holy Gali (Halli Galli Card Game)
-- [할리갈리](https://ko.wikipedia.org/wiki/%ED%95%A0%EB%A6%AC%EA%B0%88%EB%A6%AC) 카드 게임
+- [할리갈리](https://ko.wikipedia.org/wiki/%ED%95%A0%EB%A6%AC%EA%B0%88%EB%A6%AC) 카드 게임을 모방하여 만든 미니 게임 입니다. 할리갈리(Halli Galli)는 이스라엘 게임 디자이너 Haim Shafir가 디자인하고 독일의 아미고가 출판한 카드으로 간단한 규칙과 빠른 진행으로 많은 인기를 얻고 있습니다.
+
 ```
 1. START버튼을 누르면 게임시작
 2. 시작하기 전에, 카드를 같은 개수로 나눠서 각자의 앞에 놓고, 종을 중앙에 놓는다.
