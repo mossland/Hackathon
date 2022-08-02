@@ -10,3 +10,6 @@ This repository introduces mini-services of Mossverse (Mossland Metaverse). Mini
 2. [THUG War](thug_war/README.md)
   - The starting THUG character appears, and the user must guess whether the character ID is higher or lower than the starting character.
   - THUG character IDs are displayed in ascending order on the top of the screen.
+3. [Holy Gali](HGOE/README.md)
+  - A mini-game inspired by the Halligali card game. 
+  - Halli Galli is a card designed by Israeli game designer Haim Shafir and published by Amigo in Germany, which is very popular for its simple rules and fast pace.
