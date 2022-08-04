@@ -12,4 +12,4 @@ This repository introduces mini-services of Mossverse (Mossland Metaverse). Mini
   - THUG character IDs are displayed in ascending order on the top of the screen.
 3. [Holy Gali](HGOE/README.md)
   - A mini-game inspired by the Halligali card game. 
-  - Halli Galli is a card designed by Israeli game designer Haim Shafir and published by Amigo in Germany, which is very popular for its simple rules and fast pace.
+  - This is an odd-even game made using the card design of the Halligali card game.
