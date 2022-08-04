@@ -1,5 +1,6 @@
 # Holy Gali (Halli Galli Card Game)
 - [할리갈리](https://ko.wikipedia.org/wiki/%ED%95%A0%EB%A6%AC%EA%B0%88%EB%A6%AC) 카드 게임의 카드를 이용하여 만든 홀짝 카드 게임입니다.
+- [데모 페이지](https://asset.moss.land/HGOE/index.html)
 
 ```
 룰 소개:
@@ -10,5 +11,5 @@
 5. 사용자선택이후 두번째 카드가 오픈되고, 결과가 홀인지 짝인지 보여주고, 그후 승패를 보여준다. 
 6. 두번째카드는 첫번째카드와 똑같은카드가 등장할수있다.
 ```
-[데모 페이지](https://asset.moss.land/HGOE/index.html)
+
 
