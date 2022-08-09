@@ -13,3 +13,6 @@ This repository introduces mini-services of Mossverse (Mossland Metaverse). Mini
 3. [Holy Gali](HGOE/README.md)
   - A mini-game inspired by the Halligali card game. 
   - This is an odd-even game made using the card design of the Halligali card game.
+4. [Lucky7Dice](Lucky7Dice/README.md)
+  - A game of predicting whether the sum of two dice is greater than or less than 7
+  
