@@ -1,4 +1,4 @@
-(function() {
+(function () {
     // Shared Lib
     var CANVAS_ID = 'application-canvas';
 
@@ -23,7 +23,7 @@
         iosVersion: getIosVersion(),
 
         createCanvas: function () {
-            canvas = document.createElement('canvas');
+            canvas = document.createElement('canvas'); // eslint-disable-line no-global-assign
             canvas.setAttribute('id', CANVAS_ID);
             canvas.setAttribute('tabindex', 0);
             // canvas.style.visibility = 'hidden';
@@ -35,6 +35,7 @@
 
             return canvas;
         },
+
 
         resizeCanvas: function (app, canvas) {
             canvas.style.width = '';
@@ -74,7 +75,7 @@
                 }.bind(this), 100);
 
                 // Don't want to do this all the time so stop polling after some short time
-                setTimeout(function() {
+                setTimeout(function () {
                     if (!!windowSizeChangeIntervalHandler) {
                         clearInterval(windowSizeChangeIntervalHandler);
                         windowSizeChangeIntervalHandler = null;
@@ -188,7 +189,7 @@
             // iOS showing a squished iframe sometimes
             setTimeout(function () {
                 pcBootstrap.reflow(app, canvas);
-                pcBootstrap.reflowHandler = function() { pcBootstrap.reflow(app, canvas); };
+                pcBootstrap.reflowHandler = function () { pcBootstrap.reflow(app, canvas); };
 
                 window.addEventListener('resize', pcBootstrap.reflowHandler, false);
                 window.addEventListener('orientationchange', pcBootstrap.reflowHandler, false);
