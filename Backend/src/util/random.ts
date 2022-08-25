@@ -49,33 +49,45 @@ val: ${curSeed}`);
   });
 }
 
-export const spendByGameId = async (gameId: number, resultGenerateFunc: (hash: string) => any) => {
-  return db.transaction(async (trx) => {
-    try {
-      const hashes = await trx('hash').select('*').where({
-        gameId,
-        isSpend: false,
-      }).orderBy('hashId', 'asc').limit(1);
-      const spendingHash = hashes[0];
+export const spendByGameId = async (gameId: number, betAmount: number, resultGenerateFunc: (hash: string) => any) => {
+  return new Promise((resolve, reject) => {
+    db.transaction(async (trx) => {
+      try {
+        const hashes = await trx('hash').select('*').where({
+          gameId,
+          isSpend: false,
+        }).orderBy('hashId', 'asc').limit(1);
+        const spendingHash = hashes[0];
+  
+        const { meta, payout } = resultGenerateFunc(spendingHash.key);
+        const ticketId = uuidv4();
 
-      const ticket = resultGenerateFunc(spendingHash.key);
+        const newTicket = {
+          gameId,
+          hashId: spendingHash.hashId,
+          ticketId,
+          betAmount,
+          payout,
+          meta: JSON.stringify(meta),
+        };
+        await trx('ticket').insert(newTicket);
+  
+        await trx('hash').update({
+          isSpend: true,
+        }).where({
+          hashId: spendingHash.hashId,
+        });
+  
+        await trx.commit();
 
-      await trx('ticket').insert({
-        gameId,
-        hashId: spendingHash.hashId,
-        result: JSON.stringify(ticket),
-      });
-
-      await trx('hash').update({
-        isSpend: true,
-      }).where({
-        hashId: spendingHash.hashId,
-      });
-
-      await trx.commit()
-    } catch (e) {
-      console.error(e);
-      await trx.rollback();
-    }
+        newTicket.meta = meta;
+        resolve(newTicket);
+      } catch (e) {
+        console.error(e);
+        await trx.rollback();
+        reject(e);
+      }
+    });
   });
+  
 };
