@@ -4,4 +4,4 @@
 
 [Demo Link](http://asset.moss.land/ThugWar/index.html)
 
-![newUI](https://user-images.githubusercontent.com/13128375/191896450-59f1c28e-6aa5-48ae-8c64-387d32448eb1.gif)
+![newUI](https://user-images.githubusercontent.com/13128375/191896638-2c74fc4f-53d7-4511-be9a-d03840479da5.gif)
