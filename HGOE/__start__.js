@@ -199,7 +199,7 @@
                         console.error(err);
                     }
 
-                    app.loadScene(SCENE_PATH, function (err, scene) {
+                    app.scenes.loadScene(SCENE_PATH, function (err, scene) {
                         if (err) {
                             console.error(err);
                         }
