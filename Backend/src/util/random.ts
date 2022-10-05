@@ -2,69 +2,94 @@ import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import db from '../db';
 import bluebird from 'bluebird';
+import hashModel from '../model/hashModel';
 
-const generateCount = 100000;
+const generateCount = 6000;
 
 export const generateSeed = async (gameId: number) => {
-  const lastHashId = await db('hash').select('*').where({
-    gameId
-  }).orderBy('hashId', 'desc').limit(1);
-  
-  let hashId = lastHashId.length > 0 ? lastHashId[0].hashId + generateCount : generateCount;
+  const lastHashId = await db('current_hash').select('*').orderBy('hashId', 'desc').limit(1);
+
+  let hashId = lastHashId.length > 0 ? lastHashId[0].hashId + 1 : 1;
   let seed = uuidv4();
+  const originalSeed = seed;
+  let hash = crypto.createHash('sha256');
+  const hashList: string[] = [];
 
-  return db.transaction(async (trx) => {
-    try {
-      await trx('seed').insert({
-        hashId,
-        seedString: seed,
-      });
+  Array.from({ length: generateCount }).forEach((_, idx) => {
+    hash.update(seed);
+    const curSeed = hash.copy().digest('hex');
+    hashList.push(curSeed);
+    seed = curSeed;
+  });
 
-      let hash = crypto.createHash('sha256');
-
-      await bluebird.each(
-        Array.from({ length: generateCount }),
-        async (_, idx) => {
-          hash.update(seed);
-          const curSeed = hash.copy().digest('hex');
-          console.log(`hashId: ${hashId}
-val: ${curSeed}`);
-          await trx('hash').insert({
-            gameId,
-            hashId,
-            key: curSeed,
-            isSpend: false,
-            isGenesis: idx === 0,
-          });
-          seed = curSeed;
-          hashId -= 1;
+  try {
+    await new Promise((resolve, reject) => {
+      hashModel.create(
+        {
+          id: hashId,
+          seed: originalSeed,
+          hash: hashList.reverse(),
+        },
+        (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
         }
       );
-
-      await trx.commit();
-    } catch (e) {
-      console.error(e);
-      await trx.rollback();
-    }
-  });
+    });
+    return db.raw(`
+      INSERT INTO
+        current_hash
+      (gameId, hashId, hashIdx)
+        VALUES (?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        hashId = VALUES(hashId),
+        hashIdx = VALUES(hashIdx)`, [ gameId, hashId, 0 ]);
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 }
 
 export const spendByGameId = async (gameId: number, betAmount: number, resultGenerateFunc: (hash: string) => any) => {
   return new Promise((resolve, reject) => {
     db.transaction(async (trx) => {
       try {
-        const hashes = await trx('hash').select('*').where({
+        let currentHashes = await trx('current_hash').select('*').where({
           gameId,
-          isSpend: false,
-        }).orderBy('hashId', 'asc').limit(1);
-        const spendingHash = hashes[0];
+        });
+        let currentHash = currentHashes[0];
+
+        if (currentHash.hashIdx >= generateCount) {
+          await generateSeed(gameId);
+          currentHashes = await trx('current_hash').select('*').where({
+            gameId,
+          });
+          currentHash = currentHashes[0];
+        }
+        
+        const hashString: string = await new Promise((resolve, reject) => {
+          hashModel.get({id: currentHash.hashId}, async (err, data) => {
+            if (err) {
+              reject(err);
+            } else {
+              const hashList: any = await data.get('hash');
+              resolve(hashList[currentHash.hashIdx] as string);
+            }
+          });
+        });
+        
   
-        const { meta, payout } = resultGenerateFunc(spendingHash.key);
+        const { meta, payout } = resultGenerateFunc(hashString);
         const ticketId = uuidv4();
 
         const newTicket = {
           gameId,
-          hashId: spendingHash.hashId,
+          hashId: currentHash.hashId,
+          hashIdx: currentHash.hashIdx,
+          hashString,
           ticketId,
           betAmount,
           payout,
@@ -72,10 +97,11 @@ export const spendByGameId = async (gameId: number, betAmount: number, resultGen
         };
         await trx('ticket').insert(newTicket);
   
-        await trx('hash').update({
-          isSpend: true,
+        await trx('current_hash').update({
+          hashId: currentHash.hashId,
+          hashIdx: currentHash.hashIdx + 1,
         }).where({
-          hashId: spendingHash.hashId,
+          gameId,
         });
   
         await trx.commit();
@@ -89,5 +115,4 @@ export const spendByGameId = async (gameId: number, betAmount: number, resultGen
       }
     });
   });
-  
 };
