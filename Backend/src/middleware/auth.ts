@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
+import StatusCodes from 'http-status-codes';
+import ServerError from '../util/serverError';
 
 export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   const bearerHeader = req.headers['authorization'];
@@ -8,6 +10,6 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
     (req as any).token = bearerToken;
     next();
   } else {
-    res.sendStatus(403);
+    next(new ServerError(StatusCodes.UNAUTHORIZED, 'fail to verify user'));
   }
 }
