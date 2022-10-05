@@ -12,4 +12,4 @@
 6. 두번째카드는 첫번째카드와 똑같은카드가 등장할수있다.
 ```
 
-
+![hgoe](https://user-images.githubusercontent.com/13128375/193191959-f0e74c5e-cc5c-43f2-ab46-575fa09c3eb0.gif)

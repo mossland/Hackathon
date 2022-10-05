@@ -1,4 +1,4 @@
-var loadModules = function (modules, urlPrefix, doneCallback) {
+var loadModules = function (modules, urlPrefix, doneCallback) { // eslint-disable-line no-unused-vars
 
     // check for wasm module support
     function wasmSupported() {
