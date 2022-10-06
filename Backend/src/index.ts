@@ -1,3 +1,8 @@
+import path from 'path';
+require('dotenv').config({
+  path: path.join(__dirname, `../.env.${process.env.NODE_ENV}`),
+});
+
 import app from './app';
 import dynamo from 'dynamodb';
 
