@@ -12,3 +12,5 @@
 9. 예측 성공 시 5배의 수익을 얻을 수 있습니다.
 ```
 [데모 페이지](http://asset.moss.land/RYB/index.html)
+
+![ryb_finish](https://user-images.githubusercontent.com/13128375/194215902-e3ec0857-709a-414b-aaa0-c2376ea9d837.gif)
