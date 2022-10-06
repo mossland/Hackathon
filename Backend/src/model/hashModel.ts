@@ -7,7 +7,7 @@ export default dynamo.define('Hash', {
   schema: {
     id: joi.number(),
     seed: joi.string().uuid(),
-    hash: dynamo.types.stringSet(),
+    hash: joi.array(),
   },
   tableName: process.env.AWS_DYNAMO_HASH_TABLE_NAME!.toString(),
 });

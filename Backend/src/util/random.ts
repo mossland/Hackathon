@@ -3,23 +3,22 @@ import { v4 as uuidv4 } from 'uuid';
 import db from '../db';
 import bluebird from 'bluebird';
 import hashModel from '../model/hashModel';
+import { IRspMetadata, ITicketModel } from '../model/ticketModel';
 
 const generateCount = 6000;
+
 
 export const generateSeed = async (gameId: number) => {
   const lastHashId = await db('current_hash').select('*').orderBy('hashId', 'desc').limit(1);
 
   let hashId = lastHashId.length > 0 ? lastHashId[0].hashId + 1 : 1;
-  let seed = uuidv4();
-  const originalSeed = seed;
-  let hash = crypto.createHash('sha256');
+  const seed = uuidv4();
   const hashList: string[] = [];
 
+  let prevHash: string = '';
   Array.from({ length: generateCount }).forEach((_, idx) => {
-    hash.update(seed);
-    const curSeed = hash.copy().digest('hex');
-    hashList.push(curSeed);
-    seed = curSeed;
+    prevHash = crypto.createHmac('sha256', seed).update(prevHash).digest('hex');
+    hashList.push(prevHash);
   });
 
   try {
@@ -27,7 +26,7 @@ export const generateSeed = async (gameId: number) => {
       hashModel.create(
         {
           id: hashId,
-          seed: originalSeed,
+          seed,
           hash: hashList.reverse(),
         },
         (err, data) => {
@@ -53,7 +52,7 @@ export const generateSeed = async (gameId: number) => {
   }
 }
 
-export const spendByGameId = async (gameId: number, betAmount: number, resultGenerateFunc: (hash: string) => any) => {
+export const spendByGameId = async (gameId: number, betAmount: number, resultGenerateFunc: (hash: string) => { meta: IRspMetadata ,payout: number }): Promise<ITicketModel> => {
   return new Promise((resolve, reject) => {
     db.transaction(async (trx) => {
       try {
@@ -85,7 +84,7 @@ export const spendByGameId = async (gameId: number, betAmount: number, resultGen
         const { meta, payout } = resultGenerateFunc(hashString);
         const ticketId = uuidv4();
 
-        const newTicket = {
+        const newTicket: any = {
           gameId,
           hashId: currentHash.hashId,
           hashIdx: currentHash.hashIdx,
@@ -107,7 +106,7 @@ export const spendByGameId = async (gameId: number, betAmount: number, resultGen
         await trx.commit();
 
         newTicket.meta = meta;
-        resolve(newTicket);
+        resolve(newTicket as ITicketModel);
       } catch (e) {
         console.error(e);
         await trx.rollback();
