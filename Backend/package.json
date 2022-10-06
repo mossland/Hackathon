@@ -5,7 +5,9 @@
   "license": "MIT",
   "scripts": {
     "build": "npx tsc -p .",
+    "build:dev": "set NODE_ENV=development&npx tsc -p .",
     "start": "node dist/index.js",
+    "start:dev": "set NODE_ENV=development&node dist/index.js",
     "dev": "nodemon -r dotenv/config ./src/index.ts dotenv_config_path=./.env.development\"",
     "script:dev": "ts-node -r dotenv/config script.ts dotenv_config_path=./.env.development"
   },
