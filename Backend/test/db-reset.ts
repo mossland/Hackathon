@@ -5,6 +5,7 @@ import { generateSeed } from '../src/util/random';
 
 export const dbReset = async () => {
   console.log('[START] truncate db');
+  await db('last_hash_id').truncate();
   await db('current_hash').truncate();
   await db('game').truncate();
   await db('ticket').truncate();
@@ -24,6 +25,7 @@ export const dbReset = async () => {
     hashId: 0,
     hashIdx: 0,
   });
+  
   console.log('[END] insert data');
   
 
@@ -41,6 +43,16 @@ export const dbReset = async () => {
       });
     });
   });
-  await generateSeed(1);
+
+  await db.transaction(async (trx) => {
+    try {
+      await generateSeed(1, trx);
+      await trx.commit();
+    } catch (e) {
+      console.error(e);
+      await trx.rollback();
+    }
+  });
+
   console.log('[END] reset hashchain');
 };

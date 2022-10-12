@@ -1,21 +1,23 @@
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import db from '../db';
+import { Knex } from 'knex';
 import hashModel from '../model/hashModel';
 import { IRspMetadata, ITicketModel } from '../model/ticketModel';
 
-const generateCount = 6000;
+const defaultChainSize = 6000;
 
-
-export const generateSeed = async (gameId: number) => {
-  const lastHashId = await db('current_hash').select('*').orderBy('hashId', 'desc').limit(1);
-
-  let hashId = lastHashId.length > 0 ? lastHashId[0].hashId + 1 : 1;
+export const generateSeed = async (gameId: number, trx: Knex.Transaction) => {
+  const lastHashIds = await trx('last_hash_id').select('*').forUpdate();
+  let hashId = 1;
+  if (lastHashIds.length > 0) {
+    hashId = lastHashIds[0].hashId + 1;
+  }
   const seed = uuidv4();
   const hashList: string[] = [];
 
   let prevHash: string = '';
-  Array.from({ length: generateCount }).forEach((_, idx) => {
+  Array.from({ length: parseInt(process.env.HASH_CHAIN_SIZE?.toString() || defaultChainSize.toString()) }).forEach((_, idx) => {
     prevHash = crypto.createHmac('sha256', seed).update(prevHash).digest('hex');
     hashList.push(prevHash);
   });
@@ -37,7 +39,14 @@ export const generateSeed = async (gameId: number) => {
         }
       );
     });
-    return db.raw(`
+
+    if (hashId !== 1) {
+      await trx('last_hash_id').update({ hashId }).where({ hashId: hashId - 1 });
+    } else {
+      await trx('last_hash_id').insert({ hashId });
+    }
+    
+    return trx.raw(`
       INSERT INTO
         current_hash
       (gameId, hashId, hashIdx)
@@ -60,8 +69,8 @@ export const spendByGameId = async (gameId: number, betAmount: number, resultGen
         }).forUpdate();
         let currentHash = currentHashes[0];
 
-        if (currentHash.hashIdx >= generateCount) {
-          await generateSeed(gameId);
+        if (currentHash.hashIdx >= parseInt(process.env.HASH_CHAIN_SIZE?.toString() || defaultChainSize.toString())) {
+          await generateSeed(gameId, trx);
           currentHashes = await trx('current_hash').select('*').where({
             gameId,
           }).forUpdate();
