@@ -21,7 +21,7 @@ export const dbReset = async () => {
 
   await db('current_hash').insert({
     gameId: 1,
-    hashId: 1,
+    hashId: 0,
     hashIdx: 0,
   });
   console.log('[END] insert data');
@@ -41,9 +41,6 @@ export const dbReset = async () => {
       });
     });
   });
-
-  await bluebird.each(Array.from({length: 10}), async (_, idx) => {
-    await generateSeed(idx + 1);
-  });
+  await generateSeed(1);
   console.log('[END] reset hashchain');
 };

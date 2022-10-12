@@ -3,11 +3,12 @@ require('dotenv').config({
   path: path.join(__dirname, `../.env.${process.env.NODE_ENV}`),
 });
 
-
-import request from 'supertest';
-import app from '../src/app';
 import bluebird from 'bluebird';
+import request from 'supertest';
 
+
+import app from '../src/app';
+import db from '../src/db';
 import { dbReset } from './db-reset';
 
 describe('Test /rsp', () => {
@@ -150,6 +151,26 @@ describe('Test /rsp', () => {
             expect(response.body.ticket.payout).toBeGreaterThanOrEqual(3);
             expect(response.body.ticket.payout % 3).toBe(0);
           }
+          return expect(response.body.success).toBe(true);
+        });
+      }
+    );
+  });
+
+  it ('rsp ticket generate', async () => {
+    await bluebird.each(
+      Array.from({length: 81}),
+      async (_) => {
+        await request(app).post('/rsp/result').send({
+          pick: Math.floor(Math.random() * 81) % 3,
+          betAmount: 100,
+        }).then(async (response) => {
+          const tickets = await db('ticket').where({ticketId: response.body.ticket.ticketId})
+          const ticket = tickets[0];
+          ticket.meta = JSON.parse(ticket.meta);
+
+          expect(ticket).toBeDefined();
+          expect(ticket).toMatchObject(response.body.ticket);
           return expect(response.body.success).toBe(true);
         });
       }
