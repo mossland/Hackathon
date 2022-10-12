@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import db from '../db';
-import bluebird from 'bluebird';
 import hashModel from '../model/hashModel';
 import { IRspMetadata, ITicketModel } from '../model/ticketModel';
 
@@ -58,20 +57,21 @@ export const spendByGameId = async (gameId: number, betAmount: number, resultGen
       try {
         let currentHashes = await trx('current_hash').select('*').where({
           gameId,
-        });
+        }).forUpdate();
         let currentHash = currentHashes[0];
 
         if (currentHash.hashIdx >= generateCount) {
           await generateSeed(gameId);
           currentHashes = await trx('current_hash').select('*').where({
             gameId,
-          });
+          }).forUpdate();
           currentHash = currentHashes[0];
         }
         
         const hashString: string = await new Promise((resolve, reject) => {
           hashModel.get({id: currentHash.hashId}, async (err, data) => {
             if (err) {
+              console.error(err);
               reject(err);
             } else {
               const hashList: any = await data.get('hash');

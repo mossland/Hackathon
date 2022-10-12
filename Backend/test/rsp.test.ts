@@ -8,11 +8,16 @@ import request from 'supertest';
 import app from '../src/app';
 import bluebird from 'bluebird';
 
+import { dbReset } from './db-reset';
+
 describe('Test /rsp', () => {
-  it ('empty body should return success false', (done) => {
-    request(app).post('/rsp/result').then((response) => {
-      expect(response.body.success).toBe(false);
-      done();
+  beforeAll(async () => {
+    await dbReset();
+  });
+
+  it ('empty body should return success false', async () => {
+    await request(app).post('/rsp/result').then((response) => {
+      return expect(response.body.success).toBe(false);
     });
   });
 
@@ -87,10 +92,10 @@ describe('Test /rsp', () => {
   });
 
   it ('valid input should return success true', async () => {
-    await bluebird.each(
+    await bluebird.map(
       Array.from({length: 81}),
       async (_) => {
-        return request(app).post('/rsp/result').send({
+        await request(app).post('/rsp/result').send({
           pick: 0,
           betAmount: 100,
         }).then((response) => {
@@ -108,10 +113,10 @@ describe('Test /rsp', () => {
       }
     );
 
-    await bluebird.each(
+    await bluebird.map(
       Array.from({length: 81}),
       async (_) => {
-        return request(app).post('/rsp/result').send({
+        await request(app).post('/rsp/result').send({
           pick: 1,
           betAmount: 100,
         }).then((response) => {
@@ -129,10 +134,10 @@ describe('Test /rsp', () => {
       }
     );
 
-    await bluebird.each(
+    await bluebird.map(
       Array.from({length: 81}),
       async (_) => {
-        return request(app).post('/rsp/result').send({
+        await request(app).post('/rsp/result').send({
           pick: 2,
           betAmount: 100,
         }).then((response) => {
