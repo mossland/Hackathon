@@ -5,15 +5,24 @@ import Morgan from 'morgan';
 import rspRouter from './route/rsp';
 
 import ServerError from './util/serverError';
+import morgan from 'morgan';
 
 const app: Express = express();
 
-if (process.env.NODE_ENV !== 'production') {
-  app.use(Morgan('dev'));
-} else {
-  app.use(Morgan('combined'));
-}
+app.use(Morgan(`:remote-addr - [:date[clf]] ":method :url HTTP/:http-version" :status ":referrer" ":user-agent" - ":userId"`));
+morgan.token('userId', function(req, res) {
+  if (!(res as any).locals.user) {
+    return 'unknown';
+  } else {
+    return (res as any).locals.user.id
+  }
+});
 
+morgan.token('remote-addr', function(req, res) {
+  return (req as any).ip;
+});
+
+app.set('trust proxy', true);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
