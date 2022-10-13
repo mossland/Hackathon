@@ -11,6 +11,9 @@ import app from '../src/app';
 import db from '../src/db';
 import { dbReset } from './db-reset';
 import Big from 'big.js';
+import { StatusCodes } from 'http-status-codes';
+
+const testToken = process.env.TEST_TOKEN?.toString() || '';
 
 describe('Test /rsp', () => {
   beforeAll(async () => {
@@ -18,26 +21,26 @@ describe('Test /rsp', () => {
   });
 
   it ('empty body should return success false', async () => {
-    await request(app).post('/rsp/result').then((response) => {
+    await request(app).post('/rsp/result').set('Authorization', testToken).then((response) => {
       return expect(response.body.success).toBe(false);
     });
   });
 
   it ('invalid input should return success false', async () => {
-    await request(app).post('/rsp/result').send({
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
       betAmount: 100,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
 
-    await request(app).post('/rsp/result').send({
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: 'a',
       betAmount: 100,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
 
-    await request(app).post('/rsp/result').send({
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: -123,
       betAmount: 100,
     }).then((response) => {
@@ -51,42 +54,42 @@ describe('Test /rsp', () => {
       return expect(response.body.success).toBe(false);
     });
 
-    await request(app).post('/rsp/result').send({
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: Infinity,
       betAmount: 100,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
 
-    await request(app).post('/rsp/result').send({
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: 2,
       betAmount: 'a',
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
 
-    await request(app).post('/rsp/result').send({
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: 2,
       betAmount: 0,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
 
-    await request(app).post('/rsp/result').send({
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: 2,
       betAmount: -23,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
 
-    await request(app).post('/rsp/result').send({
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: 2,
       betAmount: Infinity,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
 
-    await request(app).post('/rsp/result').send({
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: 2,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
@@ -97,7 +100,10 @@ describe('Test /rsp', () => {
     await bluebird.map(
       Array.from({length: 81}),
       async (_) => {
-        await request(app).post('/rsp/result').send({
+        await request(app)
+        .post('/rsp/result')
+        .set('Authorization', testToken)
+        .send({
           pick: 0,
           betAmount: 100,
         }).then((response) => {
@@ -118,7 +124,10 @@ describe('Test /rsp', () => {
     await bluebird.map(
       Array.from({length: 81}),
       async (_) => {
-        await request(app).post('/rsp/result').send({
+        await request(app)
+        .post('/rsp/result')
+        .set('Authorization', testToken)
+        .send({
           pick: 1,
           betAmount: 100,
         }).then((response) => {
@@ -139,7 +148,10 @@ describe('Test /rsp', () => {
     await bluebird.map(
       Array.from({length: 81}),
       async (_) => {
-        await request(app).post('/rsp/result').send({
+        await request(app)
+        .post('/rsp/result')
+        .set('Authorization', testToken)
+        .send({
           pick: 2,
           betAmount: 100,
         }).then((response) => {
@@ -182,10 +194,10 @@ describe('Test /rsp', () => {
       Array.from({length: 81}),
       async (_) => {
         const pick = Math.floor(Math.random() * 81) % 3;
-        await request(app).post('/rsp/result').send({
+        await request(app).post('/rsp/result').set('Authorization', testToken).send({
           pick,
           betAmount: 100,
-        }).then(async (response) => {
+        }).set('Authorization', testToken).then(async (response) => {
           const tickets = await db('ticket').where({ticketId: response.body.ticket.ticketId})
           const ticket = tickets[0];
           ticket.meta = JSON.parse(ticket.meta);
@@ -209,7 +221,7 @@ describe('Test /rsp', () => {
     await bluebird.each(
       Array.from({length: 30}),
       async (_, hIdx) => {
-        await request(app).post('/rsp/result').send({
+        await request(app).post('/rsp/result').set('Authorization', testToken).send({
           pick: Math.floor(Math.random() * 81) % 3,
           betAmount: 100,
         }).then(async (response) => {
@@ -226,5 +238,53 @@ describe('Test /rsp', () => {
         });
       }
     );
+  });
+
+  it ('should return success false when the status of game is unavailable', async () => {
+    await db('game').update({isAvailable: false}).where({ gameId: 1 });
+    await request(app)
+      .post('/rsp/result')
+      .set('Authorization', testToken)
+      .send({
+        pick: Math.floor(Math.random() * 81) % 3,
+        betAmount: 100,
+      }).then((response) => {
+        return expect(response.body.success).toBe(false);
+      });
+  });
+
+  it ('user auth test', async () => {
+    await dbReset();
+    await request(app)
+      .post('/rsp/result')
+      .set('Authorization', '')
+      .send({
+        pick: Math.floor(Math.random() * 81) % 3,
+        betAmount: 100,
+      }).then((response) => {
+        expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+        return expect(response.body.success).toBe(false);
+      });
+    await request(app)
+      .post('/rsp/result')
+      .set('Authorization', 'Bearer eyAbhGciOiJIUzI1NiIsInR5cCI6KipXVCJ1.eyJrZXlyaW5nIjoiNjMyOTdlNWZkMThmYtI5ZTUxYWQ5Y6UiIiwicm7sZSI6InVzFTKiLTBzdGF4fXMiOiJhY3RpdmUiLCJpYXQiOjE2NjM2NjM3MTF9.BDfnJsUB_x9qPj3I5PtcA3A7QtVZdFc01Ufyg2jziFh')
+      .send({
+        pick: Math.floor(Math.random() * 81) % 3,
+        betAmount: 100,
+      }).then((response) => {
+        expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+        return expect(response.body.success).toBe(false);
+      });
+
+      await request(app)
+      .post('/rsp/result')
+      .set('Authorization', testToken)
+      .send({
+        pick: Math.floor(Math.random() * 81) % 3,
+        betAmount: 100,
+      }).then((response) => {
+        expect(response.statusCode).toEqual(StatusCodes.OK);
+        return expect(response.body.success).toBe(true);
+      });
   });
 });

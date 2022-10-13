@@ -4,3 +4,4 @@ dist
 .env.*
 
 coverage/*
+manual_script.ts

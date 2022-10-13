@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import StatusCodes from 'http-status-codes';
 import ServerError from '../util/serverError';
+import db from '../db';
 
-export const verifyUserGameInput = async (req: Request, res: Response, next: NextFunction) => {
+export const validateUserGameInput = async (req: Request, res: Response, next: NextFunction) => {
   if (typeof(req.body.pick) === typeof(undefined) || typeof(req.body.betAmount) === typeof(undefined)) {
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
@@ -19,4 +20,15 @@ export const verifyUserGameInput = async (req: Request, res: Response, next: Nex
   }
   
   next();
+}
+
+export const createGameStateValidator = (gameId: number): (req: Request, res: Response, next: NextFunction)=> any => {
+  return async function(req: Request, res: Response, next: NextFunction) {
+    const rspgame = (await db('game').select('*').where('gameId', 1))[0];
+    if (rspgame.isAvailable) {
+      next();
+    } else {
+      return next(new ServerError(StatusCodes.FORBIDDEN, 'the game is not available now'));
+    }
+  }
 }

@@ -4,6 +4,8 @@ import db from '../db';
 import { Knex } from 'knex';
 import hashModel from '../model/hashModel';
 import { IRspMetadata, ITicketModel } from '../model/ticketModel';
+import Platform from "../util/platform";
+import Big from 'big.js';
 
 const defaultChainSize = 6000;
 
@@ -60,7 +62,12 @@ export const generateSeed = async (gameId: number, trx: Knex.Transaction) => {
   }
 }
 
-export const spendByGameId = async (gameId: number, betAmount: number, resultGenerateFunc: (hash: string) => { meta: IRspMetadata ,payout: number }): Promise<ITicketModel> => {
+export const spendByGameId = async (
+  gameId: number,
+  betAmount: number,
+  userId: string,
+  token: string,
+  resultGenerateFunc: (hash: string) => { meta: IRspMetadata ,payout: number }): Promise<ITicketModel> => {
   return new Promise((resolve, reject) => {
     db.transaction(async (trx) => {
       try {
@@ -103,7 +110,26 @@ export const spendByGameId = async (gameId: number, betAmount: number, resultGen
           payout,
           meta: JSON.stringify(meta),
         };
+
+        let pointDelta = 0;
+
+        if (payout === 0) {
+          pointDelta = -betAmount;
+        } else {
+          pointDelta = new Big(pointDelta).mul(payout).toNumber();
+        }
+
+        await Platform.instance.updateUserPoint(
+          userId,
+          token,
+          ticketId,
+          pointDelta,
+        );
         await trx('ticket').insert(newTicket);
+        await trx('user_ticket_history').insert({
+          userId,
+          ticketId,
+        });
   
         await trx('current_hash').update({
           hashId: currentHash.hashId,

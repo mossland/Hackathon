@@ -1,15 +1,29 @@
 import { Request, Response, NextFunction } from 'express';
 import StatusCodes from 'http-status-codes';
 import ServerError from '../util/serverError';
+import axios from 'axios';
 
 export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
-  const bearerHeader = req.headers['authorization'];
-  if (typeof bearerHeader !== 'undefined') {
-    const bearer = bearerHeader.split(' ');
-    const bearerToken = bearer[1];
-    (req as any).token = bearerToken;
-    next();
-  } else {
-    next(new ServerError(StatusCodes.UNAUTHORIZED, 'fail to verify user'));
+  const bearerToken = req.headers['authorization'];
+
+  if (!bearerToken) {
+    return next(new ServerError(StatusCodes.UNAUTHORIZED, 'fail to verify user'));
+  }
+
+  try {
+    const { data } = await axios.get(
+      `${process.env.MOSSVERSE_PLATFORM_BASE}/user/whoAmI`,
+      {
+        headers: {
+          Authorization: bearerToken,
+        }
+      }
+    );
+
+    res.locals.user = data;
+    res.locals.token = bearerToken;
+    return next();
+  } catch (e) {
+    return next(new ServerError(StatusCodes.UNAUTHORIZED, 'fail to verify user'));
   }
 }
