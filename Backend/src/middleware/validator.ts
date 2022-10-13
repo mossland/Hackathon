@@ -3,6 +3,12 @@ import StatusCodes from 'http-status-codes';
 import ServerError from '../util/serverError';
 import db from '../db';
 
+Number.isInteger = Number.isInteger || function(value) {
+  return typeof value === 'number' && 
+    isFinite(value) && 
+    Math.floor(value) === value;
+};
+
 export const validateUserGameInput = async (req: Request, res: Response, next: NextFunction) => {
   if (typeof(req.body.pick) === typeof(undefined) || typeof(req.body.betAmount) === typeof(undefined)) {
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
@@ -12,6 +18,10 @@ export const validateUserGameInput = async (req: Request, res: Response, next: N
   const betAmount = parseInt(req.body.betAmount);
 
   if (isNaN(pick) || isNaN(betAmount)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (!Number.isInteger(pick) || !Number.isInteger(betAmount)) {
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
 

@@ -91,6 +91,27 @@ describe('Test /rsp', () => {
 
     await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: 2,
+      betAmount: 30.5,
+    }).then((response) => {
+      return expect(response.body.success).toBe(false);
+    });
+
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
+      pick: 1.5,
+      betAmount: 10,
+    }).then((response) => {
+      return expect(response.body.success).toBe(false);
+    });
+
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
+      pick: 1.5,
+      betAmount: 10.4,
+    }).then((response) => {
+      return expect(response.body.success).toBe(false);
+    });
+
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
+      pick: 2,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
