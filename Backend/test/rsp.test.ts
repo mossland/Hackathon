@@ -28,35 +28,35 @@ describe('Test /rsp', () => {
 
   it ('invalid input should return success false', async () => {
     await request(app).post('/rsp/result').set('Authorization', testToken).send({
-      betAmount: 100,
+      betAmount: 10,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
 
     await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: 'a',
-      betAmount: 100,
+      betAmount: 10,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
 
     await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: -123,
-      betAmount: 100,
+      betAmount: 10,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
 
     await request(app).post('/rsp/result').send({
       pick: 56,
-      betAmount: 100,
+      betAmount: 10,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
 
     await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: Infinity,
-      betAmount: 100,
+      betAmount: 10,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
     });
@@ -126,7 +126,7 @@ describe('Test /rsp', () => {
         .set('Authorization', testToken)
         .send({
           pick: 0,
-          betAmount: 100,
+          betAmount: 10,
         }).then((response) => {
           if (response.body.ticket.meta.computerPick === 0) {
             expect(response.body.ticket.payout).toBe(1);
@@ -150,7 +150,7 @@ describe('Test /rsp', () => {
         .set('Authorization', testToken)
         .send({
           pick: 1,
-          betAmount: 100,
+          betAmount: 10,
         }).then((response) => {
           if (response.body.ticket.meta.computerPick === 1) {
             expect(response.body.ticket.payout).toBe(1);
@@ -174,7 +174,7 @@ describe('Test /rsp', () => {
         .set('Authorization', testToken)
         .send({
           pick: 2,
-          betAmount: 100,
+          betAmount: 10,
         }).then((response) => {
           if (response.body.ticket.meta.computerPick === 2) {
             expect(response.body.ticket.payout).toBe(1);
@@ -217,7 +217,7 @@ describe('Test /rsp', () => {
         const pick = Math.floor(Math.random() * 81) % 3;
         await request(app).post('/rsp/result').set('Authorization', testToken).send({
           pick,
-          betAmount: 100,
+          betAmount: 10,
         }).set('Authorization', testToken).then(async (response) => {
           const tickets = await db('ticket').where({ticketId: response.body.ticket.ticketId})
           const ticket = tickets[0];
@@ -244,7 +244,7 @@ describe('Test /rsp', () => {
       async (_, hIdx) => {
         await request(app).post('/rsp/result').set('Authorization', testToken).send({
           pick: Math.floor(Math.random() * 81) % 3,
-          betAmount: 100,
+          betAmount: 10,
         }).then(async (response) => {
           const tickets = await db('ticket').where({ticketId: response.body.ticket.ticketId})
           const ticket = tickets[0];
@@ -268,7 +268,7 @@ describe('Test /rsp', () => {
       .set('Authorization', testToken)
       .send({
         pick: Math.floor(Math.random() * 81) % 3,
-        betAmount: 100,
+        betAmount: 10,
       }).then((response) => {
         return expect(response.body.success).toBe(false);
       });
@@ -281,7 +281,7 @@ describe('Test /rsp', () => {
       .set('Authorization', '')
       .send({
         pick: Math.floor(Math.random() * 81) % 3,
-        betAmount: 100,
+        betAmount: 10,
       }).then((response) => {
         expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
         return expect(response.body.success).toBe(false);
@@ -291,7 +291,7 @@ describe('Test /rsp', () => {
       .set('Authorization', 'Bearer eyAbhGciOiJIUzI1NiIsInR5cCI6KipXVCJ1.eyJrZXlyaW5nIjoiNjMyOTdlNWZkMThmYtI5ZTUxYWQ5Y6UiIiwicm7sZSI6InVzFTKiLTBzdGF4fXMiOiJhY3RpdmUiLCJpYXQiOjE2NjM2NjM3MTF9.BDfnJsUB_x9qPj3I5PtcA3A7QtVZdFc01Ufyg2jziFh')
       .send({
         pick: Math.floor(Math.random() * 81) % 3,
-        betAmount: 100,
+        betAmount: 10,
       }).then((response) => {
         expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
         return expect(response.body.success).toBe(false);
@@ -302,7 +302,7 @@ describe('Test /rsp', () => {
       .set('Authorization', testToken)
       .send({
         pick: Math.floor(Math.random() * 81) % 3,
-        betAmount: 100,
+        betAmount: 10,
       }).then((response) => {
         expect(response.statusCode).toEqual(StatusCodes.OK);
         return expect(response.body.success).toBe(true);
