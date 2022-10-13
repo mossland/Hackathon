@@ -1,11 +1,18 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
+import Morgan from 'morgan';
 
 import rspRouter from './route/rsp';
 
 import ServerError from './util/serverError';
 
 const app: Express = express();
+
+if (process.env.NODE_ENV !== 'production') {
+  app.use(Morgan('dev'));
+} else {
+  app.use(Morgan('combined'));
+}
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
