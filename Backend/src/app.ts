@@ -9,7 +9,7 @@ import morgan from 'morgan';
 
 const app: Express = express();
 
-app.use(Morgan(`:remote-addr - [:date[clf]] ":method :url HTTP/:http-version" :status ":referrer" ":user-agent" - ":userId" ":userNickname"`));
+app.use(Morgan(`:remote-addr - [:date[clf]] ":method :url HTTP/:http-version" :status ":user-agent"  ":referrer" ":origin" - ":userId" ":userNickname"`));
 morgan.token('userId', function(req, res) {
   if (!(res as any).locals.user) {
     return 'unknown';
@@ -29,6 +29,10 @@ morgan.token('userNickname', function(req, res) {
 morgan.token('remote-addr', function(req, res) {
   return (req as any).ip;
 });
+
+morgan.token('origin', function(req, res) {
+  return req.headers.origin;
+})
 
 app.set('trust proxy', true);
 app.use(bodyParser.urlencoded({ extended: true }));
