@@ -15,6 +15,6 @@ dynamo.AWS.config.update({
 app.listen(
   process.env.PORT,
   async () => {
-    console.log(`⚡️[server]: Server is running at https://localhost:${process.env.PORT}`);
+    console.log(`⚡️[server]: Server is running at http://localhost:${process.env.PORT}`);
   }
 );
