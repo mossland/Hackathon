@@ -192,7 +192,7 @@ describe('Test /rsp', () => {
   });
 
   it ('rsp ticket generate', async () => {
-    const ruleByUserPick: { [keys: string]: any } = {
+    const defaultPayoutResultByUserPick: { [keys: string]: any } = {
       '0': {
         0: 1,
         1: 0,
@@ -227,8 +227,8 @@ describe('Test /rsp', () => {
           expect(ticket).toMatchObject(response.body.ticket);
 
           expect(ticket.meta.userPick).toBe(pick);
-          const payoutBig = new Big(ruleByUserPick[pick][ticket.meta.computerPick]).mul(ticket.meta.multiplier);
-          expect(ticket.payout).toBe(new Big(ruleByUserPick[pick][ticket.meta.computerPick]).eq(1) ? 1 : payoutBig.toNumber());
+          const payoutBig = new Big(defaultPayoutResultByUserPick[pick][ticket.meta.computerPick]).mul(ticket.meta.multiplier);
+          expect(ticket.payout).toBe(new Big(defaultPayoutResultByUserPick[pick][ticket.meta.computerPick]).eq(1) ? 1 : payoutBig.toNumber());
           return expect(response.body.success).toBe(true);
         });
       }

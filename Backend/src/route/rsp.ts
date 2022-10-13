@@ -37,7 +37,7 @@ router.post('/result', createGameStateValidator(1), validateUserGameInput, verif
         const multiplierResult = new Big(BigInt(`0x${multiplier}`).toString()).mod(10).plus(1);
 
         // rock : 0, paper : 1, scissors : 2
-        const ruleByUserPick: { [keys: string]: any } = {
+        const defaultPayoutResultByUserPick: { [keys: string]: any } = {
           '0': {
             0: 1,
             1: 0,
@@ -55,7 +55,7 @@ router.post('/result', createGameStateValidator(1), validateUserGameInput, verif
           }
         };
 
-        const payoutBig = new Big(ruleByUserPick[req.body.pick as any][computer.toNumber()]);
+        const payoutBig = new Big(defaultPayoutResultByUserPick[req.body.pick as any][computer.toNumber()]);
         const payout = payoutBig.eq(1) ? 1 : payoutBig.mul(multiplierResult).toNumber();
         return {
           payout,
