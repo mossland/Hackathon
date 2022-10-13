@@ -19,7 +19,7 @@ router.post('/result', createGameStateValidator(1), validateUserGameInput, verif
     }
 
 
-    const userPoint: number = await Platform.instance.fetchUserPoint(res.locals.user.id, res.locals.token);
+    const userPoint: number = await Platform.instance.fetchUserPoint(res.locals.user.id);
 
     if (new Big(userPoint).lt(req.body.betAmount)) {
       return next(new ServerError(StatusCodes.FORBIDDEN, 'Not enough point'));
@@ -29,7 +29,6 @@ router.post('/result', createGameStateValidator(1), validateUserGameInput, verif
       rspGameId,
       parseInt(req.body.betAmount),
       res.locals.user.id,
-      res.locals.token,
       (hash) => {
         const resultHash = hash.slice(0, 32);
         const multiplier = hash.slice(32);

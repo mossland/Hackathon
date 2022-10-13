@@ -25,22 +25,22 @@ export default class Platform {
     });
     return data;
   }
-  public async fetchUserPoint(userId: string, token: string) {
+  public async fetchUserPoint(userId: string) {
     const { data } = await this.axiosInstance.get(`/point/${userId}`, {
       headers: {
-        Authorization: token,
+        Authorization: process.env.ADMIN_TOKEN,
       }
     });
     return data;
   }
 
-  public async updateUserPoint(userId: string, token: string, ticketId: string, pointDelta: number) {
+  public async updateUserPoint(userId: string, ticketId: string, pointDelta: number) {
     const { data } = await this.axiosInstance.post(`/point/${userId}`, {
       hash: ticketId,
       num: pointDelta,
     }, {
       headers: {
-        Authorization: token,
+        Authorization: process.env.ADMIN_TOKEN,
       }
     });
     return data;

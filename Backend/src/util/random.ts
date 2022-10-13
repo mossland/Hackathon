@@ -66,7 +66,6 @@ export const spendByGameId = async (
   gameId: number,
   betAmount: number,
   userId: string,
-  token: string,
   resultGenerateFunc: (hash: string) => { meta: IRspMetadata ,payout: number }): Promise<ITicketModel> => {
   return new Promise((resolve, reject) => {
     db.transaction(async (trx) => {
@@ -121,7 +120,6 @@ export const spendByGameId = async (
 
         await Platform.instance.updateUserPoint(
           userId,
-          token,
           ticketId,
           pointDelta,
         );
