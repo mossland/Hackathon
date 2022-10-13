@@ -9,12 +9,20 @@ import morgan from 'morgan';
 
 const app: Express = express();
 
-app.use(Morgan(`:remote-addr - [:date[clf]] ":method :url HTTP/:http-version" :status ":referrer" ":user-agent" - ":userId"`));
+app.use(Morgan(`:remote-addr - [:date[clf]] ":method :url HTTP/:http-version" :status ":referrer" ":user-agent" - ":userId" ":userNickname"`));
 morgan.token('userId', function(req, res) {
   if (!(res as any).locals.user) {
     return 'unknown';
   } else {
     return (res as any).locals.user.id
+  }
+});
+
+morgan.token('userNickname', function(req, res) {
+  if (!(res as any).locals.user) {
+    return '';
+  } else {
+    return (res as any).locals.user.nickname
   }
 });
 
