@@ -6,6 +6,7 @@ import { verifyToken } from '../middleware/auth';
 import StatusCodes from 'http-status-codes';
 import ServerError from '../util/serverError';
 import Platform from "../util/platform";
+import { ITicketModel } from "../model/ticketModel";
 
 const router = Router();
 const rspGameId = 1;
@@ -25,9 +26,9 @@ router.post('/result', createGameStateValidator(1), validateUserGameInput, verif
       return next(new ServerError(StatusCodes.FORBIDDEN, 'Not enough point'));
     }
     
-    const ticket = await spendByGameId(
+    const ticket: ITicketModel = await spendByGameId(
       rspGameId,
-      parseInt(req.body.betAmount),
+      new Big(req.body.betAmount),
       res.locals.user.id,
       (hash) => {
         const resultHash = hash.slice(0, 32);
@@ -55,9 +56,9 @@ router.post('/result', createGameStateValidator(1), validateUserGameInput, verif
         };
 
         const payoutBig = new Big(ruleByUserPick[req.body.pick as any][computer.toNumber()]);
-
+        const payout = payoutBig.eq(1) ? 1 : payoutBig.mul(multiplierResult).toNumber();
         return {
-          payout: payoutBig.eq(1) ? 1 : payoutBig.mul(multiplierResult).toNumber(),
+          payout,
           meta: {
             hash,
             userPick: userPickNum,

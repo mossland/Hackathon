@@ -64,7 +64,7 @@ export const generateSeed = async (gameId: number, trx: Knex.Transaction) => {
 
 export const spendByGameId = async (
   gameId: number,
-  betAmount: number,
+  betAmount: Big,
   userId: string,
   resultGenerateFunc: (hash: string) => { meta: IRspMetadata ,payout: number }): Promise<ITicketModel> => {
   return new Promise((resolve, reject) => {
@@ -105,7 +105,7 @@ export const spendByGameId = async (
           hashIdx: currentHash.hashIdx,
           hashString,
           ticketId,
-          betAmount,
+          betAmount: betAmount.toNumber(),
           payout,
           meta: JSON.stringify(meta),
         };
@@ -113,9 +113,9 @@ export const spendByGameId = async (
         let pointDelta = 0;
 
         if (payout === 0) {
-          pointDelta = -betAmount;
+          pointDelta = -betAmount.toNumber();
         } else {
-          pointDelta = new Big(pointDelta).mul(payout).toNumber();
+          pointDelta = betAmount.mul(payout).toNumber();
         }
 
         await Platform.instance.updateUserPoint(
