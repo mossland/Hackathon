@@ -110,18 +110,13 @@ export const spendByGameId = async (
           meta: JSON.stringify(meta),
         };
 
-        let pointDelta = 0;
-
-        if (payout === 0) {
-          pointDelta = -betAmount.toNumber();
-        } else {
-          pointDelta = betAmount.mul(payout).toNumber();
-        }
+        let pointDelta = betAmount.mul(-1);
+        pointDelta = pointDelta.plus(betAmount.mul(payout))
 
         await Platform.instance.updateUserPoint(
           userId,
           ticketId,
-          pointDelta,
+          pointDelta.toNumber(),
         );
         await trx('ticket').insert(newTicket);
         await trx('user_ticket_history').insert({

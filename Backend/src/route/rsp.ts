@@ -19,51 +19,68 @@ router.post('/result', createGameStateValidator(1), validateUserGameInput, verif
       return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
     }
 
-
     const userPoint: number = await Platform.instance.fetchUserPoint(res.locals.user.id);
 
     if (new Big(userPoint).lt(req.body.betAmount)) {
       return next(new ServerError(StatusCodes.FORBIDDEN, 'Not enough point'));
     }
     
+    
     const ticket: ITicketModel = await spendByGameId(
       rspGameId,
       new Big(req.body.betAmount),
       res.locals.user.id,
       (hash) => {
-        const resultHash = hash.slice(0, 32);
-        const multiplier = hash.slice(32);
-        const computer = new Big(BigInt(`0x${resultHash}`).toString()).mod(3);
-        const multiplierResult = new Big(BigInt(`0x${multiplier}`).toString()).mod(10).plus(1);
+        const N_BIT = 32;
+        const computerHex = hash.slice(0, 32).slice(0, N_BIT / 4);
+        const computerDecimal = parseInt(computerHex, 16);
+        const computerHashValue = new Big(computerDecimal).div(new Big(2).pow(N_BIT)).mul(81).round(0, 0).mod(3);
+        
+        const multiplierHex = hash.slice(32).slice(0, N_BIT / 4);
+        const multiplierDecimal = parseInt(multiplierHex, 16);
+        const multiplierHashValue = new Big(multiplierDecimal).div(new Big(2).pow(N_BIT)).mul(100000).round(0, 0).plus(1);
+
+        let multiplierResult;
+        if (multiplierHashValue.lt(10)) {
+          multiplierResult = 10;
+        } else if (multiplierHashValue.lt(100)) {
+          multiplierResult = 7;
+        } else if (multiplierHashValue.lt(500)) {
+          multiplierResult = 4;
+        } else if (multiplierHashValue.lt(51700)) {
+          multiplierResult = 1;
+        } else {
+          multiplierResult = 2;
+        }
 
         // rock : 0, paper : 1, scissors : 2
         const defaultPayoutResultByUserPick: { [keys: string]: any } = {
           '0': {
             0: 1,
             1: 0,
-            2: 3,
+            2: multiplierResult,
           },
           '1': {
-            0: 3,
+            0: multiplierResult,
             1: 1,
             2: 0,
           },
           '2': {
             0: 0,
-            1: 3,
+            1: multiplierResult,
             2: 1,
           }
         };
 
-        const payoutBig = new Big(defaultPayoutResultByUserPick[req.body.pick as any][computer.toNumber()]);
-        const payout = payoutBig.eq(1) ? 1 : payoutBig.mul(multiplierResult).toNumber();
+        const payoutBig = new Big(defaultPayoutResultByUserPick[req.body.pick as any][computerHashValue.toNumber()]);
+        
         return {
-          payout,
+          payout: payoutBig.toNumber(),
           meta: {
             hash,
             userPick: userPickNum,
-            computerPick: computer.toNumber(),
-            multiplier: multiplierResult.toNumber(),
+            computerPick: computerHashValue.toNumber(),
+            multiplier: multiplierResult,
           }
         };
       }

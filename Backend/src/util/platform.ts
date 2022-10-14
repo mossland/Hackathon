@@ -26,23 +26,55 @@ export default class Platform {
     return data;
   }
   public async fetchUserPoint(userId: string) {
-    const { data } = await this.axiosInstance.get(`/point/${userId}`, {
-      headers: {
-        Authorization: process.env.ADMIN_TOKEN,
+    let retryCount = 0;
+    let isSuccess = false;
+    let result;
+    while(!isSuccess) {
+      try {
+        const { data } = await this.axiosInstance.get(`/point/${userId}`, {
+          headers: {
+            Authorization: process.env.ADMIN_TOKEN,
+          }
+        });
+        result = data;
+        isSuccess = true;
+      } catch (e) {
+        console.error(e);
+        if (retryCount > 10) {
+          throw new Error(e as any);
+        }
+        retryCount++;
       }
-    });
-    return data;
+    }
+
+    return result;
   }
 
   public async updateUserPoint(userId: string, ticketId: string, pointDelta: number) {
-    const { data } = await this.axiosInstance.post(`/point/${userId}`, {
-      hash: ticketId,
-      num: pointDelta,
-    }, {
-      headers: {
-        Authorization: process.env.ADMIN_TOKEN,
+    let retryCount = 0;
+    let isSuccess = false;
+    let result;
+    while(!isSuccess) {
+      try {
+        const { data } = await this.axiosInstance.post(`/point/${userId}`, {
+          hash: ticketId,
+          num: pointDelta,
+        }, {
+          headers: {
+            Authorization: process.env.ADMIN_TOKEN,
+          }
+        });
+        result = data;
+        isSuccess = true;
+      } catch (e) {
+        console.error(e);
+        if (retryCount > 10) {
+          throw new Error(e as any);
+        }
+        retryCount++;
       }
-    });
-    return data;
+    }
+    
+    return result;
   }
 }

@@ -1,6 +1,6 @@
 import path from 'path';
 require('dotenv').config({
-  path: path.join(__dirname, `../.env.${process.env.NODE_ENV}`),
+  path: path.join(__dirname, `../.env.test`),
 });
 
 import bluebird from 'bluebird';
@@ -12,12 +12,27 @@ import db from '../src/db';
 import { dbReset } from './db-reset';
 import Big from 'big.js';
 import { StatusCodes } from 'http-status-codes';
+import Platform from '../src/util/platform';
+import { randomUUID } from 'crypto';
 
 const testToken = process.env.TEST_TOKEN?.toString() || '';
 
 describe('Test /rsp', () => {
   beforeAll(async () => {
     await dbReset();
+
+    const userCurPoint = await Platform.instance.fetchUserPoint(process.env.TEST_USER_ID?.toString() || '');
+    await Platform.instance.updateUserPoint(
+      process.env.TEST_USER_ID?.toString() || '',
+      randomUUID(),
+      new Big(userCurPoint).mul(-1).toNumber(),
+    );
+
+    await Platform.instance.updateUserPoint(
+      process.env.TEST_USER_ID?.toString() || '',
+      randomUUID(),
+      new Big(1000000).toNumber(),
+    );
   });
 
   it ('empty body should return success false', async () => {
@@ -111,6 +126,20 @@ describe('Test /rsp', () => {
     });
 
     await request(app).post('/rsp/result').set('Authorization', testToken).send({
+      pick: 1.5,
+      betAmount: '10.4',
+    }).then((response) => {
+      return expect(response.body.success).toBe(false);
+    });
+
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
+      pick: '1.5',
+      betAmount: 10.4,
+    }).then((response) => {
+      return expect(response.body.success).toBe(false);
+    });
+
+    await request(app).post('/rsp/result').set('Authorization', testToken).send({
       pick: 2,
     }).then((response) => {
       return expect(response.body.success).toBe(false);
@@ -118,99 +147,75 @@ describe('Test /rsp', () => {
   });
 
   it ('valid input should return success true', async () => {
-    await bluebird.map(
-      Array.from({length: 81}),
-      async (_) => {
-        await request(app)
-        .post('/rsp/result')
-        .set('Authorization', testToken)
-        .send({
-          pick: 0,
-          betAmount: 10,
-        }).then((response) => {
-          if (response.body.ticket.meta.computerPick === 0) {
-            expect(response.body.ticket.payout).toBe(1);
-          } else if (response.body.ticket.meta.computerPick === 1) {
-            expect(response.body.ticket.payout).toBe(0);
-          } else {
-            expect(response.body.ticket.meta.computerPick).toBe(2);
-            expect(response.body.ticket.payout).toBeGreaterThanOrEqual(3);
-            expect(response.body.ticket.payout % 3).toBe(0);
-          }
-          return expect(response.body.success).toBe(true);
-        });
-      }
-    );
+    const prevUserPoint = await Platform.instance.fetchUserPoint(process.env.TEST_USER_ID?.toString() || '');
+    let deltaPoint = new Big(0);
+    const probability = {
+      1: 0,
+      2: 0,
+      4: 0,
+      7: 0,
+      10: 0,
+    };
 
-    await bluebird.map(
-      Array.from({length: 81}),
-      async (_) => {
-        await request(app)
-        .post('/rsp/result')
-        .set('Authorization', testToken)
-        .send({
-          pick: 1,
-          betAmount: 10,
-        }).then((response) => {
-          if (response.body.ticket.meta.computerPick === 1) {
-            expect(response.body.ticket.payout).toBe(1);
-          } else if (response.body.ticket.meta.computerPick === 2) {
-            expect(response.body.ticket.payout).toBe(0);
-          } else {
-            expect(response.body.ticket.meta.computerPick).toBe(0);
-            expect(response.body.ticket.payout).toBeGreaterThanOrEqual(3);
-            expect(response.body.ticket.payout % 3).toBe(0);
-          }
-          return expect(response.body.success).toBe(true);
-        });
-      }
-    );
-
-    await bluebird.map(
-      Array.from({length: 81}),
-      async (_) => {
-        await request(app)
-        .post('/rsp/result')
-        .set('Authorization', testToken)
-        .send({
-          pick: 2,
-          betAmount: 10,
-        }).then((response) => {
-          if (response.body.ticket.meta.computerPick === 2) {
-            expect(response.body.ticket.payout).toBe(1);
-          } else if (response.body.ticket.meta.computerPick === 0) {
-            expect(response.body.ticket.payout).toBe(0);
-          } else {
-            expect(response.body.ticket.meta.computerPick).toBe(1);
-            expect(response.body.ticket.payout).toBeGreaterThanOrEqual(3);
-            expect(response.body.ticket.payout % 3).toBe(0);
-          }
-          return expect(response.body.success).toBe(true);
-        });
-      }
-    );
-  });
-
-  it ('rsp ticket generate', async () => {
-    const defaultPayoutResultByUserPick: { [keys: string]: any } = {
-      '0': {
-        0: 1,
-        1: 0,
-        2: 3,
+    const testWinLoseByUserPick = {
+      0: {
+        win: 2,
+        lose: 1,
+        draw: 0,
       },
-      '1': {
-        0: 3,
-        1: 1,
-        2: 0,
+      1: {
+        win: 0,
+        lose: 2,
+        draw: 1,
       },
-      '2': {
-        0: 0,
-        1: 3,
-        2: 1,
+      2: {
+        win: 1,
+        lose: 0,
+        draw: 2,
       }
     };
 
+    await bluebird.map(
+      Array.from({length: 500}),
+      async (_) => {
+        const userPick = Math.floor(Math.random() * 81) % 3;
+        
+        await request(app)
+        .post('/rsp/result')
+        .set('Authorization', testToken)
+        .send({
+          pick: userPick,
+          betAmount: 10,
+        }).then(async (response) => {
+          probability[response.body.ticket.meta.multiplier]++;
+          if (response.body.ticket.meta.computerPick === testWinLoseByUserPick[userPick].draw) {
+            expect(response.body.ticket.payout).toBe(1);
+          } else if (response.body.ticket.meta.computerPick === testWinLoseByUserPick[userPick].lose) {
+            expect(response.body.ticket.payout).toBe(0);
+            deltaPoint = deltaPoint.minus(10);
+          } else {
+            expect(response.body.ticket.meta.computerPick).toBe(testWinLoseByUserPick[userPick].win);
+            deltaPoint = deltaPoint.plus(new Big(10).mul(response.body.ticket.payout).minus(10));
+          }
+          return expect(response.body.success).toBe(true);
+        });
+      },
+      { concurrency: 20 }
+    );
+    
+    const nextUserPoint = await Platform.instance.fetchUserPoint(process.env.TEST_USER_ID?.toString() || '');
+    const total = Object.keys(probability).reduce((sum, pKey) => {
+      return sum + probability[pKey];
+    }, 0)
+    let floatProb = Object.keys(probability).reduce((acc, key) => {
+      acc[key] = new Big(probability[key]).div(total).toString();
+      return acc;
+    }, {});
 
+    return expect(nextUserPoint).toBe(new Big(prevUserPoint).plus(deltaPoint).toNumber());
+  });
+
+  it ('rsp ticket generate', async () => {
     await bluebird.each(
       Array.from({length: 81}),
       async (_) => {
@@ -227,8 +232,25 @@ describe('Test /rsp', () => {
           expect(ticket).toMatchObject(response.body.ticket);
 
           expect(ticket.meta.userPick).toBe(pick);
-          const payoutBig = new Big(defaultPayoutResultByUserPick[pick][ticket.meta.computerPick]).mul(ticket.meta.multiplier);
-          expect(ticket.payout).toBe(new Big(defaultPayoutResultByUserPick[pick][ticket.meta.computerPick]).eq(1) ? 1 : payoutBig.toNumber());
+          const defaultPayoutResultByUserPick: { [keys: string]: any } = {
+            '0': {
+              0: 1,
+              1: 0,
+              2: parseInt(ticket.meta.multiplier),
+            },
+            '1': {
+              0: parseInt(ticket.meta.multiplier),
+              1: 1,
+              2: 0,
+            },
+            '2': {
+              0: 0,
+              1: parseInt(ticket.meta.multiplier),
+              2: 1,
+            }
+          };
+          const payoutBig = new Big(defaultPayoutResultByUserPick[pick][ticket.meta.computerPick]);
+          expect(ticket.payout).toBe(payoutBig.toNumber());
           return expect(response.body.success).toBe(true);
         });
       }
@@ -236,9 +258,8 @@ describe('Test /rsp', () => {
   });
 
   it ('auto hash chain generate test', async () => {
-    process.env['HASH_CHAIN_SIZE'] = '10';
     await dbReset();
-    let curHashId = 1;
+
     await bluebird.each(
       Array.from({length: 30}),
       async (_, hIdx) => {
