@@ -9,7 +9,7 @@
     "start": "node dist/index.js",
     "start:dev": "set NODE_ENV=development&node dist/index.js",
     "dev": "nodemon -r dotenv/config ./src/index.ts dotenv_config_path=./.env.development\"",
-    "script:dev": "ts-node -r dotenv/config script.ts dotenv_config_path=./.env.development",
+    "script:dev": "ts-node -r dotenv/config manual_script.ts dotenv_config_path=./.env.development",
     "test": "set NODE_ENV=development&jest --coverage --forceExit"
   },
   "dependencies": {

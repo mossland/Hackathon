@@ -1,13 +1,7 @@
 import { generateSeed } from './src/util/random';
 import db from './src/db';
+import { dbReset } from './test/db-reset';
 
 (async () => {
-  await db.transaction(async (trx) => {
-    try {
-      await generateSeed(1, trx);
-      await trx.commit();
-    } catch (e) {
-      await trx.rollback();
-    }
-  });
+  await dbReset();
 })();
