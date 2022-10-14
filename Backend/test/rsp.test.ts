@@ -155,6 +155,14 @@ describe('Test /rsp', () => {
       4: 0,
       7: 0,
       10: 0,
+      total: 0,
+    };
+
+    const winLoseProb = {
+      win: 0,
+      lose: 0,
+      draw: 0,
+      total: 0,
     };
 
     const testWinLoseByUserPick = {
@@ -187,13 +195,18 @@ describe('Test /rsp', () => {
           pick: userPick,
           betAmount: 10,
         }).then(async (response) => {
+          winLoseProb.total += 1;
+          probability.total += 1;
           probability[response.body.ticket.meta.multiplier]++;
           if (response.body.ticket.meta.computerPick === testWinLoseByUserPick[userPick].draw) {
+            winLoseProb.draw += 1;
             expect(response.body.ticket.payout).toBe(1);
           } else if (response.body.ticket.meta.computerPick === testWinLoseByUserPick[userPick].lose) {
+            winLoseProb.lose += 1;
             expect(response.body.ticket.payout).toBe(0);
             deltaPoint = deltaPoint.minus(10);
           } else {
+            winLoseProb.win += 1;
             expect(response.body.ticket.meta.computerPick).toBe(testWinLoseByUserPick[userPick].win);
             deltaPoint = deltaPoint.plus(new Big(10).mul(response.body.ticket.payout).minus(10));
           }
@@ -204,13 +217,10 @@ describe('Test /rsp', () => {
     );
     
     const nextUserPoint = await Platform.instance.fetchUserPoint(process.env.TEST_USER_ID?.toString() || '');
-    const total = Object.keys(probability).reduce((sum, pKey) => {
-      return sum + probability[pKey];
-    }, 0)
-    let floatProb = Object.keys(probability).reduce((acc, key) => {
-      acc[key] = new Big(probability[key]).div(total).toString();
-      return acc;
-    }, {});
+    
+    
+    console.log('Win, Draw, Lose Prob', winLoseProb.win/ winLoseProb.total, winLoseProb.lose / winLoseProb.total, winLoseProb.draw / winLoseProb.total);
+    console.log('Multiplier 1, 2, 4, 7, 10', probability[1] / probability.total, probability[2] / probability.total, probability[4] / probability.total, probability[7] / probability.total, probability[10] / probability.total);
 
     return expect(nextUserPoint).toBe(new Big(prevUserPoint).plus(deltaPoint).toNumber());
   });
