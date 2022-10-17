@@ -47,7 +47,7 @@ router.post('/result', createGameStateValidator(1), validateUserGameInput, verif
           multiplierResult = 7;
         } else if (multiplierHashValue.lt(500)) {
           multiplierResult = 4;
-        } else if (multiplierHashValue.lt(51700)) {
+        } else if (multiplierHashValue.lt(15000)) {
           multiplierResult = 1;
         } else {
           multiplierResult = 2;
