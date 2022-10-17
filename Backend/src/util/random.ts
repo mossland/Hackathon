@@ -75,27 +75,39 @@ export const spendByGameId = async (
         }).forUpdate();
         let currentHash = currentHashes[0];
 
-        if (currentHash.hashIdx >= parseInt(process.env.HASH_CHAIN_SIZE?.toString() || defaultChainSize.toString())) {
-          await generateSeed(gameId, trx);
-          currentHashes = await trx('current_hash').select('*').where({
-            gameId,
-          }).forUpdate();
-          currentHash = currentHashes[0];
-        }
-        
-        const hashString: string = await new Promise((resolve, reject) => {
+        let hashList: string[] = await new Promise((resolve, reject) => {
           hashModel.get({id: currentHash.hashId}, async (err, data) => {
             if (err) {
               console.error(err);
               reject(err);
             } else {
-              const hashList: any = await data.get('hash');
-              resolve(hashList[currentHash.hashIdx] as string);
+              const rawHashList: any = await data.get('hash');
+              resolve(rawHashList);
             }
           });
         });
-        
-  
+
+        if (currentHash.hashIdx >= hashList.length) {
+          await generateSeed(gameId, trx);
+          currentHashes = await trx('current_hash').select('*').where({
+            gameId,
+          }).forUpdate();
+          currentHash = currentHashes[0];
+
+          hashList = await new Promise((resolve, reject) => {
+            hashModel.get({id: currentHash.hashId}, async (err, data) => {
+              if (err) {
+                console.error(err);
+                reject(err);
+              } else {
+                const rawHashList: any = await data.get('hash');
+                resolve(rawHashList);
+              }
+            });
+          });
+        }
+
+        const hashString: string = hashList[currentHash.hashIdx];
         const { meta, payout } = resultGenerateFunc(hashString);
         const ticketId = uuidv4();
 
