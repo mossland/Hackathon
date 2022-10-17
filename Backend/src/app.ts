@@ -3,9 +3,11 @@ import bodyParser from 'body-parser';
 import Morgan from 'morgan';
 
 import rspRouter from './route/rsp';
+import userRouter from './route/user';
 
 import ServerError from './util/serverError';
 import morgan from 'morgan';
+import cors from 'cors';
 
 const app: Express = express();
 
@@ -35,9 +37,25 @@ morgan.token('origin', function(req, res) {
 })
 
 app.set('trust proxy', true);
+
+const corsWhitelist: any[] = [];
+app.use(cors({
+  origin: (origin, callback) => {
+    if (process.env.NODE_ENV === 'production') {
+      if (corsWhitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    } else {
+      callback(null, true);
+    }
+  }
+}))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.use('/user', userRouter);
 app.use('/rsp', rspRouter);
 
 app.use((err: ServerError, req: Request, res: Response, next: NextFunction) => {
