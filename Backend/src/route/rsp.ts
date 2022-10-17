@@ -41,13 +41,13 @@ router.post('/result', createGameStateValidator(1), validateUserGameInput, verif
         const multiplierHashValue = new Big(multiplierDecimal).div(new Big(2).pow(N_BIT)).mul(100000).round(0, 0).plus(1);
 
         let multiplierResult;
-        if (multiplierHashValue.lt(10)) {
+        if (multiplierHashValue.lt(500)) {
           multiplierResult = 10;
-        } else if (multiplierHashValue.lt(100)) {
+        } else if (multiplierHashValue.lt(2000)) {
           multiplierResult = 7;
-        } else if (multiplierHashValue.lt(500)) {
+        } else if (multiplierHashValue.lt(5500)) {
           multiplierResult = 4;
-        } else if (multiplierHashValue.lt(15000)) {
+        } else if (multiplierHashValue.lt(37500)) {
           multiplierResult = 1;
         } else {
           multiplierResult = 2;
