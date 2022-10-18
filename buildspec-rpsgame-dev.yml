@@ -26,7 +26,6 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - echo Pushing the RPS to S3...
 
 artifacts:
   files:
