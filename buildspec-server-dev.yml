@@ -4,7 +4,7 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Docker Hub...
-      - docker login -u muyomuyo -p _vvp4dEQbh#+f=B
+      - docker login -u muyomuyo -p $DOCKER_PW
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ssm get-parameter --with-decryption --name mossverse-game-backend-$NODE_ENV --region $AWS_DEFAULT_REGION | jq '.Parameter.Value' | sed 's/^.//;s/.$//' | perl -pe 's/\\n/\n/g' > ./Backend/.env.$NODE_ENV

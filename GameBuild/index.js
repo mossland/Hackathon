@@ -8,6 +8,8 @@ program.option('-g, --game <char>');
 program.parse();
 const options = program.opts();
 
+const fs = require('fs');
+const https = require('https');
 
 const axios = require('axios');
 
@@ -15,7 +17,7 @@ const projMeta = {
   rsp: {
     id: process.env.RSP_PROJ_ID,
     scene: process.env.RSP_PROJ_SCENE,
-    name: 'Mossland Metaverse Game - Rock Paper Scissors',
+    name: 'RpsGame',
   }
 };
 
@@ -62,10 +64,27 @@ const projMeta = {
         setTimeout(resolve, 1000);
       });
     }
+    
+    const downloadUrl = jobData.data.download_url;
 
-    console.log(jobData);
-    const downloadUrl = jobData.download_url;
-    console.log(downloadUrl);
+    if (!fs.existsSync(path.join(__dirname, './dist'))) {
+      fs.mkdirSync(path.join(__dirname, './dist'));
+    }
+
+    const file = fs.createWriteStream(`./dist/${projMeta[options.game].name}.zip`);
+    await new Promise((downloadResolve, downloadReject) => {
+      https.get(
+        downloadUrl,
+        function(response) {
+          response.pipe(file);
+          file.on("finish", () => {
+              file.close();
+              console.log("Download Completed");
+              downloadResolve();
+          });
+        }
+      );
+    });
   } catch (e) {
     console.error(e);
   }
