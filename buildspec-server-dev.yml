@@ -1,5 +1,10 @@
 version: 0.2
 
+env:
+  secrets-manager:
+    DOCKER_ID: "common/docker:DOCKER_ID"
+    DOCKER_PW: "common/docker:DOCKER_PW"
+
 phases:  
   pre_build:
     commands:
