@@ -63,6 +63,7 @@ const projMeta = {
       });
     }
 
+    console.log(jobData);
     const downloadUrl = jobData.download_url;
     console.log(downloadUrl);
   } catch (e) {
