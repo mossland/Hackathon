@@ -26,8 +26,8 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - echo Pushing the Backend Docker images...
+      - echo Pushing the RPS to S3...
 
 artifacts:
   files:
-    - Mossland Metaverse Game - Rock Paper Scissors.zip
+    - GameBuild/dist/RpsGame.zip
