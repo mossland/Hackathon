@@ -64,6 +64,7 @@ const projMeta = {
     }
 
     const downloadUrl = jobData.download_url;
+    console.log(downloadUrl);
   } catch (e) {
     console.error(e);
   }

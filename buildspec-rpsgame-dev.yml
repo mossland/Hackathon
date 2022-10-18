@@ -1,0 +1,33 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+    commands:
+      - npm install -g yarn
+  pre_build:
+    commands:
+      - aws --version
+      - aws ssm get-parameter --with-decryption --name mossverse-game-$NODE_ENV --region $AWS_DEFAULT_REGION | jq '.Parameter.Value' | sed 's/^.//;s/.$//' | perl -pe 's/\\n/\n/g' > ./GameBuild/.env.$NODE_ENV
+      - echo "$(cat ./GameBuild/.env.development)"
+      - echo "$(cat ./GameBuild/.env.production)"
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - echo $NODE_ENV
+
+  build:
+    commands:    
+      - echo Build started on `date`
+      - echo Building the Game - RPS
+      - cd ./GameBuild
+      - yarn install
+      - yarn build:dev:rsp
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Backend Docker images...
+
+artifacts:
+  files:
+    - Mossland Metaverse Game - Rock Paper Scissors.zip
