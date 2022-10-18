@@ -29,4 +29,5 @@ phases:
 
 artifacts:
   files:
-    - GameBuild/dist/RpsGame.zip
+    - '**/*'
+  base-directory: GameBuild/dist/rps

@@ -12,6 +12,7 @@ const fs = require('fs');
 const https = require('https');
 
 const axios = require('axios');
+const unzipper = require('unzipper');
 
 const projMeta = {
   rsp: {
@@ -85,6 +86,13 @@ const projMeta = {
         }
       );
     });
+
+    if (!fs.existsSync(path.join(__dirname, './dist/rps'))) {
+      fs.mkdirSync(path.join(__dirname, './dist/rps'));
+    }
+
+    fs.createReadStream(path.join(__dirname, `./dist/${projMeta[options.game].name}.zip`))
+    .pipe(unzipper.Extract({ path: path.join(__dirname, './dist/rps') }));
   } catch (e) {
     console.error(e);
   }
