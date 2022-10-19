@@ -7,7 +7,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
   const bearerToken = req.headers['authorization'];
 
   if (!bearerToken) {
-    return next(new ServerError(StatusCodes.UNAUTHORIZED, 'fail to verify user'));
+    return next(new ServerError(StatusCodes.UNAUTHORIZED, 'fail to verify user - auth header missing'));
   }
 
   try {
@@ -24,6 +24,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
     res.locals.token = bearerToken;
     return next();
   } catch (e) {
+    console.error(e);
     return next(new ServerError(StatusCodes.UNAUTHORIZED, 'fail to verify user'));
   }
 }
