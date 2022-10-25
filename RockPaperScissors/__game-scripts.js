@@ -1,1 +1,1713 @@
-var NumberController=pc.createScript("numberController");NumberController.attributes.add("allNumber",{type:"entity",array:!0}),NumberController.attributes.add("one",{type:"entity",array:!0}),NumberController.attributes.add("two",{type:"entity",array:!0}),NumberController.attributes.add("four",{type:"entity",array:!0}),NumberController.attributes.add("seven",{type:"entity",array:!0}),NumberController.attributes.add("ten",{type:"entity",array:!0}),NumberController.prototype.initialize=function(){NumberController.instance=this,this.idleTimer=null,this.idleIndex=0,this.resultTimer=null},NumberController.prototype.update=function(t){},NumberController.prototype.disableAll=function(){this.allNumber.forEach((t=>t.enabled=!1))},NumberController.prototype.turnOnMultiplier=function(t){this.disableAll();let e=null;e=1===t?this.one:2===t?this.two:4===t?this.four:7===t?this.seven:this.ten,e[getRandomInt(0,e.length)].enabled=!0,AudioController.instance.playSound("num")},NumberController.prototype.turnOn=function(t){this.disableAll(),t<this.allNumber.length&&(this.allNumber[t].enabled=!0,AudioController.instance.playSound("num"))},NumberController.prototype.setResult=function(t){this.disableAll(),this.playResultEffect(),setTimeout((()=>{clearTimeout(this.resultTimer),this.turnOnMultiplier(t)}),2e3)},NumberController.prototype.playResultEffect=function(){this.resultTimer=setTimeout((()=>{let t=getRandomInt(0,this.allNumber.length);this.turnOn(t),this.playResultEffect()}),200)},NumberController.prototype.startIdle=function(){this.idleIndex=getRandomInt(0,this.allNumber.length),this.setIdle()},NumberController.prototype.setIdle=function(){this.idleIndex=(this.idleIndex+1)%this.allNumber.length,this.turnOn(this.idleIndex),this.idleTimer=setTimeout((()=>{this.setIdle()}),2e3)},NumberController.prototype.stopIdle=function(){clearTimeout(this.idleTimer),this.idleTimer=null,this.disableAll()};var RpsController=pc.createScript("rpsController");RpsController.attributes.add("rps",{type:"entity",array:!0}),RpsController.prototype.initialize=function(){RpsController.instance=this,this.idleTimer=null,this.idleIndex=0,this.inGameTimer=null},RpsController.prototype.update=function(t){},RpsController.prototype.disableAll=function(){this.rps.forEach((t=>t.enabled=!1))},RpsController.prototype.turnOn=function(t){this.disableAll(),t<this.rps.length&&(AudioController.instance.playSound("rps"),this.rps[t].enabled=!0)},RpsController.prototype.startIdle=function(){this.idleIndex=getRandomInt(0,this.rps.length),this.setIdle()},RpsController.prototype.startGame=function(){this.inGameTimer=setTimeout((()=>{this.idleIndex=this.getNextRps(),this.turnOn(this.idleIndex),this.startGame()}),200)},RpsController.prototype.endGame=function(t){clearTimeout(this.inGameTimer),this.inGameTimer=null,this.disableAll(),this.turnOn(t)},RpsController.prototype.getNextRps=function(){let t=this.idleIndex;for(;t===this.idleIndex;)t=getRandomInt(0,this.rps.length);return this.idleIndex=t,t},RpsController.prototype.setIdle=function(){this.idleIndex=this.getNextRps(),this.turnOn(this.idleIndex),this.idleTimer=setTimeout((()=>{this.setIdle()}),1e3)},RpsController.prototype.stopIdle=function(){clearTimeout(this.idleTimer),this.idleTimer=null,this.disableAll()};var GameController=pc.createScript("gameController");GameController.prototype.initialize=function(){GameController.instance=this,this.resultTimer=null},GameController.prototype.postInitialize=function(){this.init(),this.setIdle()},GameController.prototype.init=async function(){let e=await DummyServer.instance.login();console.log(e),UserBalance.instance.setBalance(e.balance),UserBalance.instance.setUserName(e.id)},GameController.prototype.setIdle=function(){NumberController.instance.setIdle(),RpsController.instance.setIdle(),ResultController.instance.setIdle(),ButtonController.instance.setIdle()},GameController.prototype.stopIdle=function(){},GameController.prototype.startGame=function(e){let t=BetController.instance.getBetAmount();if(t<=0)return;let n=DummyServer.instance.startGame(t,e);console.log("startGame",n),UserBalance.instance.setBalance(n.balance),NumberController.instance.stopIdle(),RpsController.instance.stopIdle(),RpsController.instance.startGame()},GameController.prototype.setIdleAction=function(e){UserBalance.instance.setBalance(e),BetController.instance.betCheck(),setTimeout((()=>{this.setIdle()}),3e3)},GameController.prototype.endGame=function(e){console.log(e),RpsController.instance.endGame(e.lastNum),ResultController.instance.setResult(e.isWin),0===e.isWin?(NumberController.instance.setResult(e.multiplier),setTimeout((()=>{this.setIdleAction(e.balance)}),2500)):this.setIdleAction(e.balance)};var DummyServer=pc.createScript("dummyServer");DummyServer.prototype.initialize=function(){DummyServer.instance=this,this.betAmount=-1,this.userBalance=0},DummyServer.prototype.login=async function(){return this.userBalance=getRandomInt(1e3,5e3),{id:"UserName",balance:this.userBalance}},DummyServer.prototype.startGame=function(e,t){let n=getRandomInt(0,3),r=0;r=t===n?1:0===t?1===n?2:0:1===t?0===n?0:2:0===n?2:0,this.userBalance=this.userBalance-e,this.betAmount=e;let a={balance:this.userBalance,betAmount:this.betAmount};return setTimeout((()=>{this.endGame(r,n)}),1e3),a},DummyServer.prototype.getMultiplier=function(){let e=getRandomInt(0,1e5),t=2;return t=e<10?10:e<100?7:e<500?4:e<1e4?1:2,t},DummyServer.prototype.endGame=function(e,t){let n=0,r=0;0===e?(n=this.getMultiplier(),r=this.betAmount*n,this.userBalance=this.userBalance+r):1===e&&(r=this.betAmount,this.userBalance=this.userBalance+r);let a={isWin:e,lastNum:t,multiplier:n,balance:this.userBalance,profit:r};return GameController.instance.endGame(a),a},DummyServer.prototype.update=function(e){};var GlobalFunction=pc.createScript("globalFunction");function getRandomInt(o,n){return o=Math.ceil(o),n=Math.floor(n),Math.floor(Math.random()*(n-o))+o}function setButton(o,n,t){o.element.on("touchend",n,t),o.element.on("mouseup",n,t)}function rgbToColor(o,n,t,e){return new pc.Color(o/255,n/255,t/255,e/255)}var ButtonController=pc.createScript("buttonController");ButtonController.attributes.add("rpsButton",{type:"entity",array:!0}),ButtonController.attributes.add("rpsNormalImage",{type:"entity",array:!0}),ButtonController.attributes.add("rpsPushImage",{type:"entity",array:!0}),ButtonController.prototype.initialize=function(){ButtonController.instance=this,this.hoverColor=1,this.normalColor=.784,this.isInGame=!1,this.setButton(this.rpsButton[0],this.onRBtnClick,this.onRBtnHoverStart,this.onRBtnHoverEnd),this.setButton(this.rpsButton[1],this.onPBtnClick,this.onPBtnHoverStart,this.onPBtnHoverEnd),this.setButton(this.rpsButton[2],this.onSBtnClick,this.onSBtnHoverStart,this.onSBtnHoverEnd)},ButtonController.prototype.setIdle=function(){this.isInGame=!1,this.rpsNormalImage.forEach((t=>{t.enabled=!0,t.element.color=this.getColor(this.normalColor)})),this.rpsPushImage.forEach((t=>{t.enabled=!1}))},ButtonController.prototype.getColor=function(t){return new pc.Color(t,t,t,1)},ButtonController.prototype.onRBtnClick=function(){this.onClick(0)},ButtonController.prototype.onRBtnHoverStart=function(){this.onHoverStart(0)},ButtonController.prototype.onRBtnHoverEnd=function(){this.onHoverEnd(0)},ButtonController.prototype.onPBtnClick=function(){this.onClick(1)},ButtonController.prototype.onPBtnHoverStart=function(){this.onHoverStart(1)},ButtonController.prototype.onPBtnHoverEnd=function(){this.onHoverEnd(1)},ButtonController.prototype.onSBtnClick=function(){this.onClick(2)},ButtonController.prototype.onSBtnHoverStart=function(){this.onHoverStart(2)},ButtonController.prototype.onSBtnHoverEnd=function(){this.onHoverEnd(2)},ButtonController.prototype.onHoverStart=function(t){!0!==this.isInGame&&(AudioController.instance.playSound("btn"),this.rpsNormalImage[t].element.color=this.getColor(this.hoverColor))},ButtonController.prototype.onHoverEnd=function(t){!0!==this.isInGame&&(this.rpsNormalImage[t].element.color=this.getColor(this.normalColor))},ButtonController.prototype.onClick=function(t){BetController.instance.getBetAmount()<=0||!0!==this.isInGame&&(AudioController.instance.playSound("btn"),this.rpsNormalImage[t].enabled=!1,this.rpsPushImage[t].enabled=!0,this.isInGame=!0,GameController.instance.startGame(t))},ButtonController.prototype.setButton=function(t,o,n,r){t.element.on("touchend",o,this),t.element.on("mouseup",o,this),t.button.on("hoverstart",n,this),t.button.on("hoverend",r,this)};var ResultController=pc.createScript("resultController");ResultController.attributes.add("win",{type:"entity"}),ResultController.attributes.add("lose",{type:"entity"}),ResultController.attributes.add("draw",{type:"entity"}),ResultController.prototype.initialize=function(){ResultController.instance=this,this.resultTimer=null,this.disableAll()},ResultController.prototype.setIdle=function(){this.disableAll(),clearTimeout(this.resultTimer),this.resultTimer=null},ResultController.prototype.disableAll=function(){this.win.enabled=!1,this.lose.enabled=!1,this.draw.enabled=!1},ResultController.prototype.setResult=function(t){this.disableAll(),AudioController.instance.playSound("wld"),0===t?this.setResultWin():1===t?this.setResultDraw():this.setResultLose()},ResultController.prototype.setResultWin=function(){this.win.enabled=!1,this.resultTimer=setTimeout((()=>{AudioController.instance.playSound("wld"),this.win.enabled=!0,this.resultTimer=setTimeout((()=>{this.setResultWin()}),150)}),150)},ResultController.prototype.setResultLose=function(){this.disableAll(),this.lose.enabled=!0},ResultController.prototype.setResultDraw=function(){this.disableAll(),this.draw.enabled=!0};var AudioController=pc.createScript("audioController");AudioController.attributes.add("soundSource",{type:"entity"}),AudioController.prototype.initialize=function(){AudioController.instance=this,this.isMute=!0,this.soundSource.sound.volume=0},AudioController.prototype.update=function(o){},AudioController.prototype.setMute=function(o){this.isMute=o,this.isMute?this.soundSource.sound.volume=0:this.soundSource.sound.volume=.55},AudioController.prototype.playSound=function(o){!0!==this.isMute&&this.soundSource.sound.play(o)};pc.extend(pc,function(){var TweenManager=function(t){this._app=t,this._tweens=[],this._add=[]};TweenManager.prototype={add:function(t){return this._add.push(t),t},update:function(t){for(var i=0,e=this._tweens.length;i<e;)this._tweens[i].update(t)?i++:(this._tweens.splice(i,1),e--);if(this._add.length){for(let t=0;t<this._add.length;t++)this._tweens.indexOf(this._add[t])>-1||this._tweens.push(this._add[t]);this._add.length=0}}};var Tween=function(t,i,e){pc.events.attach(this),this.manager=i,e&&(this.entity=null),this.time=0,this.complete=!1,this.playing=!1,this.stopped=!0,this.pending=!1,this.target=t,this.duration=0,this._currentDelay=0,this.timeScale=1,this._reverse=!1,this._delay=0,this._yoyo=!1,this._count=0,this._numRepeats=0,this._repeatDelay=0,this._from=!1,this._slerp=!1,this._fromQuat=new pc.Quat,this._toQuat=new pc.Quat,this._quat=new pc.Quat,this.easing=pc.Linear,this._sv={},this._ev={}},_parseProperties=function(t){var i;return t instanceof pc.Vec2?i={x:t.x,y:t.y}:t instanceof pc.Vec3?i={x:t.x,y:t.y,z:t.z}:t instanceof pc.Vec4||t instanceof pc.Quat?i={x:t.x,y:t.y,z:t.z,w:t.w}:t instanceof pc.Color?(i={r:t.r,g:t.g,b:t.b},void 0!==t.a&&(i.a=t.a)):i=t,i};Tween.prototype={to:function(t,i,e,s,n,r){return this._properties=_parseProperties(t),this.duration=i,e&&(this.easing=e),s&&this.delay(s),n&&this.repeat(n),r&&this.yoyo(r),this},from:function(t,i,e,s,n,r){return this._properties=_parseProperties(t),this.duration=i,e&&(this.easing=e),s&&this.delay(s),n&&this.repeat(n),r&&this.yoyo(r),this._from=!0,this},rotate:function(t,i,e,s,n,r){return this._properties=_parseProperties(t),this.duration=i,e&&(this.easing=e),s&&this.delay(s),n&&this.repeat(n),r&&this.yoyo(r),this._slerp=!0,this},start:function(){var t,i,e,s;if(this.playing=!0,this.complete=!1,this.stopped=!1,this._count=0,this.pending=this._delay>0,this._reverse&&!this.pending?this.time=this.duration:this.time=0,this._from){for(t in this._properties)this._properties.hasOwnProperty(t)&&(this._sv[t]=this._properties[t],this._ev[t]=this.target[t]);this._slerp&&(this._toQuat.setFromEulerAngles(this.target.x,this.target.y,this.target.z),i=void 0!==this._properties.x?this._properties.x:this.target.x,e=void 0!==this._properties.y?this._properties.y:this.target.y,s=void 0!==this._properties.z?this._properties.z:this.target.z,this._fromQuat.setFromEulerAngles(i,e,s))}else{for(t in this._properties)this._properties.hasOwnProperty(t)&&(this._sv[t]=this.target[t],this._ev[t]=this._properties[t]);this._slerp&&(i=void 0!==this._properties.x?this._properties.x:this.target.x,e=void 0!==this._properties.y?this._properties.y:this.target.y,s=void 0!==this._properties.z?this._properties.z:this.target.z,void 0!==this._properties.w?(this._fromQuat.copy(this.target),this._toQuat.set(i,e,s,this._properties.w)):(this._fromQuat.setFromEulerAngles(this.target.x,this.target.y,this.target.z),this._toQuat.setFromEulerAngles(i,e,s)))}return this._currentDelay=this._delay,this.manager.add(this),this},pause:function(){this.playing=!1},resume:function(){this.playing=!0},stop:function(){this.playing=!1,this.stopped=!0},delay:function(t){return this._delay=t,this.pending=!0,this},repeat:function(t,i){return this._count=0,this._numRepeats=t,this._repeatDelay=i||0,this},loop:function(t){return t?(this._count=0,this._numRepeats=1/0):this._numRepeats=0,this},yoyo:function(t){return this._yoyo=t,this},reverse:function(){return this._reverse=!this._reverse,this},chain:function(){for(var t=arguments.length;t--;)t>0?arguments[t-1]._chained=arguments[t]:this._chained=arguments[t];return this},update:function(t){if(this.stopped)return!1;if(!this.playing)return!0;if(!this._reverse||this.pending?this.time+=t*this.timeScale:this.time-=t*this.timeScale,this.pending){if(!(this.time>this._currentDelay))return!0;this._reverse?this.time=this.duration-(this.time-this._currentDelay):this.time-=this._currentDelay,this.pending=!1}var i=0;(!this._reverse&&this.time>this.duration||this._reverse&&this.time<0)&&(this._count++,this.complete=!0,this.playing=!1,this._reverse?(i=this.duration-this.time,this.time=0):(i=this.time-this.duration,this.time=this.duration));var e,s,n=0===this.duration?1:this.time/this.duration,r=this.easing(n);for(var h in this._properties)this._properties.hasOwnProperty(h)&&(e=this._sv[h],s=this._ev[h],this.target[h]=e+(s-e)*r);if(this._slerp&&this._quat.slerp(this._fromQuat,this._toQuat,r),this.entity&&(this.entity._dirtifyLocal(),this.element&&this.entity.element&&(this.entity.element[this.element]=this.target),this._slerp&&this.entity.setLocalRotation(this._quat)),this.fire("update",t),this.complete){var a=this._repeat(i);return a?this.fire("loop"):(this.fire("complete",i),this.entity&&this.entity.off("destroy",this.stop,this),this._chained&&this._chained.start()),a}return!0},_repeat:function(t){if(this._count<this._numRepeats){if(this._reverse?this.time=this.duration-t:this.time=t,this.complete=!1,this.playing=!0,this._currentDelay=this._repeatDelay,this.pending=!0,this._yoyo){for(var i in this._properties){var e=this._sv[i];this._sv[i]=this._ev[i],this._ev[i]=e}this._slerp&&(this._quat.copy(this._fromQuat),this._fromQuat.copy(this._toQuat),this._toQuat.copy(this._quat))}return!0}return!1}};var BounceOut=function(t){return t<1/2.75?7.5625*t*t:t<2/2.75?7.5625*(t-=1.5/2.75)*t+.75:t<2.5/2.75?7.5625*(t-=2.25/2.75)*t+.9375:7.5625*(t-=2.625/2.75)*t+.984375},BounceIn=function(t){return 1-BounceOut(1-t)};return{TweenManager:TweenManager,Tween:Tween,Linear:function(t){return t},QuadraticIn:function(t){return t*t},QuadraticOut:function(t){return t*(2-t)},QuadraticInOut:function(t){return(t*=2)<1?.5*t*t:-.5*(--t*(t-2)-1)},CubicIn:function(t){return t*t*t},CubicOut:function(t){return--t*t*t+1},CubicInOut:function(t){return(t*=2)<1?.5*t*t*t:.5*((t-=2)*t*t+2)},QuarticIn:function(t){return t*t*t*t},QuarticOut:function(t){return 1- --t*t*t*t},QuarticInOut:function(t){return(t*=2)<1?.5*t*t*t*t:-.5*((t-=2)*t*t*t-2)},QuinticIn:function(t){return t*t*t*t*t},QuinticOut:function(t){return--t*t*t*t*t+1},QuinticInOut:function(t){return(t*=2)<1?.5*t*t*t*t*t:.5*((t-=2)*t*t*t*t+2)},SineIn:function(t){return 0===t?0:1===t?1:1-Math.cos(t*Math.PI/2)},SineOut:function(t){return 0===t?0:1===t?1:Math.sin(t*Math.PI/2)},SineInOut:function(t){return 0===t?0:1===t?1:.5*(1-Math.cos(Math.PI*t))},ExponentialIn:function(t){return 0===t?0:Math.pow(1024,t-1)},ExponentialOut:function(t){return 1===t?1:1-Math.pow(2,-10*t)},ExponentialInOut:function(t){return 0===t?0:1===t?1:(t*=2)<1?.5*Math.pow(1024,t-1):.5*(2-Math.pow(2,-10*(t-1)))},CircularIn:function(t){return 1-Math.sqrt(1-t*t)},CircularOut:function(t){return Math.sqrt(1- --t*t)},CircularInOut:function(t){return(t*=2)<1?-.5*(Math.sqrt(1-t*t)-1):.5*(Math.sqrt(1-(t-=2)*t)+1)},BackIn:function(t){var i=1.70158;return t*t*((i+1)*t-i)},BackOut:function(t){var i=1.70158;return--t*t*((i+1)*t+i)+1},BackInOut:function(t){var i=2.5949095;return(t*=2)<1?t*t*((i+1)*t-i)*.5:.5*((t-=2)*t*((i+1)*t+i)+2)},BounceIn:BounceIn,BounceOut:BounceOut,BounceInOut:function(t){return t<.5?.5*BounceIn(2*t):.5*BounceOut(2*t-1)+.5},ElasticIn:function(t){var i,e=.1;return 0===t?0:1===t?1:(!e||e<1?(e=1,i=.1):i=.4*Math.asin(1/e)/(2*Math.PI),-e*Math.pow(2,10*(t-=1))*Math.sin((t-i)*(2*Math.PI)/.4))},ElasticOut:function(t){var i,e=.1;return 0===t?0:1===t?1:(!e||e<1?(e=1,i=.1):i=.4*Math.asin(1/e)/(2*Math.PI),e*Math.pow(2,-10*t)*Math.sin((t-i)*(2*Math.PI)/.4)+1)},ElasticInOut:function(t){var i,e=.1,s=.4;return 0===t?0:1===t?1:(!e||e<1?(e=1,i=.1):i=s*Math.asin(1/e)/(2*Math.PI),(t*=2)<1?e*Math.pow(2,10*(t-=1))*Math.sin((t-i)*(2*Math.PI)/s)*-.5:e*Math.pow(2,-10*(t-=1))*Math.sin((t-i)*(2*Math.PI)/s)*.5+1)}}}()),function(){pc.Application.prototype.addTweenManager=function(){this._tweenManager=new pc.TweenManager(this),this.on("update",(function(t){this._tweenManager.update(t)}))},pc.Application.prototype.tween=function(t){return new pc.Tween(t,this._tweenManager)},pc.Entity.prototype.tween=function(t,i){var e=this._app.tween(t);return e.entity=this,this.once("destroy",e.stop,e),i&&i.element&&(e.element=i.element),e},pc.Entity.prototype.localMoveTo=function(t,i,e=pc.QuadraticOut){return this.tween(this.getLocalPosition()).to(t,i,e).start()},pc.Entity.prototype.localMoveBy=function(t,i,e=pc.SineOut){return this.tween(this.getLocalPosition()).by(t,i,e).start()},pc.Entity.prototype.moveTo=function(t,i){return this.tween(this.getPosition()).to(t,i,pc.SineOut).start()},pc.Entity.prototype.moveBy=function(t,i){return this.tween(this.getPosition()).by(t,i,pc.SineOut).start()},pc.Entity.prototype.rotateTo=function(t,i,e=pc.CircularOut){return this.tween(this.getLocalEulerAngles()).rotate(t,i,e).start()},pc.Entity.prototype.setOpacity=function(t){this.element&&(this.element.material,this.element.opacity=t)},pc.Entity.prototype.setOpacityCascade=function(t){this.setOpacity(t);for(let i=0;i<this.children.length;i++)this.children[i].setOpacityCascade&&this.children[i].setOpacityCascade(t)},pc.Entity.prototype.opacityToCascade=function(t,i,e){let s={v:t};return this.setOpacityCascade(t),this.tween(s).to({v:i},e,pc.SineOut).on("update",(()=>{this.setOpacityCascade(s.v)})).start()},pc.Entity.prototype.opacityTo=function(t,i,e){if(!this.element.material)return;let s={v:t};return this.setOpacity(t),this.tween(s).to({v:i},e,pc.SineOut).on("update",(()=>{this.setOpacity(s.v)})).start()},pc.Entity.prototype.setTextureFromURL=function(t){let i="t_"+t,e=pc.app.assets.find(i,"texture");if(null===e){pc.app.loader.getHandler("texture").crossOrigin="anonymous";var s=new pc.Asset(i,"texture",{url:t});pc.app.assets.add(s),s.on("load",(t=>{this.element.texture=t.resource})),pc.app.assets.load(s)}else this.element.texture=e.resource},pc.Entity.prototype.blink=function(t,i,e,s){for(let n=0;n<s;n++)setTimeout((()=>{this.setOpacity(t)}),e*n*2),setTimeout((()=>{this.setOpacity(i)}),e*(2*n+1))};var t=pc.Application.getApplication();t&&t.addTweenManager()}();var UserBalance=pc.createScript("userBalance");UserBalance.attributes.add("userBalanceText",{type:"entity"}),UserBalance.attributes.add("userName",{type:"entity"}),UserBalance.prototype.initialize=function(){UserBalance.instance=this,this.userBalance=0},UserBalance.prototype.setUserName=function(e){this.userName.element.text=e},UserBalance.prototype.getUserBalance=function(){return this.userBalance},UserBalance.prototype.setBalance=function(e){this.userBalance=e;let t={value:Number(this.userBalanceText.element.text)},a=this.userBalanceText.element,n=this.entity.tween(t).to({value:e},.3,pc.Linear);n.on("update",(function(e){let n=parseFloat(t.value.toFixed(0));a.text=`${n}`})),n.start()},UserBalance.prototype.update=function(e){};async function loadJsonFromUrl(n){return new Promise((o=>{this.loadJsonFromRemote(n,(function(n){console.log(n);let e=JSON.stringify(n),s=JSON.parse(e);o(s)}))}))}async function loadJsonFromRemote(n,o){var e=new XMLHttpRequest;e.addEventListener("load",(function(){o(JSON.parse(this.response))})),e.open("GET",n),e.send()}var NumButton=pc.createScript("numButton");NumButton.attributes.add("betAmount",{type:"number"}),NumButton.prototype.initialize=function(){this.entity.children[0].element.text=`${this.betAmount}`,setButton(this.entity,this.onClick,this)},NumButton.prototype.onClick=function(){if(AudioController.instance.playSound("btn"),!0===ButtonController.instance.isInGame)return;!1!==BetController.instance.betChange(this.betAmount)&&(this.entity.element.color=rgbToColor(154,117,244,255))};var BetController=pc.createScript("betController");BetController.attributes.add("betButton",{type:"entity",array:!0}),BetController.prototype.initialize=function(){BetController.instance=this,this.betAmount=0},BetController.prototype.reset=function(){this.betAmount=0,this.resetAllButton()},BetController.prototype.resetAllButton=function(){this.betButton.forEach((t=>t.element.color=new pc.Color(.5,.5,.5,1)))},BetController.prototype.balanceCheck=function(t){let e=UserBalance.instance.getUserBalance();return console.log(e,t),!(t>e)},BetController.prototype.getBetAmount=function(){return this.betAmount},BetController.prototype.betCheck=function(){!0!==this.balanceCheck(this.betAmount)&&(this.betAmount=0,this.resetAllButton())},BetController.prototype.betChange=function(t){return!1!==this.balanceCheck(t)&&(this.betAmount=t,this.resetAllButton(),!0)},BetController.prototype.onBetOk=function(){console.log("BetController.prototype.betOk"),0!==this.betAmount&&GameController.instance.startGame(this.betAmount)},BetController.prototype.onBetCancel=function(){GameController.instance.setIdle()};var SoundButton=pc.createScript("soundButton");SoundButton.attributes.add("onImg",{type:"entity"}),SoundButton.attributes.add("offImg",{type:"entity"}),SoundButton.prototype.initialize=function(){SoundButton.instance=this,this.isMute=!0,this.setButton(this.entity,this.onClick),this.offImg.enabled=!0,this.onImg.enabled=!1},SoundButton.prototype.onClick=function(){this.isMute=!this.isMute,this.onImg.enabled=!1,this.offImg.enabled=!1,this.isMute?this.offImg.enabled=!0:this.onImg.enabled=!0,AudioController.instance.setMute(this.isMute)},SoundButton.prototype.setButton=function(t,n){t.element.on("touchend",n,this),t.element.on("mouseup",n,this)};
+// EnvController.js
+var EnvController = pc.createScript('envController');
+
+
+
+// initialize code called once per entity
+EnvController.prototype.initialize = async function() {
+    EnvController.instance = this;
+
+    this.envKey = 'development';
+    this._env = {
+        development: {
+            serverBase: 'https://dev-metaverse-game.moss.land',
+        },
+        production: {
+            serverBase: '',
+        },
+    };
+
+    try {
+        const { data } = await window.axios.get('/env');
+        this.envKey = data;
+    } catch (e) {}
+};
+
+EnvController.prototype.env = function() {
+    return this._env[this.envKey];
+};
+
+// NumberController.js
+var NumberController = pc.createScript('numberController');
+
+NumberController.attributes.add('allNumber', {type: 'entity', array: true});
+NumberController.attributes.add('one', {type: 'entity', array: true});
+NumberController.attributes.add('two', {type: 'entity', array: true});
+NumberController.attributes.add('four', {type: 'entity', array: true});
+NumberController.attributes.add('seven', {type: 'entity', array: true});
+NumberController.attributes.add('ten', {type: 'entity', array: true});
+
+NumberController.prototype.initialize = function() {
+    NumberController.instance = this;
+
+    this.idleTimer = null;
+    this.idleIndex = 0;
+
+    this.resultTimer = null;
+};
+
+NumberController.prototype.update = function(dt) {
+
+};
+
+NumberController.prototype.disableAll = function() {
+    this.allNumber.forEach(element => element.enabled = false);
+};
+
+
+NumberController.prototype.turnOnMultiplier = function(mul) {
+    this.disableAll();
+    
+    let target = null;
+    if (mul === 1)       target = this.one;
+    else if (mul === 2)  target = this.two;
+    else if (mul === 4)  target = this.four;
+    else if (mul === 7)  target = this.seven;
+    else                 target = this.ten;
+
+    let random = getRandomInt(0, target.length);
+
+    target[random].enabled = true;
+    AudioController.instance.playSound('num');
+};
+
+NumberController.prototype.turnOn = function(index) {
+    this.disableAll();
+    if (index < this.allNumber.length){
+        this.allNumber[index].enabled = true;
+        AudioController.instance.playSound('num');
+    }
+};
+
+
+NumberController.prototype.setResult = function(mul) {
+    this.disableAll();
+
+    this.playResultEffect();
+    setTimeout(() => {
+        clearTimeout(this.resultTimer);
+        this.turnOnMultiplier(mul);
+    }, 2000);
+
+};
+NumberController.prototype.playResultEffect = function() {
+    this.resultTimer = setTimeout(() => {
+        let target = getRandomInt(0, this.allNumber.length);
+        this.turnOn(target);
+        this.playResultEffect();
+    }, 200);
+};
+
+NumberController.prototype.startIdle = function() {
+    this.idleIndex = getRandomInt(0, this.allNumber.length);
+    this.setIdle();
+};
+
+NumberController.prototype.setIdle = function() {
+    this.idleIndex = (this.idleIndex + 1) % this.allNumber.length;
+    this.turnOn(this.idleIndex);
+    this.idleTimer = setTimeout(() => {
+        this.setIdle();
+    }, 2000);
+};
+
+NumberController.prototype.stopIdle = function() {
+    clearTimeout(this.idleTimer);
+    this.idleTimer = null;
+    this.disableAll();
+};
+
+// RpsController.js
+var RpsController = pc.createScript('rpsController');
+
+RpsController.attributes.add('rps', {type: 'entity', array: true});
+
+RpsController.prototype.initialize = function() {
+    RpsController.instance = this;
+    this.idleTimer = null;
+    this.idleIndex = 0;
+
+    this.inGameTimer = null;
+};
+
+RpsController.prototype.update = function(dt) {
+
+};
+
+RpsController.prototype.disableAll = function() {
+    this.rps.forEach(element => element.enabled = false);
+};
+
+
+RpsController.prototype.turnOn = function(index) {
+    this.disableAll();
+    if (index < this.rps.length){
+        AudioController.instance.playSound('rps');
+        this.rps[index].enabled = true;
+    }
+};
+
+
+RpsController.prototype.startIdle = function() {
+    this.idleIndex = getRandomInt(0, this.rps.length);
+    this.setIdle();
+};
+
+RpsController.prototype.startGame = function() {
+    this.inGameTimer = setTimeout(() => {
+        this.idleIndex = this.getNextRps();
+        this.turnOn(this.idleIndex);
+        this.startGame();
+    }, 200);
+};
+
+RpsController.prototype.endGame = function(result) {
+    clearTimeout(this.inGameTimer);
+    this.inGameTimer = null;
+    this.disableAll();
+
+    this.turnOn(result);
+};
+
+
+RpsController.prototype.getNextRps = function() {
+    let temp = this.idleIndex; 
+    while( temp === this.idleIndex) {
+        temp = getRandomInt(0, this.rps.length);
+    }
+
+    this.idleIndex = temp;
+
+    return temp;
+};
+
+RpsController.prototype.setIdle = function() {
+    
+    this.idleIndex = this.getNextRps();
+    this.turnOn(this.idleIndex);
+    this.idleTimer = setTimeout(() => {
+        this.setIdle();
+    }, 1000);
+};
+
+RpsController.prototype.stopIdle = function() {
+    clearTimeout(this.idleTimer);
+    this.idleTimer = null;
+    this.disableAll();
+};
+
+// GameController.js
+var GameController = pc.createScript('gameController');
+
+
+GameController.prototype.initialize = function() {
+    GameController.instance = this;  
+    this.resultTimer = null;
+    window.addEventListener('message', ({ data }) => {
+        if (!data || !data.type) {
+            return;
+        }
+        if (data.type === 'setToken') {
+            window.token = data.data;
+            this.init();
+            this.setIdle();
+        }
+    });
+    setTimeout( () => {
+        window.token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlyaW5nIjoiNjM0N2IxMDc0MDExYWQ5MGI4OWRiYTkxIiwicm9sZSI6InVzZXIiLCJzdGF0dXMiOiJhY3RpdmUiLCJpYXQiOjE2NjU2NDY0ODl9.adQi3ptjMI4xRi3tdN4mhA5q4OsCVqgweqgekcgbEMw';
+    this.init();
+    this.setIdle();
+    }, 1000);
+    
+};
+
+// GameController.prototype.postInitialize = function() {
+//     this.init();
+//     this.setIdle();
+// };
+
+GameController.prototype.init = async function() {
+    let loginInfo = await DummyServer.instance.login();
+    UserBalance.instance.setBalance(loginInfo.balance);
+    UserBalance.instance.setUserName(loginInfo.id);
+};
+
+
+GameController.prototype.setIdle = function() {
+    NumberController.instance.setIdle();
+    RpsController.instance.setIdle();
+    ResultController.instance.setIdle();
+    ButtonController.instance.setIdle();
+};
+
+GameController.prototype.stopIdle = function() {
+};
+
+
+//r : 0, p : 1, s : 2
+GameController.prototype.startGame = async function(rps) {
+    let betAmount = BetController.instance.getBetAmount();
+    if (betAmount <= 0)
+        return;
+
+    const { result, point } = await DummyServer.instance.startGame(betAmount, rps);
+
+    let temp = UserBalance.instance.getUserBalance() - betAmount;
+
+    UserBalance.instance.setBalance(temp);
+    NumberController.instance.stopIdle();
+    RpsController.instance.stopIdle();
+    RpsController.instance.startGame();
+};
+
+
+GameController.prototype.setIdleAction = function(balance){
+    UserBalance.instance.setBalance(balance);
+
+    BetController.instance.betCheck();
+    setTimeout( () => {
+        this.setIdle();
+    }, 3000);
+};
+//r : 0, p : 1, s : 2
+GameController.prototype.endGame = function(result) {
+    console.log(result);
+    RpsController.instance.endGame(result.lastNum);
+    ResultController.instance.setResult(result.isWin);
+
+    if (result.isWin === 0){
+        NumberController.instance.setResult(result.multiplier);   
+        setTimeout( () => {
+            UserBalance.instance.setBalance(result.balance); 
+            this.setIdleAction(result.balance);
+        }, 2500);
+    }
+    else{
+        this.setIdleAction(result.balance);
+    }
+};
+
+
+
+// DummyServer.js
+var DummyServer = pc.createScript('dummyServer');
+
+
+DummyServer.prototype.initialize = function() {
+    DummyServer.instance = this;
+
+    this.betAmount = -1;
+    this.userBalance = 0;
+};
+
+DummyServer.prototype.getAxiosInstance = function() {
+    const inst =  window.axios.create({
+        headers: {
+            Authorization: window.token,
+        }
+    });
+    return inst;
+};
+
+DummyServer.prototype.login = async function() {
+    try {
+        const env = EnvController.instance.envKey;
+        if (env === 'production') {
+            
+        } else {
+            const { data: userInfo } = await this.getAxiosInstance().get(`${EnvController.instance.env().serverBase}/user/info`);
+            const { data: userPoint } = await this.getAxiosInstance().get(`${EnvController.instance.env().serverBase}/user/point`);
+
+            return {
+                id : userInfo.user.nickname,
+                balance : userPoint.point,
+            };
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Login fail');
+        return {
+            id : '',
+            balance : 0,
+        };
+    }
+};
+
+DummyServer.prototype.startGame = async function(betAmount, userRps) {
+    /** server response **/
+
+    // interface IRPSResultResponse {
+    //     success: boolean;
+    //     ticket: IGameTicket;
+    // }
+
+    // interface IGameTicket {
+    //     gameId: number;
+    //     hashId: number;
+    //     hashIdx: number;
+    //     hashString: string;
+    //     ticketId: string;
+    //     betAmount: number;
+    //     payout: number;
+    //     meta: {
+    //         hash: string;
+    //         userPick: number;
+    //         computerPick: number;
+    //         multiplier: number;
+    //     }
+    // }
+
+    const axios = this.getAxiosInstance();
+    const { data: result } = await axios.post(
+        `${EnvController.instance.env().serverBase}/rsp/result`,
+        {
+            pick: userRps,
+            betAmount,
+        }
+    );
+
+    const {data: pointInfo} = await axios.get(`${EnvController.instance.env().serverBase}/user/point`);
+    const point = pointInfo.point;
+
+
+    // 0 win, 1 draw, 2 lose
+    const resultMapByUserPick = {
+        '0': {
+            0: 1,
+            1: 2,
+            2: 0,
+        },
+        '1': {
+            0: 0,
+            1: 1,
+            2: 2,
+        },
+        '2': {
+            0: 2,
+            1: 0,
+            2: 1,
+        }
+    };
+
+    const isWin = resultMapByUserPick[result.ticket.meta.userPick][result.ticket.meta.computerPick];
+
+    setTimeout( () => {
+        this.endGame({
+            isWin,
+            multiplier: isWin === 0 ? result.ticket.meta.multiplier : 0,
+            lastNum: result.ticket.meta.computerPick,
+            balance: point,
+            profit: result.ticket.betAmount * result.ticket.payout,
+        });
+    }, 1000);
+
+    console.log(result);
+
+    return {
+        result,
+        point,
+    };
+};
+
+DummyServer.prototype.endGame = function ({isWin, multiplier, lastNum, balance, profit}) {
+    let result = {
+            isWin, 
+            lastNum, 
+            multiplier,
+            balance,
+            profit,
+        };
+
+    GameController.instance.endGame(result);
+
+    return result;
+};
+
+
+// GlobalFunction.js
+var GlobalFunction = pc.createScript('globalFunction');
+
+function getRandomInt (min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; 
+}
+
+function setButton(btn, handler, entity) {
+    btn.element.on('touchend', handler, entity);
+    btn.element.on('mouseup', handler, entity);
+}
+
+function rgbToColor(r, g, b, a) {
+    return new pc.Color(r/255, g/255, b/255, a/255);
+}
+
+function getCommaText(number) {
+    let num = number;
+    let commas = num.toLocaleString("en-US");
+
+    return commas;
+}
+
+// ButtonController.js
+var ButtonController = pc.createScript('buttonController');
+
+//r p s
+ButtonController.attributes.add('rpsButton', {type: 'entity', array: true});
+ButtonController.attributes.add('rpsNormalImage', {type: 'entity', array: true});
+ButtonController.attributes.add('rpsPushImage', {type: 'entity', array: true});
+
+ButtonController.prototype.initialize = function() {
+    ButtonController.instance = this;
+
+    this.hoverColor = 1;
+    this.normalColor = 0.784;
+
+    this.isInGame = false;
+
+    this.setButton(this.rpsButton[0], this.onRBtnClick, this.onRBtnHoverStart, this.onRBtnHoverEnd);  
+    this.setButton(this.rpsButton[1], this.onPBtnClick, this.onPBtnHoverStart, this.onPBtnHoverEnd);  
+    this.setButton(this.rpsButton[2], this.onSBtnClick, this.onSBtnHoverStart, this.onSBtnHoverEnd);  
+};
+
+ButtonController.prototype.setIdle = function(){
+    this.isInGame = false;
+
+    this.rpsNormalImage.forEach((element) => 
+        {
+            element.enabled = true;
+            element.element.color = this.getColor(this.normalColor);
+        });
+
+    this.rpsPushImage.forEach((element) => 
+        {
+            element.enabled = false;
+        });
+};
+
+ButtonController.prototype.getColor = function(color) {
+    return new pc.Color(color, color, color, 1);
+};
+
+ButtonController.prototype.onRBtnClick = function() {
+    this.onClick(0);
+};
+ButtonController.prototype.onRBtnHoverStart = function() {
+    this.onHoverStart(0);
+};
+ButtonController.prototype.onRBtnHoverEnd = function() {
+    this.onHoverEnd(0);
+};
+
+ButtonController.prototype.onPBtnClick = function() {
+    this.onClick(1);
+};
+ButtonController.prototype.onPBtnHoverStart = function() {
+    this.onHoverStart(1);
+};
+ButtonController.prototype.onPBtnHoverEnd = function() {
+    this.onHoverEnd(1);
+};
+
+ButtonController.prototype.onSBtnClick = function() {
+    this.onClick(2);
+};
+ButtonController.prototype.onSBtnHoverStart = function() {
+    
+    this.onHoverStart(2);
+};
+ButtonController.prototype.onSBtnHoverEnd = function() {
+    this.onHoverEnd(2);
+};
+
+ButtonController.prototype.onHoverStart = function(index) {
+    if (this.isInGame === true)
+        return;
+
+    AudioController.instance.playSound('btn');
+    this.rpsNormalImage[index].element.color = this.getColor(this.hoverColor);
+};
+
+ButtonController.prototype.onHoverEnd = function(index) {
+    if (this.isInGame === true)
+        return;
+
+    this.rpsNormalImage[index].element.color = this.getColor(this.normalColor);
+};
+
+ButtonController.prototype.onClick = function(index) {
+    if (BetController.instance.getBetAmount() <= 0)
+        return;
+        
+    if (this.isInGame === true)
+        return;
+
+    AudioController.instance.playSound('btn');
+    this.rpsNormalImage[index].enabled = false;
+    this.rpsPushImage[index].enabled = true;
+
+    this.isInGame = true;
+
+    GameController.instance.startGame(index);
+};
+
+ButtonController.prototype.setButton = function(btn, clickHandler, hoverStartHandler, hoverEndHandler) {
+    btn.element.on('touchend', clickHandler, this);
+    btn.element.on('mouseup', clickHandler, this);
+
+    btn.button.on('hoverstart', hoverStartHandler, this);
+    btn.button.on('hoverend', hoverEndHandler, this);
+};
+
+
+
+// ResultController.js
+var ResultController = pc.createScript('resultController');
+
+ResultController.attributes.add('win', {type: 'entity'});
+ResultController.attributes.add('lose', {type: 'entity'});
+ResultController.attributes.add('draw', {type: 'entity'});
+
+ResultController.prototype.initialize = function() {
+    ResultController.instance = this;
+
+    this.resultTimer = null;
+
+    this.disableAll();
+};
+
+
+ResultController.prototype.setIdle = function() {
+    this.disableAll();
+    clearTimeout(this.resultTimer);
+    this.resultTimer = null;
+};
+
+
+ResultController.prototype.disableAll = function() {
+    this.win.enabled = false;
+    this.lose.enabled = false;
+    this.draw.enabled = false;
+};
+
+ResultController.prototype.setResult = function(isWin) {
+    this.disableAll();
+    AudioController.instance.playSound('wld');
+    if (isWin === 0)
+        this.setResultWin();
+    else if (isWin === 1)
+        this.setResultDraw();
+    else
+        this.setResultLose();
+};
+
+
+ResultController.prototype.setResultWin = function() {
+    this.win.enabled = false;
+
+    this.resultTimer = setTimeout ( () => {
+        AudioController.instance.playSound('wld');
+        this.win.enabled = true;
+        this.resultTimer = setTimeout ( () => {
+            
+            this.setResultWin();
+        }, 150);
+    }, 150);
+};
+
+ResultController.prototype.setResultLose = function() {
+    this.disableAll();
+    this.lose.enabled = true;
+};
+
+ResultController.prototype.setResultDraw = function() {
+    this.disableAll();
+    this.draw.enabled = true;
+};
+
+
+// AudioController.js
+var AudioController = pc.createScript('audioController');
+
+AudioController.attributes.add('soundSource', {'type':'entity'});
+
+AudioController.prototype.initialize = function() {
+    AudioController.instance = this;
+
+    this.isMute = true;
+    this.soundSource.sound.volume = 0;
+};
+
+AudioController.prototype.update = function(dt) {
+
+};
+
+AudioController.prototype.setMute = function(isMute) {
+    this.isMute = isMute;
+
+    if (this.isMute)    this.soundSource.sound.volume = 0;
+    else                this.soundSource.sound.volume = 0.55;
+};
+
+AudioController.prototype.playSound = function(type) {
+    if (this.isMute === true)
+        return;
+    this.soundSource.sound.play(type);
+};
+
+
+// Tween.js
+pc.extend(pc, function () {
+
+    /**
+     * @name pc.TweenManager
+     * @description Handles updating tweens
+     * @param {pc.Application} app - The application
+     */
+    var TweenManager = function (app) {
+        this._app = app;
+        this._tweens = [];
+        this._add = []; // to be added
+    };
+
+    TweenManager.prototype = {
+        add: function (tween) {
+            this._add.push(tween);
+            return tween;
+        },
+
+        update: function (dt) {
+            var i = 0;
+            var n = this._tweens.length;
+            while (i < n) {
+                if (this._tweens[i].update(dt)) {
+                    i++;
+                } else {
+                    this._tweens.splice(i, 1);
+                    n--;
+                }
+            }
+
+            // add any tweens that were added mid-update
+            if (this._add.length) {
+                for (let i = 0; i < this._add.length; i++) {
+                    if (this._tweens.indexOf(this._add[i]) > -1) continue;
+                    this._tweens.push(this._add[i]);
+                }
+                this._add.length = 0;
+            }
+        }
+    };
+
+    /**
+     * @name  pc.Tween
+     * @param {object} target - The target property that will be tweened
+     * @param {pc.TweenManager} manager - The tween manager
+     * @param {pc.Entity} entity - The pc.Entity whose property we are tweening
+     */
+    var Tween = function (target, manager, entity) {
+        pc.events.attach(this);
+
+        this.manager = manager;
+
+        if (entity) {
+            this.entity = null; // if present the tween will dirty the transforms after modify the target
+        }
+
+        this.time = 0;
+
+        this.complete = false;
+        this.playing = false;
+        this.stopped = true;
+        this.pending = false;
+
+        this.target = target;
+
+        this.duration = 0;
+        this._currentDelay = 0;
+        this.timeScale = 1;
+        this._reverse = false;
+
+        this._delay = 0;
+        this._yoyo = false;
+
+        this._count = 0;
+        this._numRepeats = 0;
+        this._repeatDelay = 0;
+
+        this._from = false; // indicates a "from" tween
+
+        // for rotation tween
+        this._slerp = false; // indicates a rotation tween
+        this._fromQuat = new pc.Quat();
+        this._toQuat = new pc.Quat();
+        this._quat = new pc.Quat();
+
+        this.easing = pc.Linear;
+
+        this._sv = {}; // start values
+        this._ev = {}; // end values
+    };
+
+    var _parseProperties = function (properties) {
+        var _properties;
+        if (properties instanceof pc.Vec2) {
+            _properties = {
+                x: properties.x,
+                y: properties.y
+            };
+        } else if (properties instanceof pc.Vec3) {
+            _properties = {
+                x: properties.x,
+                y: properties.y,
+                z: properties.z
+            };
+        } else if (properties instanceof pc.Vec4) {
+            _properties = {
+                x: properties.x,
+                y: properties.y,
+                z: properties.z,
+                w: properties.w
+            };
+        } else if (properties instanceof pc.Quat) {
+            _properties = {
+                x: properties.x,
+                y: properties.y,
+                z: properties.z,
+                w: properties.w
+            };
+        } else if (properties instanceof pc.Color) {
+            _properties = {
+                r: properties.r,
+                g: properties.g,
+                b: properties.b
+            };
+            if (properties.a !== undefined) {
+                _properties.a = properties.a;
+            }
+        } else {
+            _properties = properties;
+        }
+        return _properties;
+    };
+    Tween.prototype = {
+        // properties - js obj of values to update in target
+        to: function (properties, duration, easing, delay, repeat, yoyo) {
+            this._properties = _parseProperties(properties);
+            this.duration = duration;
+
+            if (easing) this.easing = easing;
+            if (delay) {
+                this.delay(delay);
+            }
+            if (repeat) {
+                this.repeat(repeat);
+            }
+
+            if (yoyo) {
+                this.yoyo(yoyo);
+            }
+
+            return this;
+        },
+
+        from: function (properties, duration, easing, delay, repeat, yoyo) {
+            this._properties = _parseProperties(properties);
+            this.duration = duration;
+
+            if (easing) this.easing = easing;
+            if (delay) {
+                this.delay(delay);
+            }
+            if (repeat) {
+                this.repeat(repeat);
+            }
+
+            if (yoyo) {
+                this.yoyo(yoyo);
+            }
+
+            this._from = true;
+
+            return this;
+        },
+
+        rotate: function (properties, duration, easing, delay, repeat, yoyo) {
+            this._properties = _parseProperties(properties);
+
+            this.duration = duration;
+
+            if (easing) this.easing = easing;
+            if (delay) {
+                this.delay(delay);
+            }
+            if (repeat) {
+                this.repeat(repeat);
+            }
+
+            if (yoyo) {
+                this.yoyo(yoyo);
+            }
+
+            this._slerp = true;
+
+            return this;
+        },
+
+        start: function () {
+            var prop, _x, _y, _z;
+
+            this.playing = true;
+            this.complete = false;
+            this.stopped = false;
+            this._count = 0;
+            this.pending = (this._delay > 0);
+
+            if (this._reverse && !this.pending) {
+                this.time = this.duration;
+            } else {
+                this.time = 0;
+            }
+
+            if (this._from) {
+                for (prop in this._properties) {
+                    if (this._properties.hasOwnProperty(prop)) {
+                        this._sv[prop] = this._properties[prop];
+                        this._ev[prop] = this.target[prop];
+                    }
+                }
+
+                if (this._slerp) {
+                    this._toQuat.setFromEulerAngles(this.target.x, this.target.y, this.target.z);
+
+                    _x = this._properties.x !== undefined ? this._properties.x : this.target.x;
+                    _y = this._properties.y !== undefined ? this._properties.y : this.target.y;
+                    _z = this._properties.z !== undefined ? this._properties.z : this.target.z;
+                    this._fromQuat.setFromEulerAngles(_x, _y, _z);
+                }
+            } else {
+                for (prop in this._properties) {
+                    if (this._properties.hasOwnProperty(prop)) {
+                        this._sv[prop] = this.target[prop];
+                        this._ev[prop] = this._properties[prop];
+                    }
+                }
+
+                if (this._slerp) {
+                    _x = this._properties.x !== undefined ? this._properties.x : this.target.x;
+                    _y = this._properties.y !== undefined ? this._properties.y : this.target.y;
+                    _z = this._properties.z !== undefined ? this._properties.z : this.target.z;
+
+                    if (this._properties.w !== undefined) {
+                        this._fromQuat.copy(this.target);
+                        this._toQuat.set(_x, _y, _z, this._properties.w);
+                    } else {
+                        this._fromQuat.setFromEulerAngles(this.target.x, this.target.y, this.target.z);
+                        this._toQuat.setFromEulerAngles(_x, _y, _z);
+                    }
+                }
+            }
+
+            // set delay
+            this._currentDelay = this._delay;
+
+            // add to manager when started
+            this.manager.add(this);
+
+            return this;
+        },
+
+        pause: function () {
+            this.playing = false;
+        },
+
+        resume: function () {
+            this.playing = true;
+        },
+
+        stop: function () {
+            this.playing = false;
+            this.stopped = true;
+        },
+
+        delay: function (delay) {
+            this._delay = delay;
+            this.pending = true;
+
+            return this;
+        },
+
+        repeat: function (num, delay) {
+            this._count = 0;
+            this._numRepeats = num;
+            if (delay) {
+                this._repeatDelay = delay;
+            } else {
+                this._repeatDelay = 0;
+            }
+
+            return this;
+        },
+
+        loop: function (loop) {
+            if (loop) {
+                this._count = 0;
+                this._numRepeats = Infinity;
+            } else {
+                this._numRepeats = 0;
+            }
+
+            return this;
+        },
+
+        yoyo: function (yoyo) {
+            this._yoyo = yoyo;
+            return this;
+        },
+
+        reverse: function () {
+            this._reverse = !this._reverse;
+
+            return this;
+        },
+
+        chain: function () {
+            var n = arguments.length;
+
+            while (n--) {
+                if (n > 0) {
+                    arguments[n - 1]._chained = arguments[n];
+                } else {
+                    this._chained = arguments[n];
+                }
+            }
+
+            return this;
+        },
+
+        update: function (dt) {
+            if (this.stopped) return false;
+
+            if (!this.playing) return true;
+
+            if (!this._reverse || this.pending) {
+                this.time += dt * this.timeScale;
+            } else {
+                this.time -= dt * this.timeScale;
+            }
+
+            // delay start if required
+            if (this.pending) {
+                if (this.time > this._currentDelay) {
+                    if (this._reverse) {
+                        this.time = this.duration - (this.time - this._currentDelay);
+                    } else {
+                        this.time -= this._currentDelay;
+                    }
+                    this.pending = false;
+                } else {
+                    return true;
+                }
+            }
+
+            var _extra = 0;
+            if ((!this._reverse && this.time > this.duration) || (this._reverse && this.time < 0)) {
+                this._count++;
+                this.complete = true;
+                this.playing = false;
+                if (this._reverse) {
+                    _extra = this.duration - this.time;
+                    this.time = 0;
+                } else {
+                    _extra = this.time - this.duration;
+                    this.time = this.duration;
+                }
+            }
+
+            var elapsed = (this.duration === 0) ? 1 : (this.time / this.duration);
+
+            // run easing
+            var a = this.easing(elapsed);
+
+            // increment property
+            var s, e;
+            for (var prop in this._properties) {
+                if (this._properties.hasOwnProperty(prop)) {
+                    s = this._sv[prop];
+                    e = this._ev[prop];
+                    this.target[prop] = s + (e - s) * a;
+                }
+            }
+
+            if (this._slerp) {
+                this._quat.slerp(this._fromQuat, this._toQuat, a);
+            }
+
+            // if this is a entity property then we should dirty the transform
+            if (this.entity) {
+                this.entity._dirtifyLocal();
+
+                // apply element property changes
+                if (this.element && this.entity.element) {
+                    this.entity.element[this.element] = this.target;
+                }
+
+                if (this._slerp) {
+                    this.entity.setLocalRotation(this._quat);
+                }
+            }
+
+            this.fire("update", dt);
+
+            if (this.complete) {
+                var repeat = this._repeat(_extra);
+                if (!repeat) {
+                    this.fire("complete", _extra);
+                    if (this.entity)
+                        this.entity.off('destroy', this.stop, this);
+                    if (this._chained) this._chained.start();
+                } else {
+                    this.fire("loop");
+                }
+
+                return repeat;
+            }
+
+            return true;
+        },
+
+        _repeat: function (extra) {
+            // test for repeat conditions
+            if (this._count < this._numRepeats) {
+                // do a repeat
+                if (this._reverse) {
+                    this.time = this.duration - extra;
+                } else {
+                    this.time = extra; // include overspill time
+                }
+                this.complete = false;
+                this.playing = true;
+
+                this._currentDelay = this._repeatDelay;
+                this.pending = true;
+
+                if (this._yoyo) {
+                    // swap start/end properties
+                    for (var prop in this._properties) {
+                        var tmp = this._sv[prop];
+                        this._sv[prop] = this._ev[prop];
+                        this._ev[prop] = tmp;
+                    }
+
+                    if (this._slerp) {
+                        this._quat.copy(this._fromQuat);
+                        this._fromQuat.copy(this._toQuat);
+                        this._toQuat.copy(this._quat);
+                    }
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+    };
+
+
+    /**
+     * Easing methods
+     */
+
+    var Linear = function (k) {
+        return k;
+    };
+
+    var QuadraticIn = function (k) {
+        return k * k;
+    };
+
+    var QuadraticOut = function (k) {
+        return k * (2 - k);
+    };
+
+    var QuadraticInOut = function (k) {
+        if ((k *= 2) < 1) {
+            return 0.5 * k * k;
+        }
+        return -0.5 * (--k * (k - 2) - 1);
+    };
+
+    var CubicIn = function (k) {
+        return k * k * k;
+    };
+
+    var CubicOut = function (k) {
+        return --k * k * k + 1;
+    };
+
+    var CubicInOut = function (k) {
+        if ((k *= 2) < 1) return 0.5 * k * k * k;
+        return 0.5 * ((k -= 2) * k * k + 2);
+    };
+
+    var QuarticIn = function (k) {
+        return k * k * k * k;
+    };
+
+    var QuarticOut = function (k) {
+        return 1 - (--k * k * k * k);
+    };
+
+    var QuarticInOut = function (k) {
+        if ((k *= 2) < 1) return 0.5 * k * k * k * k;
+        return -0.5 * ((k -= 2) * k * k * k - 2);
+    };
+
+    var QuinticIn = function (k) {
+        return k * k * k * k * k;
+    };
+
+    var QuinticOut = function (k) {
+        return --k * k * k * k * k + 1;
+    };
+
+    var QuinticInOut = function (k) {
+        if ((k *= 2) < 1) return 0.5 * k * k * k * k * k;
+        return 0.5 * ((k -= 2) * k * k * k * k + 2);
+    };
+
+    var SineIn = function (k) {
+        if (k === 0) return 0;
+        if (k === 1) return 1;
+        return 1 - Math.cos(k * Math.PI / 2);
+    };
+
+    var SineOut = function (k) {
+        if (k === 0) return 0;
+        if (k === 1) return 1;
+        return Math.sin(k * Math.PI / 2);
+    };
+
+    var SineInOut = function (k) {
+        if (k === 0) return 0;
+        if (k === 1) return 1;
+        return 0.5 * (1 - Math.cos(Math.PI * k));
+    };
+
+    var ExponentialIn = function (k) {
+        return k === 0 ? 0 : Math.pow(1024, k - 1);
+    };
+
+    var ExponentialOut = function (k) {
+        return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
+    };
+
+    var ExponentialInOut = function (k) {
+        if (k === 0) return 0;
+        if (k === 1) return 1;
+        if ((k *= 2) < 1) return 0.5 * Math.pow(1024, k - 1);
+        return 0.5 * (-Math.pow(2, -10 * (k - 1)) + 2);
+    };
+
+    var CircularIn = function (k) {
+        return 1 - Math.sqrt(1 - k * k);
+    };
+
+    var CircularOut = function (k) {
+        return Math.sqrt(1 - (--k * k));
+    };
+
+    var CircularInOut = function (k) {
+        if ((k *= 2) < 1) return -0.5 * (Math.sqrt(1 - k * k) - 1);
+        return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
+    };
+
+    var ElasticIn = function (k) {
+        var s, a = 0.1, p = 0.4;
+        if (k === 0) return 0;
+        if (k === 1) return 1;
+        if (!a || a < 1) {
+            a = 1; s = p / 4;
+        } else s = p * Math.asin(1 / a) / (2 * Math.PI);
+        return -(a * Math.pow(2, 10 * (k -= 1)) * Math.sin((k - s) * (2 * Math.PI) / p));
+    };
+
+    var ElasticOut = function (k) {
+        var s, a = 0.1, p = 0.4;
+        if (k === 0) return 0;
+        if (k === 1) return 1;
+        if (!a || a < 1) {
+            a = 1; s = p / 4;
+        } else s = p * Math.asin(1 / a) / (2 * Math.PI);
+        return (a * Math.pow(2, -10 * k) * Math.sin((k - s) * (2 * Math.PI) / p) + 1);
+    };
+
+    var ElasticInOut = function (k) {
+        var s, a = 0.1, p = 0.4;
+        if (k === 0) return 0;
+        if (k === 1) return 1;
+        if (!a || a < 1) {
+            a = 1; s = p / 4;
+        } else s = p * Math.asin(1 / a) / (2 * Math.PI);
+        if ((k *= 2) < 1) return -0.5 * (a * Math.pow(2, 10 * (k -= 1)) * Math.sin((k - s) * (2 * Math.PI) / p));
+        return a * Math.pow(2, -10 * (k -= 1)) * Math.sin((k - s) * (2 * Math.PI) / p) * 0.5 + 1;
+    };
+
+    var BackIn = function (k) {
+        var s = 1.70158;
+        return k * k * ((s + 1) * k - s);
+    };
+
+    var BackOut = function (k) {
+        var s = 1.70158;
+        return --k * k * ((s + 1) * k + s) + 1;
+    };
+
+    var BackInOut = function (k) {
+        var s = 1.70158 * 1.525;
+        if ((k *= 2) < 1) return 0.5 * (k * k * ((s + 1) * k - s));
+        return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
+    };
+
+    var BounceOut = function (k) {
+        if (k < (1 / 2.75)) {
+            return 7.5625 * k * k;
+        } else if (k < (2 / 2.75)) {
+            return 7.5625 * (k -= (1.5 / 2.75)) * k + 0.75;
+        } else if (k < (2.5 / 2.75)) {
+            return 7.5625 * (k -= (2.25 / 2.75)) * k + 0.9375;
+        }
+        return 7.5625 * (k -= (2.625 / 2.75)) * k + 0.984375;
+
+    };
+
+    var BounceIn = function (k) {
+        return 1 - BounceOut(1 - k);
+    };
+
+    var BounceInOut = function (k) {
+        if (k < 0.5) return BounceIn(k * 2) * 0.5;
+        return BounceOut(k * 2 - 1) * 0.5 + 0.5;
+    };
+
+    return {
+        TweenManager: TweenManager,
+        Tween: Tween,
+        Linear: Linear,
+        QuadraticIn: QuadraticIn,
+        QuadraticOut: QuadraticOut,
+        QuadraticInOut: QuadraticInOut,
+        CubicIn: CubicIn,
+        CubicOut: CubicOut,
+        CubicInOut: CubicInOut,
+        QuarticIn: QuarticIn,
+        QuarticOut: QuarticOut,
+        QuarticInOut: QuarticInOut,
+        QuinticIn: QuinticIn,
+        QuinticOut: QuinticOut,
+        QuinticInOut: QuinticInOut,
+        SineIn: SineIn,
+        SineOut: SineOut,
+        SineInOut: SineInOut,
+        ExponentialIn: ExponentialIn,
+        ExponentialOut: ExponentialOut,
+        ExponentialInOut: ExponentialInOut,
+        CircularIn: CircularIn,
+        CircularOut: CircularOut,
+        CircularInOut: CircularInOut,
+        BackIn: BackIn,
+        BackOut: BackOut,
+        BackInOut: BackInOut,
+        BounceIn: BounceIn,
+        BounceOut: BounceOut,
+        BounceInOut: BounceInOut,
+        ElasticIn: ElasticIn,
+        ElasticOut: ElasticOut,
+        ElasticInOut: ElasticInOut
+    };
+}());
+
+// Expose prototype methods and create a default tween manager on the application
+(function () {
+    // Add pc.Application#addTweenManager method
+    pc.Application.prototype.addTweenManager = function () {
+        this._tweenManager = new pc.TweenManager(this);
+
+        this.on("update", function (dt) {
+            this._tweenManager.update(dt);
+        });
+    };
+
+    // Add pc.Application#tween method
+    pc.Application.prototype.tween = function (target) {
+        return new pc.Tween(target, this._tweenManager);
+    };
+
+    // Add pc.Entity#tween method
+    pc.Entity.prototype.tween = function (target, options) {
+        var tween = this._app.tween(target);
+        tween.entity = this;
+
+        this.once('destroy', tween.stop, tween);
+
+        if (options && options.element) {
+            // specifiy a element property to be updated
+            tween.element = options.element;
+        }
+        return tween;
+    };
+    
+    pc.Entity.prototype.localMoveTo = function(position, duration, type = pc.QuadraticOut) {
+        return this.tween(this.getLocalPosition())
+            .to(position, duration, type)
+            .start();
+    };
+    pc.Entity.prototype.localMoveBy = function(position, duration, type = pc.SineOut) {
+        return this.tween(this.getLocalPosition())
+            .by(position, duration, type)
+            .start();
+    };
+    pc.Entity.prototype.moveTo = function(position, duration) {
+        return this.tween(this.getPosition())
+            .to(position, duration, pc.SineOut)
+            .start();
+    };
+    pc.Entity.prototype.moveBy = function(position, duration) {
+        return this.tween(this.getPosition())
+            .by(position, duration, pc.SineOut)
+            .start();
+    };
+    pc.Entity.prototype.rotateTo = function(rot, duration, type = pc.CircularOut) {
+        return this.tween(this.getLocalEulerAngles())
+            .rotate(rot, duration, type)
+            .start();
+    };
+    
+    pc.Entity.prototype.setOpacity = function(v) {
+        if (!this.element) return;
+        
+        /*
+        if (!this.element.material.cloned) {
+            this.element.material = this.element.material.clone();
+            this.element.material.cloned = true;
+        }
+        this.element.material.opacity = v;
+        this.element.material.update();
+        */
+        
+        if (this.element.material && false) {
+            if (!this.element.material.cloned) {
+                const c = this.element.color;
+                
+                this.element.material = this.element.material.clone();
+                this.element.material.emissive = c;
+                this.element.material.cloned = true;
+            }
+            this.element.material.opacity = v;
+            this.element.material.update();   
+        }
+        else {
+            this.element.opacity = v;
+        }
+    };
+    pc.Entity.prototype.setOpacityCascade = function(v) {
+        this.setOpacity(v);
+        for (let i=0;i<this.children.length; i++) {
+            if (!this.children[i].setOpacityCascade)
+                continue;
+            this.children[i].setOpacityCascade(v);
+        }
+    };
+    
+    pc.Entity.prototype.opacityToCascade = function(from, to, duration) {
+        let o = {v: from};
+        this.setOpacityCascade(from);
+        
+        return this.tween(o)
+            .to({v: to}, duration, pc.SineOut)
+            .on('update', () => {
+                this.setOpacityCascade(o.v);
+            })
+            .start();
+    };
+
+    pc.Entity.prototype.opacityTo = function(from, to, duration) {
+        if (!this.element.material) return;
+        
+        let o = {v: from};
+        this.setOpacity(from);
+        return this.tween(o)
+            .to({v: to}, duration, pc.SineOut)
+            .on('update', () => {
+                this.setOpacity(o.v);
+            })
+            .start();
+    };
+    
+    pc.Entity.prototype.setTextureFromURL = function(url) {
+        let assetName = "t_" + url;
+        
+        let asset2 = pc.app.assets.find(assetName, "texture");
+        if (asset2 !== null){
+            this.element.texture = asset2.resource;
+            return;
+        }
+
+        pc.app.loader.getHandler("texture").crossOrigin = "anonymous";
+        var asset = new pc.Asset(assetName, "texture", {
+            url: url
+        });
+        pc.app.assets.add(asset);
+        asset.on("load", (asset) => {
+            this.element.texture = asset.resource;
+        });
+        pc.app.assets.load(asset);  
+    };
+    pc.Entity.prototype.blink = function(min, max, interval, loop) {
+        for (let i=0;i<loop;i++) {
+            setTimeout(() => {
+                this.setOpacity(min);
+            }, interval * i * 2);
+            setTimeout(() => {
+                this.setOpacity(max);
+            }, interval * (i * 2 + 1));
+        }  
+    };
+    
+
+    // Create a default tween manager on the application
+    var application = pc.Application.getApplication();
+    if (application) {
+        application.addTweenManager();
+    }
+})();
+
+// UserBalance.js
+var UserBalance = pc.createScript('userBalance');
+
+UserBalance.attributes.add('userBalanceText', {type: 'entity'});
+UserBalance.attributes.add('userName', {type: 'entity'});
+
+UserBalance.prototype.initialize = function() {
+    UserBalance.instance = this;
+    this.userBalance = 0;
+};
+
+UserBalance.prototype.setUserName = function(name) {
+    this.userName.element.text = name;
+};
+
+UserBalance.prototype.getUserBalance = function() {
+    return this.userBalance;
+};
+
+UserBalance.prototype.setBalance = function(balance) {
+    this.userBalance = balance;
+    
+    let data = {
+        value: Number(this.userBalanceText.element.text)
+    };
+    let element = this.userBalanceText.element;
+
+    let tween = this.entity.tween(data).to({value:balance}, 0.3, pc.Linear);
+    tween.on('update', function (dt) {
+        let newbalance = parseFloat(data.value.toFixed(0));
+        element.text = `${newbalance}`;
+    });
+    tween.start();
+};
+
+
+// async.js
+/*jshint esversion:8*/
+async function loadJsonFromUrl(url){
+    return new Promise( resolve =>{
+        this.loadJsonFromRemote(url, function (data) {
+            console.log(data);
+            let meta = JSON.stringify(data);
+
+            let meta2 = JSON.parse(meta);
+            resolve(meta2);
+        });
+    });
+}
+
+async function loadJsonFromRemote(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("load", function () {
+        callback(JSON.parse(this.response));
+    });
+    xhr.open("GET", url);
+    xhr.send();
+}
+
+// NumButton.js
+var NumButton = pc.createScript('numButton');
+
+NumButton.attributes.add('betAmount', {type: 'number'});
+
+NumButton.prototype.initialize = function() {
+    let childText = this.entity.children[0];
+
+    let num = this.betAmount;
+    let commas = getCommaText(num);
+
+    childText.element.text = `+${commas}`;
+    setButton(this.entity, this.onClick, this);
+};
+
+NumButton.prototype.onClick = function() {
+    AudioController.instance.playSound('Click');
+    let ret = BetController.instance.betChange(this.betAmount);
+    if (ret === false)
+        return;
+
+    //this.entity.element.color = rgbToColor(154, 117, 244, 255);
+};
+
+// BetController.js
+var BetController = pc.createScript('betController');
+
+BetController.attributes.add('betButton', {type: 'entity', array: true});
+BetController.attributes.add('okButton', {type: 'entity'});
+BetController.attributes.add('cancelButton', {type: 'entity'});
+BetController.attributes.add('clearButton', {type: 'entity'});
+
+BetController.attributes.add('betAmountText', {type: 'entity'});
+
+BetController.attributes.add('errorText', {type: 'entity'});
+
+BetController.prototype.initialize = function() {
+    BetController.instance = this;
+
+    this.timer = null;
+
+    this.betAmount = 0;
+    this.errorText.enabled = false;
+
+    //setButton(this.cancelButton, this.onBetCancel, this);
+    //setButton(this.okButton, this.onBetOk, this);
+    setButton(this.clearButton, this.onBetClear, this);
+};
+
+BetController.prototype.reset = function() {
+    this.betAmount = 0;
+    this.updateText();
+    this.resetAllButton();
+};
+
+
+BetController.prototype.resetAllButton = function() {
+    this.betButton.forEach(e => e.element.color = new pc.Color(0.5, 0.5, 0.5, 1));    
+};
+
+BetController.prototype.betChange = function(betAmount) {
+
+    let temp = this.betAmount + betAmount;
+    let userBalance = UserBalance.instance.getUserBalance();
+    if (temp > userBalance){
+        this.showErrorMsg();
+        return false;
+    }
+
+    this.errorText.enabled = false;
+
+    this.betAmount = temp;
+    //this.resetAllButton();
+
+    this.updateText();
+
+    return true;
+};
+
+BetController.prototype.updateText = function() {
+    let commaText = getCommaText(this.betAmount);
+    this.betAmountText.element.text = `${commaText}`;
+};
+
+
+BetController.prototype.onBetClear = function() {
+    AudioController.instance.playSound('Click');
+    console.log('BetController.prototype.betOk');
+    this.betAmount = 0;
+    this.updateText();
+};
+
+BetController.prototype.onBetOk = function() {
+    AudioController.instance.playSound('Click');
+    console.log('BetController.prototype.betOk');
+    if (this.betAmount === 0)
+        return;
+
+    GameController.instance.startGame(this.betAmount);
+};
+
+BetController.prototype.onBetCancel = function() {
+    AudioController.instance.playSound('Click');
+    GameController.instance.setIdle();
+};
+
+BetController.prototype.showErrorMsg = function() {
+    this.errorText.enabled = true;
+    clearTimeout(this.timer);
+    this.timer = setTimeout( () => {
+        this.errorText.enabled = false;
+    }, 1000);
+};
+
+BetController.prototype.getBetAmount = function() {
+    return this.betAmount;
+};
+
+BetController.prototype.betCheck = function() {
+    if (this.balanceCheck(this.betAmount) === true)
+        return;
+
+    this.betAmount = 0;
+    //this.resetAllButton();
+};
+
+BetController.prototype.balanceCheck = function(betAmount) {
+    let userBalance = UserBalance.instance.getUserBalance();
+    console.log(userBalance, betAmount);
+    if (betAmount > userBalance){
+        return false;
+    }
+
+    return true;
+};
+
+// SoundButton.js
+var SoundButton = pc.createScript('soundButton');
+
+SoundButton.attributes.add('onImg', {type:'entity'});
+SoundButton.attributes.add('offImg', {type:'entity'});
+
+SoundButton.prototype.initialize = function() {
+    SoundButton.instance = this;
+    this.isMute = true;
+    this.setButton(this.entity, this.onClick);
+
+    this.offImg.enabled = true;
+    this.onImg.enabled = false;
+};
+
+SoundButton.prototype.onClick = function() {
+    this.isMute = !this.isMute;
+
+    this.onImg.enabled = false;
+    this.offImg.enabled = false;
+
+    if (this.isMute) this.offImg.enabled = true;
+    else             this.onImg.enabled = true;
+    
+    AudioController.instance.setMute(this.isMute);
+};
+
+
+SoundButton.prototype.setButton = function(btn, handler) {
+    btn.element.on('touchend', handler, this);
+    btn.element.on('mouseup', handler, this);
+};
+
+

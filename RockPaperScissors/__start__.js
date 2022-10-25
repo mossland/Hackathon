@@ -185,6 +185,13 @@
 
             configureCss(app._fillMode, app._width, app._height);
 
+            const ltcMat1 = []; 
+            const ltcMat2 = []; 
+
+            if (ltcMat1.length && ltcMat2.length && app.setAreaLightLuts.length === 2) {
+                app.setAreaLightLuts(ltcMat1, ltcMat2);
+            }
+
             // do the first reflow after a timeout because of
             // iOS showing a squished iframe sometimes
             setTimeout(function () {
@@ -199,7 +206,7 @@
                         console.error(err);
                     }
 
-                    app.loadScene(SCENE_PATH, function (err, scene) {
+                    app.scenes.loadScene(SCENE_PATH, function (err, scene) {
                         if (err) {
                             console.error(err);
                         }
