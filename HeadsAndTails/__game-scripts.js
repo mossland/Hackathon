@@ -1115,6 +1115,7 @@ var Middle = pc.createScript('middle');
 
 Middle.attributes.add('coinGroup', {type: 'entity'});
 Middle.attributes.add('tail', {type: 'entity'});
+Middle.attributes.add('coin', {type: 'entity'});
 
 Middle.prototype.initialize = function() {
     Middle.instance = this;
@@ -1126,15 +1127,14 @@ Middle.prototype.initialize = function() {
 
     this.needStop = false;
     this.stopX = 0;
-
     this.rot = 0;
-
     this.rot2 = 10;
-
     this.du = 0.1;
     this.cal = 0.0;
 
     this.isHead = true;
+
+    this.vel = 0;
 };
 
 
@@ -1142,8 +1142,8 @@ Middle.prototype.initialize = function() {
 Middle.prototype.update = function(dt) {
     if (this.isRot === false)
         return;
-    this.cal += dt;
-    
+
+    this.addPos(this.coin, 0, this.vel, 0);  
     if (this.cal > this.du)
     {
         this.cal = 0;
@@ -1153,6 +1153,27 @@ Middle.prototype.update = function(dt) {
     }
 };
 
+Middle.prototype.setPos = function(target, x, y, z){
+    if (y < -1400) y = y % 1400;
+    let currentPos = target.setLocalPosition(x, y, z);
+};
+
+Middle.prototype.addPos = function(target, x, y, z){
+    let currentPos = target.getLocalPosition();
+
+    //console.log(currentPos);
+    currentPos.x += x;
+    currentPos.y += y;
+    currentPos.z += z;
+
+    //console.log(currentPos);
+
+    if (currentPos.y < -1050)
+        currentPos.y += 700;
+
+    target.setLocalPosition(currentPos);
+};
+
 Middle.prototype.playCoinSound = function(){
     let soundIdx = getRandomInt(1, 6);
     let soundName = 'coin' + soundIdx;
@@ -1160,17 +1181,58 @@ Middle.prototype.playCoinSound = function(){
 };
 
 Middle.prototype.startRotation = async function(isHead) {
-    this.cal = 0;
     this.isRot = true;
-    let del = getRandomInt(1500, 2000);
-    await delay(del);
-    this.isRot = false;
+    let targetRot = isHead === true ? -1400 : - 1050;
+    
+    var tween_amount={value:0};
+    let toValue = -50;
 
-    if (this.tail.enabled === isHead){
-        await delay(100);
-        this.tail.enabled = !isHead;
-        this.playCoinSound();
-    }
+    let thisObj = this;
+
+    this.startTween = this.app.tween(tween_amount).to({value:toValue}, 1.0, pc.SineOut)
+    .on('update', function(){
+        console.log(thisObj.vel);
+        thisObj.vel = tween_amount.value;
+    })
+    .start();
+
+    let del = getRandomInt(800, 1000);
+    await delay(del);
+
+    tween_amount.value = this.vel;
+    toValue = -15;
+
+    this.startTween = this.app.tween(tween_amount).to({value:toValue}, 3.0, pc.SineOut)
+    .on('update', function(){
+        console.log(thisObj.vel);
+        thisObj.vel = tween_amount.value;
+    })
+    .on('complete', function(){
+        thisObj.isRot = false;
+        thisObj.vel = 0;
+        let currentZ = thisObj.coin.getLocalPosition().y;
+        let remainRot = 0;
+        let modTarget = targetRot;
+        modTarget = targetRot - 700;
+        remainRot = modTarget - currentZ;
+            
+        let time = Math.abs(remainRot / 200);
+
+        var amount={value:currentZ};
+        let toValue2 = modTarget;
+
+        let tweenType = getRandomInt(0, 2) === 0 ? pc.BackOut : pc.SineOut;
+        console.log(time, currentZ, toValue2);
+        this.startTween = thisObj.app.tween(amount).to({value:toValue2}, time, tweenType)
+            .on('update', function(){
+                thisObj.setPos(thisObj.coin, 0, amount.value, 0);
+            })
+            .on('complete', function(){
+                GameController.instance.doneAction();
+            })
+        .start();
+    })
+    .start();
 
     return;
 };
@@ -1188,27 +1250,11 @@ Middle.prototype.numberToText = function(number) {
 
 Middle.prototype.setIdle = function() {
     AudioController.instance.playSound('Open');
-    /*
-    let card = shuffle(getDeck());
-    this.setOpenCard(card[0].number);
-    this.setHiddenCard(card[1].number);
 
-    let sum = card[0].number + card[1].number;
-    this.setResultText(this.numberToText(sum));
-    this.idleTimer = setTimeout(() => {
-        this.setIdle();
-    }, 4000);  
-    */
 };
 
 Middle.prototype.setReady = function() {
     clearTimeout(this.idleTimer);
-    
-    /*
-    this.openCard.script.card.setReady();
-    this.hiddenCard.script.card.setReady();
-    this.resultText.element.text = '?';
-    */
 };
 
 
@@ -1218,19 +1264,10 @@ Middle.prototype.setOpenCard = function(number) {
 
 Middle.prototype.setHiddenCard = function(number) {
     AudioController.instance.playSound('Open');
-    //this.hiddenCard.script.card.setCard(number);
 };
 
 Middle.prototype.setResultText = function(result) {
     AudioController.instance.playSound('Open');
-    /*
-    let resultStr = '';
-    if (result === 'over')        resultStr = 'OVER';
-    else if (result === 'seven')  resultStr = '7';
-    else                          resultStr = 'UNDER';
-
-    this.resultText.element.text = resultStr;
-    */
 };
 
 
@@ -1314,17 +1351,21 @@ GameController.prototype.startGame = async function(betAmount, isHead) {
     let result = DummyServer.instance.betGame(isHead);
     //action
     await Middle.instance.startRotation(result.result);
+    this.result = result;
+};
 
-    await delay(500);
+GameController.prototype.doneAction = async function(){
+    await delay(1000);
 
-    Bottom.instance.setResultGame(result.isWin, result.profit);
-
+    Bottom.instance.setResultGame(this.result.isWin, this.result.profit);
+    
     await delay(1500);
-    UserBalance.instance.setBalance(result.balance);
+    UserBalance.instance.setBalance(this.result.balance);
     await delay(500);
 
-    Bottom.instance.setProfit(result.profit);
+    Bottom.instance.setProfit(this.result.profit);
     Bottom.instance.setIdle();
+
 };
 
 GameController.prototype.setIdle = function() {
