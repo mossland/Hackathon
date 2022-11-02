@@ -1,3 +1,20 @@
+// BallResource.js
+var BallResource = pc.createScript('ballResource');
+
+BallResource.attributes.add('balls', {type: 'asset', assetType: 'texture', array: true});
+
+BallResource.prototype.initialize = function() {
+    BallResource.instance = this;
+};
+
+BallResource.prototype.getBall = function(ballNumber) {
+    if (ballNumber >= 1 && ballNumber <= 11)
+        return this.balls[ballNumber];
+    else
+        return this.balls[0];
+};
+
+
 // Tween.js
 pc.extend(pc, function () {
 
@@ -824,22 +841,81 @@ pc.extend(pc, function () {
     }
 })();
 
-// Background.js
-var Background = pc.createScript('background');
+// InGameButton.js
+var InGameButton = pc.createScript('inGameButton');
 
-Background.attributes.add('startPosX', {type: 'number', default: 1});
-Background.attributes.add('endPosX', {type: 'number', default: 1});
-Background.attributes.add('durationTime', {type: 'number', default: 1});
+InGameButton.attributes.add('deleteButton', {type: 'entity'});
+InGameButton.attributes.add('confirmButton', {type: 'entity'});
+InGameButton.attributes.add('cancelButton', {type: 'entity'});
+InGameButton.attributes.add('randomNumberButton', {type: 'entity'});
 
-Background.prototype.initialize = function() {
-    this.entity.setLocalPosition(this.startPosX, 0, 0);
-    this.tween = this.entity.tween(this.entity.getLocalPosition())
-        .to(new pc.Vec3(this.endPosX, 0, 0), this.durationTime, pc.Linear)
-        .loop(true)
-        .yoyo(true);
-    
-    this.tween.start();
+InGameButton.attributes.add('numberImage', {type: 'entity', array: true});
+
+InGameButton.prototype.initialize = function() {
+    InGameButton.instance = this;
+
+    setButton(this.deleteButton, this.onClickDeleteButton, this);
+    //setButton(this.selectButton, this.onClickSelectButton, this);
+    setButton(this.confirmButton, this.onClickConfirmButton, this);
+    setButton(this.randomNumberButton, this.onClickRandomNumberButton, this);
+    setButton(this.cancelButton, this.onClickCancelButton, this);
 };
+
+
+InGameButton.prototype.reset = function() {
+    //this.moveNumberPos();
+};
+
+InGameButton.prototype.resetAllNumber = function() {
+    this.numberImage.forEach( (ball) => {
+        ball.script.numberButton.activeButton(true);
+    });
+};
+
+InGameButton.prototype.activeButton = function(isActive) {
+
+    this.deleteButton.button.active = isActive;
+    this.confirmButton.button.active = isActive;
+    this.randomNumberButton.button.active = isActive;
+    this.cancelButton.button.active = isActive;
+
+    this.numberImage.forEach( (ball) => {
+        ball.script.numberButton.activeButton(isActive);
+    });
+};
+
+
+
+
+
+InGameButton.prototype.moveNumberPos = function() {
+};
+
+InGameButton.prototype.onClickDeleteButton = function() {
+    AudioController.instance.playSound('Click');
+    Bottom.instance.userNumberDelete();
+};
+
+InGameButton.prototype.onClickSelectButton = function(number) {
+    AudioController.instance.playSound('Click');
+    Bottom.instance.userNumberSet(number);  
+};
+
+InGameButton.prototype.onClickConfirmButton = function() {
+    AudioController.instance.playSound('Click');
+    Bottom.instance.confirmNumber();
+};
+
+InGameButton.prototype.onClickRandomNumberButton = function() {
+    AudioController.instance.playSound('Click');
+    Bottom.instance.setRandom();
+};
+
+InGameButton.prototype.onClickCancelButton = function() {
+    AudioController.instance.playSound('Click');
+    GameController.instance.betStart();
+};
+
 
 // UserBalance.js
 var UserBalance = pc.createScript('userBalance');
@@ -932,21 +1008,23 @@ DummyServer.prototype.betGame = function(betAmount, betNumber) {
         }
     }
     
-    let ratio = 0;
-    if (matchedBall.length === 1)   ratio = 2;
-    else if (matchedBall.length === 2)   ratio = 7;
-    else if (matchedBall.length === 3)   ratio = 165;
-
-    this.userBalance = beforeResult + betAmount * ratio;
+    let multiplier = 0;
+    let profit = 0;
+    if (matchedBall.length === 1)   multiplier = 2;
+    else if (matchedBall.length === 2)   multiplier = 7;
+    else if (matchedBall.length === 3)   multiplier = 165;
+    profit = betAmount * multiplier;
+    this.userBalance = beforeResult + profit;
 
     let betReturn = {
         beforeResultBalance : beforeResult,
         balance : this.userBalance,
         betAmount : this.betAmount,
         ball : ball,
-        winRatio : ratio,
+        winMultiplier : multiplier,
+        profit : profit,
         result : matchedBall,
-        isWin : ratio !== 0,
+        isWin : multiplier !== 0,
     };
     console.log('betGame', betReturn);
     
@@ -1107,43 +1185,9 @@ function getCommaText(number) {
     return commas;
 }
 
-// CardFront.js
-var CardFront = pc.createScript('cardFront');
-
-CardFront.attributes.add('numberImage', {type: 'entity', array: true});
-CardFront.attributes.add('isRedDice', {type: 'boolean'});
-
-CardFront.prototype.initialize = function() {
-    this.numPattern = [];
-
-    this.numPattern.push([3]); // 1
-    this.numPattern.push([0, 6]); // 2
-    this.numPattern.push([0, 3, 6]); // 3
-    this.numPattern.push([0, 1, 5, 6]); // 4
-    this.numPattern.push([0, 1, 3, 5, 6]); // 5
-    this.numPattern.push([0, 1, 2, 4, 5, 6]); // 6
+function changeTexture(target, texture) {
+    target.element.texture = texture.resource;
 };
-
-CardFront.prototype.disableAllNumber = function() {
-    this.numberImage.forEach(e => e.enabled = false);
-};
-
-CardFront.prototype.setCardNumber = function(number) {
-    //console.log('setCardNumber', number);
-    this.disableAllNumber();
-
-    let pattern = this.numPattern[number - 1];
-    pattern.forEach(num => this.numberImage[num].enabled = true);
-};
-
-CardFront.prototype.setCard = function(number) {
-    console.log('CardFront.prototype.setCard');
-    if (this.isRedDice) AudioController.instance.playSound('redDice');
-    else                AudioController.instance.playSound('blueDice');
-    this.setCardNumber(number);
-};
-
-
 
 // async.js
 /*jshint esversion:8*/
@@ -1179,7 +1223,6 @@ async function loadJsonFromRemote(url, callback) {
 // Middle.js
 var Middle = pc.createScript('middle');
 
-Middle.attributes.add('shuffleBall', {type: 'entity'});
 Middle.attributes.add('resultBall', {type: 'entity', array : true});
 
 Middle.prototype.initialize = function() {
@@ -1223,10 +1266,10 @@ Middle.prototype.setResult = async function(resultNumbers) {
 
     //shffle ball
     for(let i = 0; i < 3; ++i){
-        this.shuffleBall.script.numberBall.startShuffle(resultNumbers.slice(i, resultNumbers.lenth));
+        this.resultBall[i].script.numberBall.startShuffle(resultNumbers.slice(i, resultNumbers.lenth));
         await delay(500);
-        this.shuffleBall.script.numberBall.stopShuffle();
-        this.shuffleBall.script.numberBall.setBallNumber(resultNumbers[i]);
+        this.resultBall[i].script.numberBall.stopShuffle();
+        this.resultBall[i].script.numberBall.setBallNumber(resultNumbers[i]);
         this.resultBall[i].script.numberBall.setBallNumber(resultNumbers[i]);
         Bottom.instance.checkMatched(resultNumbers[i]);
         await delay(300);
@@ -1242,13 +1285,12 @@ Middle.prototype.doIdle = async function() {
     //result ball reset
     this.resetResultBall();
 
-    //shffle ball
     for(let i = 0; i < 3; ++i){
-        this.shuffleBall.script.numberBall.startShuffle(ball.slice(i, ball.lenth));
+        this.resultBall[i].script.numberBall.startShuffle(ball.slice(i, ball.lenth));
         await delay(500);
         if (this.stateCheck() === false)  return;
-        this.shuffleBall.script.numberBall.stopShuffle();
-        this.shuffleBall.script.numberBall.setBallNumber(selectedCard[i]);
+        this.resultBall[i].script.numberBall.stopShuffle();
+        this.resultBall[i].script.numberBall.setBallNumber(selectedCard[i]);
         this.resultBall[i].script.numberBall.setBallNumber(selectedCard[i]);
         AudioController.instance.playSound('ShowBall');
         await delay(300);
@@ -1270,33 +1312,13 @@ Middle.prototype.setReady = function() {
     clearTimeout(this.idleTimer);
 
     let ball = shuffle(getDeck());
-    this.shuffleBall.script.numberBall.startShuffle(ball.slice(0, ball.lenth));
+    //this.shuffleBall.script.numberBall.startShuffle(ball.slice(0, ball.lenth));
     this.resetResultBall();
-};
-
-
-// Card.js
-var Card = pc.createScript('card');
-
-Card.attributes.add('cardRoot', {type: 'entity'});
-Card.attributes.add('cardNumber', {type: 'entity'});
-
-Card.prototype.initialize = function() {
-    this.readyTimer = null;
-    this.prevNumber = 0;
-};
-
-Card.prototype.setCard = function(number, type) {
-    this.cardRoot.enabled = true;
-    this.prevNumber = number;
-
-    this.cardNumber.element.text = number;
-    this.cardNumber.element.color = getTypeColor(type);
-};
-
-
-Card.prototype.setReady = function() {
-    this.cardRoot.enabled = false;
+    
+    this.resultBall.forEach( (rBall) => {
+        rBall.script.numberBall.startShuffle(ball.slice(0, ball.lenth));
+    });
+    
 };
 
 
@@ -1330,42 +1352,8 @@ GameController.prototype.betStart = function() {
 GameController.prototype.startGame = function() {
     Middle.instance.setReady();
     Bottom.instance.setStartGame();
-
-    //let gameInfo = DummyServer.instance.startGame(betAmount, number);
-
-    //UserBalance.instance.setBalance(gameInfo.balance);
 };
 
-GameController.prototype.getResultText = function(resultText, index){
-    let resultModText = resultText.slice(0, index + 1);
-
-    for(let i = index; i < 2; ++i){
-        resultModText += 'g';
-    }
-
-    return resultModText;
-};
-
-GameController.prototype.getCardColor = function(color, cards){
-    if (color === 'r')  return cards[0];
-    if (color === 'y')  return cards[1];
-    if (color === 'b')  return cards[2];
-};
-
-GameController.prototype.getOpenOrder = function(cards, result){
-    let cardOrder = [];
-
-    for(let i = 0; i < 3; ++i){
-        let card = this.getCardColor(result[i], cards);
-        let resultText = this.getResultText(result, i);
-        cardOrder.push({
-            card : card, 
-            resultText : resultText
-        });
-    }
-
-    return cardOrder;
-};
 
 GameController.prototype.betGame = async function(betAmount, numbers) {
     let result = DummyServer.instance.betGame(betAmount, numbers);
@@ -1389,7 +1377,7 @@ GameController.prototype.betGame = async function(betAmount, numbers) {
     Middle.instance.setResult(arr);
     await delay(2500);
 
-    Bottom.instance.setResultGame(result.isWin);
+    Bottom.instance.setResultGame(result.isWin, result.winMultiplier, result.profit);
     UserBalance.instance.setBalance(result.balance);
 
     await delay(6000);
@@ -1409,19 +1397,18 @@ GameController.prototype.setIdle = function() {
 var Bottom = pc.createScript('bottom');
 
 Bottom.attributes.add('userSelectionBall', {type: 'entity', array : true});
+Bottom.attributes.add('matchedBG', {type: 'entity', array : true});
+
+Bottom.attributes.add('sign', {type: 'entity'});
 
 Bottom.attributes.add('startButton', {type: 'entity'});
 
 Bottom.attributes.add('ballSelectUi', {type: 'entity'});
 
 Bottom.attributes.add('winResult', {type: 'entity'});
+Bottom.attributes.add('multiplier', {type: 'entity'});
+Bottom.attributes.add('profit', {type: 'entity'});
 Bottom.attributes.add('loseResult', {type: 'entity'});
-
-Bottom.attributes.add('lBell', {type: 'entity'});
-Bottom.attributes.add('rBell', {type: 'entity'});
-
-Bottom.attributes.add('winColor', {type: 'asset', assetType: 'texture'});
-Bottom.attributes.add('winGrey', {type: 'asset', assetType: 'texture'});
 
 Bottom.attributes.add('betUi', {type:'entity'});
 
@@ -1431,7 +1418,7 @@ Bottom.prototype.initialize = function() {
     this.setButton(this.startButton, this.onClickStart);
 
     this.betButtons = [];
-    this.disableAll();
+    //this.disableAll();
 
     this.winEffectTimer = null;
     this.bellToggle = false;
@@ -1439,6 +1426,10 @@ Bottom.prototype.initialize = function() {
     this.inGame = false;
 
     this.userSelectionNumber = [];
+};
+
+Bottom.prototype.postInitialize = function() {
+    this.disableAll();
 };
 
 Bottom.prototype.setBet = function() {
@@ -1471,19 +1462,19 @@ Bottom.prototype.onClickBet = function(betType){
 
 Bottom.prototype.setEnableColor = function(target) {
     //target.element.color = new pc.Color(1, 1, 1, 1);
-    target.element.texture = this.winColor.resource;
+    //target.element.texture = this.winColor.resource;
 };
 
 Bottom.prototype.setDisableColor = function(target) {
     //target.element.color = new pc.Color(0.5, 0.5, 0.5, 1);
-    target.element.texture = this.winGrey.resource;
+    //target.element.texture = this.winGrey.resource;
 };
 
 Bottom.prototype.disableAll = function() {
     clearTimeout(this.winEffectTimer);
 
-    this.setDisableColor(this.lBell);
-    this.setDisableColor(this.rBell);
+    //this.setDisableColor(this.lBell);
+    //this.setDisableColor(this.rBell);
 
     this.startButton.enabled = false;
 
@@ -1492,7 +1483,9 @@ Bottom.prototype.disableAll = function() {
     this.winResult.enabled = false;
     this.loseResult.enabled = false;
 
-    this.ballSelectUi.enabled = false;
+    this.sign.enabled = false;
+    //this.ballSelectUi.enabled = false;
+    InGameButton.instance.activeButton(false);
 
     this.betUi.enabled = false;
 };
@@ -1501,8 +1494,9 @@ Bottom.prototype.disableAll = function() {
 Bottom.prototype.setIdle = function() {
     this.disableAll();
     this.resetUserSelectionBall();
-    this.userSelectionBall.forEach( (ball) => {
-        ball.parent.element.color = new pc.Color(0.4, 0.4, 0.4, 1);
+    this.moveSign.enabled = false;
+    this.matchedBG.forEach( (ball) => {
+        ball.enabled = false;
     });
 
     setTimeout( () => {
@@ -1524,7 +1518,7 @@ Bottom.prototype.userNumberDelete = function() {
 
     if (idx <= 0)
         return;
-    
+    this.moveSign(idx - 1);
     this.userSelectionBall[idx - 1].script.numberBall.setBallNumber(0);
 
     this.userSelectionNumber.pop();
@@ -1534,6 +1528,8 @@ Bottom.prototype.userNumberDelete = function() {
 Bottom.prototype.setRandom = function(number) {
     if (this.userSelectionNumber.length >= 3)
         return;
+
+    this.sign.enabled = false;
 
     let arr2 = this.userSelectionNumber.slice(0, this.userSelectionNumber.length);
 
@@ -1562,7 +1558,7 @@ Bottom.prototype.userNumberSet = function(number) {
 
     if (idx >= 3)
         return;
-
+    this.moveSign(idx + 1);
     this.userSelectionNumber.push(number);
     this.userSelectionBall[idx].script.numberBall.setBallNumber(number);
 };
@@ -1571,22 +1567,40 @@ Bottom.prototype.confirmNumber = function(){
     if (this.userSelectionNumber.length < 3)
         return;
 
+    this.moveSign.enabled = false;
+
     this.disableAll();
     GameController.instance.betGame(BetController.instance.betAmount, this.userSelectionNumber);
 };
 
 Bottom.prototype.checkMatched = function(number){
     let isGreen = false;
-    this.userSelectionBall.forEach((ball) => {
-        if (ball.script.numberBall.getBallNumber() === number){
-            ball.parent.element.color = new pc.Color(0, 1, 0, 1);
+    for(let i = 0 ; i < 3; ++i){
+        if (this.userSelectionBall[i].script.numberBall.getBallNumber() === number){
+            this.matchedBG[i].enabled = true;
+            //ball.parent.element.color = new pc.Color(0, 1, 0, 1);
             isGreen = true;
         }       
-    });
+    }
+    
 
     if (isGreen) AudioController.instance.playSound('Green');
     else AudioController.instance.playSound('NonGreen');
 };
+
+Bottom.prototype.moveSign = function(idx) {
+    if (idx > 2){
+        this.sign.enabled = false;
+        return;
+    }   
+    this.sign.enabled = true;
+    let pos = this.sign.getLocalPosition();
+    pos.x = this.userSelectionBall[idx].getLocalPosition().x;
+
+    this.sign.setLocalPosition(pos);
+};
+
+
 
 Bottom.prototype.setStartGame = function() {
     this.disableAll();
@@ -1598,27 +1612,26 @@ Bottom.prototype.setStartGame = function() {
 
     setTimeout( () => {
         this.inGame = true;
-        this.ballSelectUi.enabled = true;
+        //this.ballSelectUi.enabled = true;
+        InGameButton.instance.activeButton(true);
         InGameButton.instance.reset();
+        this.sign.enabled = true;
+        this.moveSign(0);
     }, 1000);
 };
 
 Bottom.prototype.playWinEffect = function() {
-    this.bellToggle = !this.bellToggle;
-    this.setDisableColor(this.bellToggle ? this.lBell : this.rBell);
-    this.setEnableColor(!this.bellToggle ? this.lBell : this.rBell);
-
-    this.winEffectTimer = setTimeout( () => {
-        this.playWinEffect();
-    }, 150);
+    return;
 };
 
-Bottom.prototype.setResultGame = function(isWin) {
+Bottom.prototype.setResultGame = function(isWin, multiplier, profit) {
     //this.disableAll();
 
     setTimeout( () => {
         if (isWin){
             AudioController.instance.playSound('Win');
+            this.multiplier.element.text = `${multiplier}x`;
+            this.profit.element.text = `+${profit}`;
             this.playWinEffect();
         }
         else{
@@ -1655,61 +1668,6 @@ AudioController.prototype.playSound = function(type) {
     console.log('AudioController.prototype.playSound', type);
     this.soundSource.sound.play(type);
 };
-
-// Ryb.js
-var Ryb = pc.createScript('ryb');
-
-Ryb.attributes.add('colorImg', {type: 'entity', array: true});
-Ryb.attributes.add('colorText', {type: 'entity', array: true});
-
-Ryb.attributes.add('defaultOrder', {type: 'string'});
-//rybg
-Ryb.attributes.add('cardType', {type: 'asset', assetType: 'texture', array: true});
-
-Ryb.prototype.initialize = function() {
-    
-};
-
-Ryb.prototype.postInitialize = function() {
-    this.init();
-};
-
-Ryb.prototype.getDefaultOrder = function() {
-    return this.defaultOrder;
-};
-
-Ryb.prototype.getImage = function(type) {
-    if (type === 'r') return this.cardType[0].resource;
-    if (type === 'y') return this.cardType[1].resource;
-    if (type === 'b') return this.cardType[2].resource;
-    if (type === 'g') return this.cardType[3].resource;
-};
-
-Ryb.prototype.init = function() {
-    this.setRyb(this.defaultOrder);
-};
-
-Ryb.prototype.setRyb = function(str){
-    //console.log(str);
-    for (let i = 0; i < 3; i++) {
-        let item = str[i];
-
-        this.colorText[i].element.text = (item === 'g') ? '?' : item.toUpperCase();
-        this.colorImg[i].element.texture = this.getImage(item);
-    }
-};
-
-// RankColor.js
-var RankColor = pc.createScript('rankColor');
-
-RankColor.attributes.add('color', {type: 'entity', array : true});
-
-RankColor.prototype.initialize = function() {
-    for(let i = 0; i < 4; ++i){
-        this.color[i].element.color = getTypeColor(i);
-    }
-};
-
 
 // SoundButton.js
 var SoundButton = pc.createScript('soundButton');
@@ -1857,103 +1815,6 @@ NumButton.prototype.onClick = function() {
     //this.entity.element.color = rgbToColor(154, 117, 244, 255);
 };
 
-// InGameButton.js
-var InGameButton = pc.createScript('inGameButton');
-
-InGameButton.attributes.add('leftButton', {type: 'entity'});
-InGameButton.attributes.add('rightButton', {type: 'entity'});
-InGameButton.attributes.add('deleteButton', {type: 'entity'});
-InGameButton.attributes.add('selectButton', {type: 'entity'});
-InGameButton.attributes.add('confirmButton', {type: 'entity'});
-InGameButton.attributes.add('cancelButton', {type: 'entity'});
-InGameButton.attributes.add('randomNumberButton', {type: 'entity'});
-
-
-InGameButton.attributes.add('numberGroup', {type: 'entity'});
-InGameButton.attributes.add('defaultGroupPos', {type: 'number'});
-InGameButton.attributes.add('numberGroupOffset', {type: 'number'});
-
-InGameButton.attributes.add('numberImage', {type: 'entity', array: true});
-
-InGameButton.prototype.initialize = function() {
-    InGameButton.instance = this;
-
-    this.selectionNumber = 1;
-    setButton(this.leftButton, this.onClickLeftButton, this);
-    setButton(this.rightButton, this.onClickRightButton, this);
-    setButton(this.deleteButton, this.onClickDeleteButton, this);
-    setButton(this.selectButton, this.onClickSelectButton, this);
-    setButton(this.confirmButton, this.onClickConfirmButton, this);
-    setButton(this.randomNumberButton, this.onClickRandomNumberButton, this);
-    setButton(this.cancelButton, this.onClickCancelButton, this);
-};
-
-
-InGameButton.prototype.reset = function() {
-    this.selectionNumber = 1;
-    this.moveNumberPos();
-};
-
-InGameButton.prototype.resetAllNumber = function() {
-    this.numberImage.forEach( (ball) => {
-        ball.script.numberBall.resetSize();
-    });
-};
-
-
-
-InGameButton.prototype.moveNumberPos = function() {
-    let posX = this.defaultGroupPos + ((this.selectionNumber - 1 )* this.numberGroupOffset);
-    this.resetAllNumber();
-    this.numberImage[this.selectionNumber - 1].script.numberBall.selectBall();
-
-    this.numberGroup.setLocalPosition(posX, 0, 0);
-};
-
-InGameButton.prototype.onClickLeftButton = function() {
-    AudioController.instance.playSound('Click');
-    if (this.selectionNumber <= 1)
-        return;
-
-    this.selectionNumber--;
-    this.moveNumberPos();
-};
-
-InGameButton.prototype.onClickRightButton = function() {
-    AudioController.instance.playSound('Click');
-    if (this.selectionNumber >= 11)
-        return;
-
-    this.selectionNumber++;
-    this.moveNumberPos();
-};
-
-InGameButton.prototype.onClickDeleteButton = function() {
-    AudioController.instance.playSound('Click');
-    Bottom.instance.userNumberDelete();
-};
-
-InGameButton.prototype.onClickSelectButton = function() {
-    AudioController.instance.playSound('Click');
-    Bottom.instance.userNumberSet(this.selectionNumber);  
-};
-
-InGameButton.prototype.onClickConfirmButton = function() {
-    AudioController.instance.playSound('Click');
-    Bottom.instance.confirmNumber();
-};
-
-InGameButton.prototype.onClickRandomNumberButton = function() {
-    AudioController.instance.playSound('Click');
-    Bottom.instance.setRandom();
-};
-
-InGameButton.prototype.onClickCancelButton = function() {
-    AudioController.instance.playSound('Click');
-    GameController.instance.betStart();
-};
-
-
 // NumberBall.js
 var NumberBall = pc.createScript('numberBall');
 
@@ -1962,7 +1823,7 @@ NumberBall.attributes.add('numberText', {type: 'entity'});
 
 NumberBall.prototype.initialize = function() {
     this.shuffleTween = null;
-    this.setNumber(this.defaultNum);
+    
     this.ballNumber = this.defaultNum;
 
     this.isStartShuffle = false;
@@ -1972,6 +1833,10 @@ NumberBall.prototype.initialize = function() {
     
     this.sizeTween = null;
     this.scaleTween = null;
+};
+
+NumberBall.prototype.postInitialize = function(){
+    this.setNumber(this.defaultNum);
 };
 
 NumberBall.prototype.stopAllTween = function(){
@@ -2011,6 +1876,7 @@ NumberBall.prototype.selectBall = function() {
 };
 
 NumberBall.prototype.resetSize = function() {
+    return;
     let duration = 0.1;
     this.stopAllTween();
 
@@ -2040,7 +1906,6 @@ NumberBall.prototype.resetSize = function() {
         child.setLocalScale(newScale, newScale, newScale);
     });
     this.scaleTween.start();
-
     }
 
 };
@@ -2056,6 +1921,8 @@ NumberBall.prototype.getBallNumber = function() {
 };
 
 NumberBall.prototype.setNumber = function(number) {
+    changeTexture(this.entity, BallResource.instance.getBall(number));
+    /*
     if (number >= 1 && number <= 11)
         this.numberText.element.text = `${number}`;
     else
@@ -2064,8 +1931,7 @@ NumberBall.prototype.setNumber = function(number) {
     let color = getNumberColor(number);
     //console.log('NumberBall.prototype.setNumber', color);
     this.entity.element.color = getNumberColor(number);
-
-    
+    */
 };
 
 NumberBall.prototype.update = function(dt) {
@@ -2091,5 +1957,30 @@ NumberBall.prototype.startShuffle = function(array) {
 
 NumberBall.prototype.stopShuffle = function() {
     this.isStartShuffle = false;
+};
+
+// NumberButton.js
+var NumberButton = pc.createScript('numberButton');
+
+NumberButton.attributes.add('defaultNum', {type: 'number', default: 0});
+NumberButton.attributes.add('select', {type: 'asset', assetType: 'texture'});
+NumberButton.attributes.add('deselect', {type: 'asset', assetType: 'texture'});
+
+// initialize code called once per entity
+NumberButton.prototype.initialize = function() {
+    this.entity.children[0].element.text = `${this.defaultNum}`;
+
+    setButton(this.entity, this.onClick, this);
+};
+
+NumberButton.prototype.onClick = function() {
+    this.activeButton(false);
+    InGameButton.instance.onClickSelectButton(this.defaultNum);
+};
+
+NumberButton.prototype.activeButton = function(isActive) {
+    this.entity.button.active = isActive;
+
+    changeTexture(this.entity, isActive? this.select : this.deselect);
 };
 
