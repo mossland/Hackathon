@@ -37,7 +37,7 @@ namespace PlaycanvasDownloader
         private bool needStop = false;
 
         private string failList;
-        private string[] projectAllName = { "thug_war", "RockPaperScissors", "HGOE", "Lucky7Dice", "RYB", "Lucky11Ball", "HeadsAndTails", "CCR", "Higher" };
+        private string[] projectAllName = { "thug_war", "RockPaperScissors", "HGOE", "Lucky7Dice", "RYB", "Lucky11Ball", "HeadsAndTails", "CCR", "Higher", "PairPair" };
 
         public MainWindow()
         {
@@ -138,6 +138,15 @@ namespace PlaycanvasDownloader
                     name = "Higher",
                     id = 995180,
                     sceneNumber = 1559734,
+                };
+            }
+            else if (name == "PairPair")
+            {
+                return new PlaycanvasProject()
+                {
+                    name = "PairPair",
+                    id = 1004003,
+                    sceneNumber = 1579160,
                 };
             }
 
