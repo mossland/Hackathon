@@ -10,4 +10,6 @@
 7. If both cards have the same number, it becomes a tie.
 ```
 
+![higher_demo](https://user-images.githubusercontent.com/13128375/211447291-b8c37240-8872-4ec7-98e6-19b9355b982b.gif)
+
 [Demo Page](http://asset.moss.land/Higher/index.html)
