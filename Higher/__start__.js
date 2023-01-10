@@ -31,6 +31,9 @@
             // Disable I-bar cursor on click+drag
             canvas.onselectstart = function () { return false; };
 
+            // Disable long-touch select on iOS devices
+            canvas.style['-webkit-user-select'] = 'none';
+
             document.body.appendChild(canvas);
 
             return canvas;
