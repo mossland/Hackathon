@@ -9,4 +9,7 @@
 6. K가 가장 큰 수이고, A가 가장 작은 숫자이다.
 7. 두 카드의 숫자가 동일하면 Tie가 된다.
 ```
+
+![higher_demo](https://user-images.githubusercontent.com/13128375/211447291-b8c37240-8872-4ec7-98e6-19b9355b982b.gif)
+
 [데모 페이지](http://asset.moss.land/Higher/index.html)
