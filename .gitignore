@@ -191,3 +191,5 @@ StyleCop.Cache
 bin
 obj
 Tool/PlaycanvasDownloader/.vs/PlaycanvasDownloader/DesignTimeBuild/.dtbcache.v2
+provably_fair_implementation/.DS_Store
+.DS_Store
