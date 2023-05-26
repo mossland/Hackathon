@@ -6,8 +6,10 @@ import land.moss.tool.StringUtils
 import land.moss.cryptoapis.response.CreateCoinsTransactionRequestFromAddressResponse
 import land.moss.cryptoapis.response.GenerateDepositAddressResponse
 import land.moss.cryptoapis.request.CreateCoinsTransactionRequestFromAddressRequest
+import land.moss.cryptoapis.request.CreateCoinsTransactionRequestFromWalletRequest
 import land.moss.cryptoapis.request.GenerateDepositAddressRequest
 import land.moss.cryptoapis.request.Request
+import land.moss.cryptoapis.response.CreateCoinsTransactionRequestFromWalletResponse
 import land.moss.http.HttpConnector
 import land.moss.http.HttpHeaderList
 import land.moss.http.HttpMethod
@@ -35,8 +37,8 @@ class CryptoApis( val apiKey: String ) {
         blockchain: Blockchain,
         network: Network,
         walletId: String,
-        request: CreateCoinsTransactionRequestFromAddressRequest
-    ): CreateCoinsTransactionRequestFromAddressResponse {
+        request: CreateCoinsTransactionRequestFromWalletRequest
+    ): CreateCoinsTransactionRequestFromWalletResponse {
 
         val url = "${CryptoApis.BASE_URL}/wallet-as-a-service/wallets/${walletId}/${blockchain.value}/${network.name}/transaction-requests"
         return this.request( HttpMethod.POST, url, request )
