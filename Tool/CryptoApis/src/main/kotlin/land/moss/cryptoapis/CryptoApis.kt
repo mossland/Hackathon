@@ -3,6 +3,7 @@ package land.moss.cryptoapis
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import land.moss.cryptoapis.callback.CreateCoinsTransactionRequestCallback
+import land.moss.cryptoapis.callback.NewConfirmedCoinsTransactionsCallback
 import land.moss.cryptoapis.request.*
 import land.moss.cryptoapis.response.*
 import land.moss.tool.StringUtils
@@ -76,7 +77,11 @@ class CryptoApis( val apiKey: String ) {
     fun getCreateCoinsTransactionRequestCallback( body:String ): CreateCoinsTransactionRequestCallback {
         return this.mapper.readValue<CreateCoinsTransactionRequestCallback>(body)
     }
-    
+
+    fun getNewConfirmedCoinsTransactionsCallback( body:String ): NewConfirmedCoinsTransactionsCallback {
+        return this.mapper.readValue<NewConfirmedCoinsTransactionsCallback>(body)
+    }
+
     private inline fun <reified T> request(method:String, url:String, request: Request) : T {
 
         val httpConnector = HttpConnector( method, url )

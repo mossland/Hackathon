@@ -1,13 +1,12 @@
 package land.moss.cryptoapis.callback
 
-
 class CreateCoinsTransactionRequestCallbackItem {
-    val blockchain: String? = null
-    val network: String? = null
-    val requiredApprovals: Int? = null
-    val requiredRejections: Int? = null
-    val currentApprovals: Int? = null
-    val currentRejections: Int? = null
+    var blockchain: String? = null
+    var network: String? = null
+    var requiredApprovals: Int? = null
+    var requiredRejections: Int? = null
+    var currentApprovals: Int? = null
+    var currentRejections: Int? = null
 }
 
 class CreateCoinsTransactionRequestCallbackData : CallbackData() {
