@@ -1,6 +1,6 @@
 package land.moss.cryptoapis.response
 
-class NewConfirmedCoinsTransactionsResponseItem {
+class NewConfirmedTransactionsResponseItem {
 
     val address: String? = null
     val callbackSecretKey: String? = null
@@ -12,11 +12,11 @@ class NewConfirmedCoinsTransactionsResponseItem {
     val referenceId: String? = null
 }
 
-class NewConfirmedCoinsTransactionsResponseData  {
-    var item:NewConfirmedCoinsTransactionsResponseItem? = null
+class NewConfirmedTransactionsResponseData  {
+    var item:NewConfirmedTransactionsResponseItem? = null
 }
 
-class NewConfirmedCoinsTransactionsResponse (
+class NewConfirmedTransactionsResponse (
 ) : Response() {
-    var data:NewConfirmedCoinsTransactionsResponseData? = null
+    var data:NewConfirmedTransactionsResponseData? = null
 }

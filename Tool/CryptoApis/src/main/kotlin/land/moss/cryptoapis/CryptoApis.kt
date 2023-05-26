@@ -3,11 +3,8 @@ package land.moss.cryptoapis
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import land.moss.cryptoapis.request.*
+import land.moss.cryptoapis.response.*
 import land.moss.tool.StringUtils
-import land.moss.cryptoapis.response.CreateCoinsTransactionRequestFromAddressResponse
-import land.moss.cryptoapis.response.GenerateDepositAddressResponse
-import land.moss.cryptoapis.response.CreateCoinsTransactionRequestFromWalletResponse
-import land.moss.cryptoapis.response.NewConfirmedCoinsTransactionsResponse
 import land.moss.http.HttpConnector
 import land.moss.http.HttpHeaderList
 import land.moss.http.HttpMethod
@@ -54,16 +51,27 @@ class CryptoApis( val apiKey: String ) {
         return this.request( HttpMethod.POST, url, request )
     }
 
-    
+
     fun newConfirmedCoinsTransactionsRequest(
         blockchain: Blockchain,
         network: Network,
-        request: NewConfirmedCoinsTransactionsRequest
-    ): NewConfirmedCoinsTransactionsResponse {
+        request: NewConfirmedTransactionsRequest
+    ): NewConfirmedTransactionsResponse {
 
         val url = "${CryptoApis.BASE_URL}/blockchain-events/${blockchain}/${network.name}/subscriptions/address-coins-transactions-confirmed"
         return this.request( HttpMethod.POST, url, request )
     }
+
+    fun newConfirmedTokensTransactionsRequest(
+        blockchain: Blockchain,
+        network: Network,
+        request: NewConfirmedTransactionsRequest
+    ): NewConfirmedTransactionsResponse {
+
+        val url = "${CryptoApis.BASE_URL}/blockchain-events/${blockchain}/${network.name}/subscriptions/address-tokens-transactions-confirmed"
+        return this.request( HttpMethod.POST, url, request )
+    }
+
 
 
     private inline fun <reified T> request(method:String, url:String, request: Request) : T {
