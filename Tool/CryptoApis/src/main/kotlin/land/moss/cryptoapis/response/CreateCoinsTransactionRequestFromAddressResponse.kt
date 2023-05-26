@@ -1,6 +1,7 @@
 package land.moss.cryptoapis.response
 
 import land.moss.cryptoapis.FeePriority
+import land.moss.cryptoapis.TransactionRequestStatus
 
 class CreateCoinsTransactionRequestFromAddressResponseItemSenders {
     var address:String? = null
@@ -23,7 +24,7 @@ class CreateCoinsTransactionRequestFromAddressResponseItem {
     var recipients:List<CreateCoinsTransactionRequestFromAddressResponseItemRecipient>? = null
     var senders:CreateCoinsTransactionRequestFromAddressResponseItemSenders? = null
     var transactionRequestId:String? = null
-    var transactionRequestStatus:String? = null
+    var transactionRequestStatus: TransactionRequestStatus? = null
 }
 
 class CreateCoinsTransactionRequestFromAddressResponseData {

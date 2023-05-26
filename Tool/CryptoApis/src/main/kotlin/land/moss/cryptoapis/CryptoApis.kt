@@ -2,6 +2,7 @@ package land.moss.cryptoapis
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import land.moss.tool.StringUtils
 import land.moss.cryptoapis.response.CreateCoinsTransactionRequestFromAddressResponse
 import land.moss.cryptoapis.response.GenerateDepositAddressResponse
 import land.moss.cryptoapis.request.CreateCoinsTransactionRequestFromAddressRequest
@@ -11,7 +12,6 @@ import land.moss.http.HttpConnector
 import land.moss.http.HttpHeaderList
 import land.moss.http.HttpMethod
 import land.moss.http.HttpResponse
-import land.moss.tool.StringUtils
 
 class CryptoApis( val apiKey: String ) {
 
@@ -31,8 +31,18 @@ class CryptoApis( val apiKey: String ) {
         return this.request( HttpMethod.POST, url, request )
     }
 
+    fun createCoinsTransactionRequestFromWallet(
+        blockchain: Blockchain,
+        network: Network,
+        walletId: String,
+        request: CreateCoinsTransactionRequestFromAddressRequest
+    ): CreateCoinsTransactionRequestFromAddressResponse {
 
-    fun createCoinsTransactionRequestFromAddressRequest(
+        val url = "${CryptoApis.BASE_URL}/wallet-as-a-service/wallets/${walletId}/${blockchain.value}/${network.name}/transaction-requests"
+        return this.request( HttpMethod.POST, url, request )
+    }
+
+    fun createCoinsTransactionRequestFromAddress(
         blockchain: Blockchain,
         network: Network,
         walletId: String,
@@ -55,7 +65,7 @@ class CryptoApis( val apiKey: String ) {
         )
 
         httpConnector.httpRequestBody = this.mapper.writeValueAsString( request )
-        val httpResponse: HttpResponse = httpConnector.request()
+        val httpResponse:HttpResponse = httpConnector.request()
         val responseString:String = this.extractResponseString( httpResponse )
         val response = this.mapper.readValue<T>(responseString)
         httpResponse.shutdown();
