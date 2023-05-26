@@ -1,8 +1,7 @@
 package land.moss.cryptoapis
 
-import cryptoapis.reponse.GenerateDepositAddressResponse
-import cryptoapis.request.GenerateDepositAddressRequest
-import cryptoapis.request.GenerateDepositAddressRequestItem
+import land.moss.cryptoapis.response.GenerateDepositAddressResponse
+import land.moss.cryptoapis.request.GenerateDepositAddressRequest
 
 
 fun main() {

@@ -1,6 +1,8 @@
 package land.moss.cryptoapis
 
-enum class Blockchain ( val value: String ) {
+import com.fasterxml.jackson.annotation.JsonValue
+
+enum class Blockchain ( @get:JsonValue val value: String ) {
     bitcoin("bitcoin"),
     bitcoin_cash("bitcoin-cash"),
     litecoin("litecoin"),
@@ -11,5 +13,8 @@ enum class Blockchain ( val value: String ) {
     xrp("xrp"),
     zcash("zcash"),
     binance_smart_chain("binance-smart-chain"),
-    tron("tron")
+    tron("tron");
+
+    @JsonValue
+    fun getSerializedValue(): String = value
 }

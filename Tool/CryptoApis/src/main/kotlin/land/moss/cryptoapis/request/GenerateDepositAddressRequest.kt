@@ -1,7 +1,7 @@
 package land.moss.cryptoapis.request
 
-import cryptoapis.Blockchain
-import cryptoapis.Network
+import land.moss.cryptoapis.Blockchain
+import land.moss.cryptoapis.Network
 
 
 class GenerateDepositAddressRequestItem ( var label:String ) {

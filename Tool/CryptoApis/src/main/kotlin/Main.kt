@@ -1,7 +1,7 @@
 import land.moss.cryptoapis.Blockchain
 import land.moss.cryptoapis.CryptoApis
 import land.moss.cryptoapis.Network
-import land.moss.cryptoapis.reponse.GenerateDepositAddressResponse
+import land.moss.cryptoapis.response.GenerateDepositAddressResponse
 import land.moss.cryptoapis.request.GenerateDepositAddressRequest
 
 fun main(args: Array<String>) {

@@ -2,7 +2,9 @@ package land.moss.cryptoapis
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import land.moss.cryptoapis.reponse.GenerateDepositAddressResponse
+import land.moss.cryptoapis.response.CreateCoinsTransactionRequestFromAddressResponse
+import land.moss.cryptoapis.response.GenerateDepositAddressResponse
+import land.moss.cryptoapis.request.CreateCoinsTransactionRequestFromAddressRequest
 import land.moss.cryptoapis.request.GenerateDepositAddressRequest
 import land.moss.cryptoapis.request.Request
 import land.moss.http.HttpConnector
@@ -23,12 +25,25 @@ class CryptoApis( val apiKey: String ) {
         blockchain: Blockchain,
         network: Network,
         walletId: String,
-        request: GenerateDepositAddressRequest
-    ): GenerateDepositAddressResponse {
+        request: GenerateDepositAddressRequest): GenerateDepositAddressResponse {
 
         val url = "${CryptoApis.BASE_URL}/wallet-as-a-service/wallets/${walletId}/${blockchain.value}/${network.name}/addresses"
         return this.request( HttpMethod.POST, url, request )
     }
+
+
+    fun createCoinsTransactionRequestFromAddressRequest(
+        blockchain: Blockchain,
+        network: Network,
+        walletId: String,
+        address: String,
+        request: CreateCoinsTransactionRequestFromAddressRequest
+    ): CreateCoinsTransactionRequestFromAddressResponse {
+
+        val url = "${CryptoApis.BASE_URL}/wallet-as-a-service/wallets/${walletId}/${blockchain.value}/${network.name}/addresses/${address}/transaction-requests"
+        return this.request( HttpMethod.POST, url, request )
+    }
+
 
     private inline fun <reified T> request(method:String, url:String, request: Request) : T {
 
