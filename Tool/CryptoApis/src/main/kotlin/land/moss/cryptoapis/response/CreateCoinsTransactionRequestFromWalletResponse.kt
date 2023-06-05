@@ -11,12 +11,12 @@ class CreateCoinsTransactionRequestFromWalletResponseItemRecipient {
 class CreateCoinsTransactionRequestFromWalletResponseItem {
     var callbackSecretKey:String? = null
     var callbackUrl:String? = null
-    var feePriority:FeePriority? = null
+    var feePriority: FeePriority? = null
     var note:String? = null
     var recipients:List<CreateCoinsTransactionRequestFromWalletResponseItemRecipient>? = null
     var totalTransactionAmount:String? = null
     var transactionRequestId:String? = null
-    var transactionRequestStatus:TransactionRequestStatus? = null
+    var transactionRequestStatus: TransactionRequestStatus? = null
 }
 
 class CreateCoinsTransactionRequestFromWalletResponseData {

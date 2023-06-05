@@ -19,7 +19,7 @@ class CreateCoinsTransactionRequestFromAddressResponseItem {
     var callbackSecretKey:String? = null
     var callbackUrl:String? = null
     var classicAddress:String? = null
-    var feePriority:FeePriority? = null
+    var feePriority: FeePriority? = null
     var note:String? = null
     var recipients:List<CreateCoinsTransactionRequestFromAddressResponseItemRecipient>? = null
     var senders:CreateCoinsTransactionRequestFromAddressResponseItemSenders? = null

@@ -4,7 +4,7 @@ import land.moss.cryptoapis.FeePriority
 
 class CreateCoinsTransactionRequestFromAddressRequestItem (
     var amount:String,
-    var feePriority:FeePriority,
+    var feePriority: FeePriority,
     var recipientAddress:String,
 
     var callbackSecretKey:String? = null,

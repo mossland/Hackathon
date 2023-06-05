@@ -1,6 +1,7 @@
 package land.moss.cryptoapis.request
 
 import land.moss.cryptoapis.FeePriority
+import land.moss.cryptoapis.PrepareStrategy
 
 class CreateCoinsTransactionRequestFromWalletRequestItemRecipients (
     var address:String,
@@ -10,7 +11,7 @@ class CreateCoinsTransactionRequestFromWalletRequestItemRecipients (
 
 class CreateCoinsTransactionRequestFromWalletRequestItem (
 
-    var feePriority:FeePriority,
+    var feePriority: FeePriority,
     var recipients:List<CreateCoinsTransactionRequestFromWalletRequestItemRecipients>,
 
     var callbackSecretKey:String? = null,

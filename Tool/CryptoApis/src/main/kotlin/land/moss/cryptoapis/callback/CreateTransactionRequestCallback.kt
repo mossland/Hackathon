@@ -1,5 +1,6 @@
 package land.moss.cryptoapis.callback
 
+
 class CreateCoinsTransactionRequestCallbackItem {
     var blockchain: String? = null
     var network: String? = null
@@ -7,6 +8,7 @@ class CreateCoinsTransactionRequestCallbackItem {
     var requiredRejections: Int? = null
     var currentApprovals: Int? = null
     var currentRejections: Int? = null
+    var errorMessage: String? = null
 }
 
 class CreateCoinsTransactionRequestCallbackData : CallbackData() {

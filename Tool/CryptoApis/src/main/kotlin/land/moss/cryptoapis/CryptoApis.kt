@@ -2,6 +2,7 @@ package land.moss.cryptoapis
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import land.moss.cryptoapis.callback.CreateAutomaticCoinsForwardingCallback
 import land.moss.cryptoapis.callback.CreateCoinsTransactionRequestCallback
 import land.moss.cryptoapis.callback.NewConfirmedCoinsTransactionsCallback
 import land.moss.cryptoapis.callback.NewConfirmedTokensTransactionsCallback
@@ -54,6 +55,17 @@ class CryptoApis( val apiKey: String ) {
         return this.request( HttpMethod.POST, url, request )
     }
 
+    fun createSingleTransactionRequestFromAddressWithoutFeePriority(
+        blockchain: Blockchain,
+        network: Network,
+        walletId: String,
+        address: String,
+        request: CreateSingleTransactionRequestFromAddressWithoutFeePriorityRequest
+    ): CreateSingleTransactionRequestFromAddressWithoutFeePriorityResponse {
+
+        val url = "${CryptoApis.BASE_URL}/wallet-as-a-service/wallets/${walletId}/${blockchain.value}/${network.name}/addresses/${address}/feeless-transaction-requests"
+        return this.request( HttpMethod.POST, url, request )
+    }
 
     fun newConfirmedCoinsTransactionsRequest(
         blockchain: Blockchain,
@@ -75,7 +87,17 @@ class CryptoApis( val apiKey: String ) {
         return this.request( HttpMethod.POST, url, request )
     }
 
-    fun getCreateCoinsTransactionRequestCallback( body:String ): CreateCoinsTransactionRequestCallback {
+    fun createAutomaticCoinsForwardingRequest(
+        blockchain: Blockchain,
+        network: Network,
+        request: NewConfirmedTransactionsRequest
+    ): CreateAutomaticCoinsForwardingResponseData {
+
+        val url = "${CryptoApis.BASE_URL}/blockchain-automations/${blockchain}/${network.name}/coins-forwarding/automations"
+        return this.request( HttpMethod.POST, url, request )
+    }
+
+    fun getCreateTransactionRequestCallback( body:String ): CreateCoinsTransactionRequestCallback {
         return this.mapper.readValue<CreateCoinsTransactionRequestCallback>(body)
     }
 
@@ -85,6 +107,10 @@ class CryptoApis( val apiKey: String ) {
 
     fun getNewConfirmedTokensTransactionsCallback( body:String ): NewConfirmedTokensTransactionsCallback {
         return this.mapper.readValue<NewConfirmedTokensTransactionsCallback>(body)
+    }
+
+    fun getCreateAutomaticCoinsForwardingCallback( body:String ): CreateAutomaticCoinsForwardingCallback {
+        return this.mapper.readValue<CreateAutomaticCoinsForwardingCallback>(body)
     }
 
     private inline fun <reified T> request(method:String, url:String, request: Request) : T {
