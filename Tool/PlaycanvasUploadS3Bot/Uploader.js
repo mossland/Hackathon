@@ -19,17 +19,26 @@ class S3Uploader{
 
     sendLog(msg){
         let channel = this.discordClient.channels.cache.get(config.Discord_Config.channel);
-        channel.send(`[${this.projectName}] ` + msg);
+        //channel.send(`[${this.projectName}] ` + msg);
+        console.log(`[${this.projectName}] ` + msg);
     };
 
     async upload(){
         const directoryName = this.localPath + '\\' + config.GameInfo[this.projectName].SubFolderName;
         let bn = `${config.GameInfo[this.projectName].BucketName}`;
-        bn += `/${config.GameInfo[this.projectName].Prefix}`;
-        if (this.isDev) bn += `/dev`;
-        else            bn += `/prod`;
 
+        if (config.GameInfo[this.projectName].Prefix != "")
+            bn += `${config.GameInfo[this.projectName].Prefix}/`;
+
+        if (config.GameInfo[this.projectName].createEnvDir == true){
+            if (this.isDev) bn += `dev`;
+            else            bn += `prod`;
+        }
+        
         bn += `/${config.GameInfo[this.projectName].SubFolderName}`;
+
+        let regex = /\/+/g;
+        bn = bn.replace(regex, '/');
 
         const credentials = {
             accessKeyId: config.AWS_Config.accessKeyId,
@@ -45,6 +54,7 @@ class S3Uploader{
 
         const invalidation = {
         };
+        console.log('s3 bucket : ' + bn);
         
         await s3FolderUpload(directoryName, credentials, options, invalidation);
     };
@@ -75,17 +85,24 @@ class S3Uploader{
 
     async start(){
         let bn = '';
-        bn += `${config.GameInfo[this.projectName].Prefix}`;
-        if (this.isDev) bn += `/dev`;
-        else            bn += `/prod`;
+        if (config.GameInfo[this.projectName].Prefix != "")
+            bn += `${config.GameInfo[this.projectName].Prefix}/`;
+
+        if (config.GameInfo[this.projectName].createEnvDir == true){
+            if (this.isDev) bn += `dev`;
+            else            bn += `prod`;
+        }
+        
         bn += `/${config.GameInfo[this.projectName].SubFolderName}`;
+
+        let regex = /\/+/g;
+        bn = bn.replace(regex, '/');
 
         await this.removeBucket(config.GameInfo[this.projectName].BucketName, bn);
         this.sendLog(`bucket remove complete`);
         
         await this.upload();
         this.sendLog('s3 upload complete');
-        
     };
 };
 

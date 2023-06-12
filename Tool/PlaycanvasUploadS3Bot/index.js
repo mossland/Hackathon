@@ -69,11 +69,11 @@ client.on("messageCreate", async function(message) {
     else if (command === "build"){
         let isDev = true;
         
-        if (args[1] == 'production') isDev = false;
+        if (args[1] == 'prod') isDev = false;
 
         if (working.includes(args[0])){
             let channel = client.channels.cache.get(config.Discord_Config.channel);
-            channel.send(`[${args[0]}]  please wait...`); 
+            //channel.send(`[${args[0]}]  please wait...`); 
             return;
         }
 
@@ -84,7 +84,7 @@ client.on("messageCreate", async function(message) {
     }
 });
 
-client.on('ready', () =>{
+client.on('ready', async () =>{
     client.user.setActivity("in my support server", { type: "PLAYING" });
 })
 

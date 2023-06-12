@@ -19,13 +19,20 @@ class PlaycanvasDownloader{
     sendLog(msg){
         let channel = this.discordClient.channels.cache.get(config.Discord_Config.channel);
         channel.send(`[${this.projectName}] ` + msg);
+        console.log(`[${this.projectName}] ` + msg);
     };
 
     async unzip(){
         await new Promise(async (resolve, reject)=> {
+            let filePath = this.localPath + '/' + this.projectName + '.zip';
+            console.log('======================');
+            console.log(filePath);
             const fileContent = fs.readFileSync(this.localPath + '/' + this.projectName + '.zip');
 
+
             const jz = new jszip();
+            console.log('======================');
+            console.log(fileContent);
             const result = await jz.loadAsync(fileContent);
             const keys = Object.keys(result.files);
             const dirName = '/' + config.GameInfo[this.projectName].SubFolderName;
@@ -44,7 +51,7 @@ class PlaycanvasDownloader{
                     fs.writeFileSync(tempPath + '/' + item.name, Buffer.from(await item.async('arraybuffer')));
                 }
             }
-            this.sendLog('unzip complete');
+            //this.sendLog('unzip complete');
             resolve();
         });
     };
@@ -68,7 +75,7 @@ class PlaycanvasDownloader{
     
                     res.data.pipe(fs.createWriteStream(dir));
                     res.data.on("end", () => {
-                        this.sendLog('download completed');
+                        //this.sendLog('download completed');
                         resolve();
                     });
                 } else {
@@ -84,7 +91,7 @@ class PlaycanvasDownloader{
 
     async replaceService(filePath){
         if (this.isDev === false){
-            this.sendLog('replace service skip');
+            //this.sendLog('replace service skip');
             return;
         }
         
@@ -97,7 +104,7 @@ class PlaycanvasDownloader{
             fs.writeFileSync(filename, result, 'utf8', function (err) {
             if (err) return console.log(err);
             });
-            this.sendLog('replace service complete');
+            //this.sendLog('replace service complete');
             resolve();
         });
     };
@@ -133,7 +140,7 @@ class PlaycanvasDownloader{
     
             axios.get(requst,{
                 headers: {
-                    Authorization: `Bearer ${options.accessToken}`
+                    Authorization: `Bearer ${playcanvasOptions.accessToken}`
                 }})
             .then(res => { 
                 resolve(res.data);
