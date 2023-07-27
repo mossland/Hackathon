@@ -8,6 +8,7 @@ This repository introduces mini-services of Mossverse (Mossland Metaverse). Mini
 1. Provably fair system: A provably fair system ensures transparency and fairness in online gambling. It uses cryptographic algorithms to prove that games are not manipulated. Players can verify the fairness of outcomes by checking seed generation and result disclosure. Trust is enhanced through transparency and verifiability. [Wikipedia](https://simple.wikipedia.org/wiki/Provably_Fair)
   - [.Net Implementation](https://github.com/mossland/Hackathon/tree/main/provably_fair_implementation/provably_fair)
   - [Kotlin Implementation](https://github.com/mossland/Hackathon/tree/main/provably_fair_implementation/provably_fair_kotlin)
+  - [Java Implementation](https://github.com/mossland/Hackathon/tree/main/provably_fair_implementation/provably_fair_java)
 
 ## Mini-services
 1. [Rock Paper Scissors](RockPaperScissors/README.md)
