@@ -2,7 +2,7 @@
     // Shared Lib
     var CANVAS_ID = 'application-canvas';
 
-    // Needed as we will have edge cases for particlar versions of iOS
+    // Needed as we will have edge cases for particular versions of iOS
     // returns null if not iOS
     var getIosVersion = function () {
         if (/iP(hone|od|ad)/.test(navigator.platform)) {
@@ -23,13 +23,15 @@
         iosVersion: getIosVersion(),
 
         createCanvas: function () {
-            canvas = document.createElement('canvas'); // eslint-disable-line no-global-assign
+            var canvas = document.createElement('canvas');
             canvas.setAttribute('id', CANVAS_ID);
             canvas.setAttribute('tabindex', 0);
-            // canvas.style.visibility = 'hidden';
 
             // Disable I-bar cursor on click+drag
             canvas.onselectstart = function () { return false; };
+
+            // Disable long-touch select on iOS devices
+            canvas.style['-webkit-user-select'] = 'none';
 
             document.body.appendChild(canvas);
 
@@ -66,7 +68,7 @@
             this.resizeCanvas(app, canvas);
 
             // Poll for size changes as the window inner height can change after the resize event for iOS
-            // Have one tab only, and rotrait to portrait -> landscape -> portrait
+            // Have one tab only, and rotate from portrait -> landscape -> portrait
             if (windowSizeChangeIntervalHandler === null) {
                 windowSizeChangeIntervalHandler = setInterval(function () {
                     if (lastWindowHeight !== window.innerHeight || lastWindowWidth !== window.innerWidth) {
@@ -185,6 +187,13 @@
 
             configureCss(app._fillMode, app._width, app._height);
 
+            const ltcMat1 = []; 
+            const ltcMat2 = []; 
+
+            if (ltcMat1.length && ltcMat2.length && app.setAreaLightLuts.length === 2) {
+                app.setAreaLightLuts(ltcMat1, ltcMat2);
+            }
+
             // do the first reflow after a timeout because of
             // iOS showing a squished iframe sometimes
             setTimeout(function () {
@@ -199,7 +208,7 @@
                         console.error(err);
                     }
 
-                    app.loadScene(SCENE_PATH, function (err, scene) {
+                    app.scenes.loadScene(SCENE_PATH, function (err, scene) {
                         if (err) {
                             console.error(err);
                         }
