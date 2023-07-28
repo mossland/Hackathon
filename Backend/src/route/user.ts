@@ -9,7 +9,6 @@ import Platform from "../util/platform";
 
 const router = Router();
 
-
 router.get('/info', verifyToken, async (req, res, next) => {
   try{
     return res.status(200).send({

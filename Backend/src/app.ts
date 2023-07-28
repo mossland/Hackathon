@@ -55,6 +55,7 @@ app.use(cors({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.use('/ping', (req, res) => { res.status(200).json({ success: true, message: 'pong' }) });
 app.use('/user', userRouter);
 app.use('/rsp', rspRouter);
 
