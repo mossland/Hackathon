@@ -1,4 +1,4 @@
-package moss.land.provablyfairserver
+package land.moss.provablyfairserver
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

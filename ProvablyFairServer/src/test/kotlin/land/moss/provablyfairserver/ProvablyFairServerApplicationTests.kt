@@ -1,4 +1,4 @@
-package moss.land.provablyfairserver
+package land.moss.provablyfairserver
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

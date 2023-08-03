@@ -1,4 +1,4 @@
-package moss.land.provablyfairserver
+package land.moss.provablyfairserver
 
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
