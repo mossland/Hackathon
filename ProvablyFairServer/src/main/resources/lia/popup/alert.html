@@ -1,0 +1,111 @@
+<style>
+
+    .alert_popup {
+        position: relative;
+        width: 420px;
+        background-color: #ffffff;
+        font-family: notokr-regular, NanumGothic;
+    }
+    .alert_popup .alert_popup_close {
+        position: absolute;
+        right: 25px;
+        top: 25px;
+        cursor: pointer;
+    }
+    .alert_popup .alert_popup_title {
+        margin-top: 25px;
+        height: 18px;
+        line-height: 18px;
+        font-size: 13px;
+        font-weight: bold;
+        text-align: center;
+        font-family: notokr-medium, NanumGothicBold;
+    }
+    .alert_popup .alert_popup_text_box {
+        margin-top: 85px;
+        margin-bottom: 80px;
+        font-size: 13px;
+        text-align: center;
+        padding: 0 40px;
+    }
+
+    .alert_popup.alert_popup_type_input_list .alert_popup_text_box {
+        margin-top: 30px;
+        margin-bottom: 25px;
+    }
+
+    .alert_popup .alert_popup_input_list {
+        display: none;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .alert_popup .alert_popup_input_list input {
+        box-sizing: border-box;
+        border:1px solid #aaaaaa;
+        height:40px;
+        padding-left:10px;padding-right:10px;
+        width:80%;
+        line-height:38px;
+        margin-bottom:5px;
+        font-size: 13px;
+        font-family: notokr-regular, NanumGothic;
+    }
+
+    .alert_popup .alert_popup_buttons {
+        position: relative;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 50px;
+    }
+    .alert_popup .alert_popup_button {
+        display: inline-block;
+        width: 50%;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        color: #ffffff;
+        float: left;
+        cursor:pointer;
+        font-family: notokr-medium, NanumGothicBold;
+    }
+    .alert_popup .alert_popup_confirm_button {
+        background-color: #333333;
+    }
+    .alert_popup .alert_popup_cancel_button {
+        background-color: #969696;
+    }
+
+    @media screen and (max-width: 767px) {
+
+        .alert_popup {
+            position: relative;
+            width: 80%;
+            background-color: #ffffff;
+        }
+
+        .alert_popup .alert_popup_input_list input {
+            width:80%;
+        }
+    }
+
+</style>
+
+<div class="dim" data-lia-popup="{next-popup}"></div>
+<div class="alert_popup popup" data-lia-dim="{prev-dim}">
+
+    <img class="alert_popup_close" alt="alert popup close button" />
+    <div class="alert_popup_title"></div>
+
+    <div class="alert_popup_text_box"></div>
+
+    <div class="alert_popup_input_list"></div>
+
+    <input type="text" class="alert_popup_focus" style="opacity: 0; position: absolute; top: -10000px;" />
+
+    <div class="alert_popup_buttons">
+        <div class="alert_popup_button alert_popup_cancel_button"></div>
+        <div class="alert_popup_button alert_popup_confirm_button"></div>
+    </div>
+</div>
