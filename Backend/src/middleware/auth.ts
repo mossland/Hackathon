@@ -12,7 +12,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
 
   try {
     const { data } = await axios.get(
-      `${process.env.MOSSVERSE_PLATFORM_BASE}/user/info`,
+      `${process.env.MOSSVERSE_PLATFORM_BASE}/user/whoAmI`,
       {
         headers: {
           Authorization: bearerToken,
