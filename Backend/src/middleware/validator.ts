@@ -17,8 +17,17 @@ function isInteger(value: any) {
     }
   }
 };
-
-export const validateUserGameInput = async (req: Request, res: Response, next: NextFunction) => {
+export const validateBetAmount = async (req: Request, res: Response, next: NextFunction) => {
+  const betAmount = new Big(req.body.betAmount);
+  if (isNaN(betAmount.toNumber())) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  if (betAmount.lte(0)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  next();
+};
+export const validateRSPGameInput = async (req: Request, res: Response, next: NextFunction) => {
   if (typeof(req.body.pick) === typeof(undefined) || typeof(req.body.betAmount) === typeof(undefined)) {
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
