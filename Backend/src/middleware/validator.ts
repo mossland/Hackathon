@@ -51,12 +51,28 @@ export const validateRSPGameInput = async (req: Request, res: Response, next: Ne
 }
 
 export const createGameStateValidator = (gameId: number): (req: Request, res: Response, next: NextFunction)=> any => {
-  return async function(req: Request, res: Response, next: NextFunction) {
-    const rspgame = (await db('game').select('*').where('gameId', 1))[0];
-    if (rspgame.isAvailable) {
-      next();
-    } else {
+  if (gameId.toString() === '1') {
+    return async function(req: Request, res: Response, next: NextFunction) {
+      const rspgame = (await db('game').select('*').where('gameId', 1))[0];
+      if (rspgame.isAvailable) {
+        next();
+      } else {
+        return next(new ServerError(StatusCodes.FORBIDDEN, 'the game is not available now'));
+      }
+    }
+  } else if (gameId.toString() === '2') {
+    return async function(req: Request, res: Response, next: NextFunction) {
+      const rspgame = (await db('game').select('*').where('gameId', 1))[0];
+      if (rspgame.isAvailable) {
+        next();
+      } else {
+        return next(new ServerError(StatusCodes.FORBIDDEN, 'the game is not available now'));
+      }
+    }
+  } else {
+    return (req: Request, res: Response, next: NextFunction) => {
       return next(new ServerError(StatusCodes.FORBIDDEN, 'the game is not available now'));
     }
   }
+  
 }
