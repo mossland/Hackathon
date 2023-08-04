@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Expires" content="-1" />
+    <meta http-equiv="Pragma" content="No-Cache" />
+    <meta http-equiv="Cache-Control" content="No-Cache" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+
+    <title>ACE EDITOR</title>
+
+    <script src="/lia/lib/jquery-3.7.0.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/lia/lia.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="/res/lib/aceeditor/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+    <style>
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        #editor {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div id="editor">
+</div>
+
+<script>
+
+    var parameterMap = Lia.extractGetParameterMap();
+
+    var mode = Lia.pd('html', parameterMap, 'mode');
+
+    var inited = false;
+    var initialValue = undefined;
+
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/" + mode);
+
+    editor.renderer.on('afterRender', function() {
+
+        inited = true;
+
+        if ( initialValue != undefined ) {
+            setEditorValue(initialValue);
+            initialValue = undefined;
+        }
+    });
+
+    function getEditorValue() {
+
+        if ( !inited ) {
+            return initialValue;
+        }
+
+        return editor.getValue();
+    }
+
+    function setEditorValue(value) {
+
+        if ( inited == true ) {
+            editor.setValue(value);
+        } else {
+            initialValue = value;
+        }
+    }
+
+</script>
+
+</body>
+</html>

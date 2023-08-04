@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Expires" content="-1" />
+    <meta http-equiv="Pragma" content="No-Cache" />
+    <meta http-equiv="Cache-Control" content="No-Cache" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+
+    <title>SMART EDITOR</title>
+
+    <script src="/lia/lib/jquery-3.7.0.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/lia/lia.js" type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript" src="/res/lib/smarteditor/demo/js/service/HuskyEZCreator.js"></script>
+
+    <style>
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            background-color:#ffffff;
+            overflow:hidden;
+        }
+
+        #wrapper {
+            width:100%;
+            height:100%;
+        }
+
+        #texteditor {
+            width:100%;height:100%;display:none;
+        }
+
+        iframe {
+            width:100%;
+            height:100% !important;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div id="wrapper">
+
+    <textarea id="texteditor"></textarea>
+
+    <script type="text/javascript">
+
+        var inited = false;
+        var initialValue = undefined;
+
+        var oEditors = [];
+
+        // 언어 (ko_KR/ en_US/ ja_JP/ zh_CN/ zh_TW), default = ko_KR
+        var sLang = "ko_KR";
+
+        // 추가 글꼴 목록
+        // var aAdditionalFontSet = [["notokr-regular", "본고딕"]];
+
+        nhn.husky.EZCreator.createInIFrame({
+            oAppRef: oEditors,
+            elPlaceHolder: "texteditor",
+            sSkinURI: "/res/lib/smarteditor/demo/SmartEditor2Skin_lia.html",
+            htParams : {
+                bUseToolbar : true,				// 툴바 사용 여부 (true:사용/ false:사용하지 않음)
+                bUseVerticalResizer : false,		// 입력창 크기 조절바 사용 여부 (true:사용/ false:사용하지 않음)
+                bUseModeChanger : true,			// 모드 탭(Editor | HTML | TEXT) 사용 여부 (true:사용/ false:사용하지 않음)
+                //bSkipXssFilter : true,		// client-side xss filter 무시 여부 (true:사용하지 않음 / 그외:사용)
+                //aAdditionalFontList : aAdditionalFontSet,		// 추가 글꼴 목록
+                fOnBeforeUnload : function(){
+                },
+                I18N_LOCALE : sLang
+            }, //boolean
+            fOnAppLoad : function(){
+
+                inited = true;
+
+                if ( initialValue != undefined ) {
+                    setEditorValue(initialValue);
+                    initialValue = undefined;
+                }
+            },
+            fCreator: "createSEditor2"
+        });
+
+
+        function getEditorValue() {
+            if ( !inited ) {
+                return initialValue;
+            }
+
+            oEditors.getById["texteditor"].exec("UPDATE_CONTENTS_FIELD", []);
+
+            var text = $("#texteditor").val();
+            if ( text == '<p><br></p>' ) {
+                return '';
+            }
+
+            return text;
+        }
+
+        function setEditorValue(value) {
+
+            if ( inited == true ) {
+
+                $("#texteditor").val(value);
+                oEditors.getById["texteditor"].exec("LOAD_CONTENTS_FIELD");
+
+            } else {
+                initialValue = value;
+            }
+        }
+
+        function attachEditorValue(value) {
+
+            if ( inited == true ) {
+                oEditors.getById["texteditor"].exec("PASTE_HTML", [value]);
+            }
+        }
+
+    </script>
+</div>
+
+</body>
+</html>
