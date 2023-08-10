@@ -24,7 +24,11 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
     res.locals.token = bearerToken;
     return next();
   } catch (e) {
-    console.error(e);
+    if ((e as any).response) {
+      console.error((e as any).response.status);
+      console.error((e as any).response.data);
+    }
+    
     return next(new ServerError(StatusCodes.UNAUTHORIZED, 'fail to verify user'));
   }
 }

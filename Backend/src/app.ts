@@ -1,8 +1,15 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import Morgan from 'morgan';
+import Big from 'big.js';
+
+Big.DP = 1000000;
+Big.RM = 0;
+Big.NE = -1000000;
+Big.PE = 1000000;
 
 import rspRouter from './route/rsp';
+import hgRouter from './route/hg';
 import userRouter from './route/user';
 
 import ServerError from './util/serverError';
@@ -58,6 +65,7 @@ app.use(bodyParser.json());
 app.use('/ping', (req, res) => { res.status(200).json({ success: true, message: 'pong' }) });
 app.use('/user', userRouter);
 app.use('/rsp', rspRouter);
+app.use('/hg', hgRouter);
 
 app.use((err: ServerError, req: Request, res: Response, next: NextFunction) => {
   return res.status(err.code).json({

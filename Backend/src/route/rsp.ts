@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { spendByGameId } from "../util/random";
 import Big from 'big.js';
-import { validateUserGameInput, createGameStateValidator } from '../middleware/validator';
+import { validateRSPGameInput, createGameStateValidator } from '../middleware/validator';
 import { verifyToken } from '../middleware/auth';
 import StatusCodes from 'http-status-codes';
 import ServerError from '../util/serverError';
@@ -11,7 +11,7 @@ import { ITicketModel } from "../model/ticketModel";
 const router = Router();
 const rspGameId = 1;
 
-router.post('/result', createGameStateValidator(1), validateUserGameInput, verifyToken, async (req, res, next) => {
+router.post('/result', createGameStateValidator(1), validateRSPGameInput, verifyToken, async (req, res, next) => {
   try {
     const userPickNum = parseInt(req.body.pick);
 

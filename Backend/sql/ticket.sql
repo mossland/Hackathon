@@ -7,6 +7,7 @@ CREATE TABLE `ticket` (
   `betAmount` bigint unsigned NOT NULL,
   `payout` decimal(30,5) unsigned NOT NULL,
   `meta` json NOT NULL,
+  `isResultSet` tinyint NOT NULL DEFAULT '1',
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   PRIMARY KEY (`gameId`,`hashId`,`hashIdx`),

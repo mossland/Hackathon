@@ -17,8 +17,17 @@ function isInteger(value: any) {
     }
   }
 };
-
-export const validateUserGameInput = async (req: Request, res: Response, next: NextFunction) => {
+export const validateBetAmount = async (req: Request, res: Response, next: NextFunction) => {
+  const betAmount = new Big(req.body.betAmount);
+  if (isNaN(betAmount.toNumber())) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  if (betAmount.lte(0)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  next();
+};
+export const validateRSPGameInput = async (req: Request, res: Response, next: NextFunction) => {
   if (typeof(req.body.pick) === typeof(undefined) || typeof(req.body.betAmount) === typeof(undefined)) {
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
@@ -42,12 +51,28 @@ export const validateUserGameInput = async (req: Request, res: Response, next: N
 }
 
 export const createGameStateValidator = (gameId: number): (req: Request, res: Response, next: NextFunction)=> any => {
-  return async function(req: Request, res: Response, next: NextFunction) {
-    const rspgame = (await db('game').select('*').where('gameId', 1))[0];
-    if (rspgame.isAvailable) {
-      next();
-    } else {
+  if (gameId.toString() === '1') {
+    return async function(req: Request, res: Response, next: NextFunction) {
+      const rspgame = (await db('game').select('*').where('gameId', 1))[0];
+      if (rspgame.isAvailable) {
+        next();
+      } else {
+        return next(new ServerError(StatusCodes.FORBIDDEN, 'the game is not available now'));
+      }
+    }
+  } else if (gameId.toString() === '2') {
+    return async function(req: Request, res: Response, next: NextFunction) {
+      const rspgame = (await db('game').select('*').where('gameId', 1))[0];
+      if (rspgame.isAvailable) {
+        next();
+      } else {
+        return next(new ServerError(StatusCodes.FORBIDDEN, 'the game is not available now'));
+      }
+    }
+  } else {
+    return (req: Request, res: Response, next: NextFunction) => {
       return next(new ServerError(StatusCodes.FORBIDDEN, 'the game is not available now'));
     }
   }
+  
 }

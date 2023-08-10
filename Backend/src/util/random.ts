@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { v4 as uuidv4 } from 'uuid';
+import uuidv7 from '../util/uuidv7';
 import db from '../db';
 import { Knex } from 'knex';
 import hashModel from '../model/hashModel';
@@ -15,7 +15,7 @@ export const generateSeed = async (gameId: number, trx: Knex.Transaction) => {
   if (lastHashIds.length > 0) {
     hashId = lastHashIds[0].hashId + 1;
   }
-  const seed = uuidv4();
+  const seed = uuidv7();
   const hashList: string[] = [];
 
   let prevHash: string = '';
@@ -62,6 +62,47 @@ export const generateSeed = async (gameId: number, trx: Knex.Transaction) => {
   }
 }
 
+export const generateHashString = async (trx: Knex.Transaction, gameId: number) => {
+  let currentHashes = await trx('current_hash').select('*').where({
+    gameId,
+  }).forUpdate();
+  let currentHash = currentHashes[0];
+
+  let hashList: string[] = await new Promise((resolve, reject) => {
+    hashModel.get({id: currentHash.hashId}, async (err, data) => {
+      if (err) {
+        console.error(err);
+        reject(err);
+      } else {
+        const rawHashList: any = await data.get('hash');
+        resolve(rawHashList);
+      }
+    });
+  });
+
+  if (currentHash.hashIdx >= hashList.length) {
+    await generateSeed(gameId, trx);
+    currentHashes = await trx('current_hash').select('*').where({
+      gameId,
+    }).forUpdate();
+    currentHash = currentHashes[0];
+
+    hashList = await new Promise((resolve, reject) => {
+      hashModel.get({id: currentHash.hashId}, async (err, data) => {
+        if (err) {
+          console.error(err);
+          reject(err);
+        } else {
+          const rawHashList: any = await data.get('hash');
+          resolve(rawHashList);
+        }
+      });
+    });
+  }
+
+  return { currentHash, hashString: hashList[currentHash.hashIdx] };
+}
+
 export const spendByGameId = async (
   gameId: number,
   betAmount: Big,
@@ -70,46 +111,9 @@ export const spendByGameId = async (
   return new Promise((resolve, reject) => {
     db.transaction(async (trx) => {
       try {
-        let currentHashes = await trx('current_hash').select('*').where({
-          gameId,
-        }).forUpdate();
-        let currentHash = currentHashes[0];
-
-        let hashList: string[] = await new Promise((resolve, reject) => {
-          hashModel.get({id: currentHash.hashId}, async (err, data) => {
-            if (err) {
-              console.error(err);
-              reject(err);
-            } else {
-              const rawHashList: any = await data.get('hash');
-              resolve(rawHashList);
-            }
-          });
-        });
-
-        if (currentHash.hashIdx >= hashList.length) {
-          await generateSeed(gameId, trx);
-          currentHashes = await trx('current_hash').select('*').where({
-            gameId,
-          }).forUpdate();
-          currentHash = currentHashes[0];
-
-          hashList = await new Promise((resolve, reject) => {
-            hashModel.get({id: currentHash.hashId}, async (err, data) => {
-              if (err) {
-                console.error(err);
-                reject(err);
-              } else {
-                const rawHashList: any = await data.get('hash');
-                resolve(rawHashList);
-              }
-            });
-          });
-        }
-
-        const hashString: string = hashList[currentHash.hashIdx];
+        const { currentHash, hashString }: { currentHash: any, hashString: string } = await generateHashString(trx, gameId);
         const { meta, payout } = resultGenerateFunc(hashString);
-        const ticketId = uuidv4();
+        const ticketId = uuidv7();
 
         const newTicket: any = {
           gameId,
