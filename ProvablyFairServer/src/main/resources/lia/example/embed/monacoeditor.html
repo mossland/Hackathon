@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Expires" content="-1" />
+    <meta http-equiv="Pragma" content="No-Cache" />
+    <meta http-equiv="Cache-Control" content="No-Cache" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+
+    <title>MONACO EDITOR</title>
+
+    <script src="/lia/lib/jquery-3.7.0.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/lia/lia.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="/res/lib/monacoeditor/min/vs/loader.js"></script>
+
+    <style>
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        #editor {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div id="editor">
+</div>
+
+<script>
+
+    var parameterMap = Lia.extractGetParameterMap();
+
+    var mode = Lia.pd('html', parameterMap, 'mode');
+
+    var inited = true;
+    var initialValue = undefined;
+    var editor = undefined;
+    require.config({ paths: { 'vs': '/res/lib/monacoeditor/min/vs' }});
+
+    require(['vs/editor/editor.main'], function() {
+
+        editor = monaco.editor.create(document.getElementById('editor'), {
+            value: '',
+            theme: "vs-dark",
+            language: mode
+        });
+    });
+
+
+
+    window.onresize = function () {
+        editor.layout();
+    };
+
+    function setEditorValue(value) {
+
+        if ( inited == true ) {
+
+            editor.getModel().setValue(value);
+
+        } else {
+            initialValue = value;
+        }
+    }
+
+
+    function getEditorValue() {
+
+        if ( !inited ) {
+            return initialValue;
+        }
+
+        return editor.getModel().getValue();
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'notokr-bold';
+    src: url('noto-sans-kr-v13-latin_korean-700.eot'); /* IE9 Compat Modes */
+    src:
+        url('noto-sans-kr-v13-latin_korean-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        url('noto-sans-kr-v13-latin_korean-700.woff2') format('woff2'), /* Super Modern Browsers */
+        url('noto-sans-kr-v13-latin_korean-700.woff') format('woff'), /* Modern Browsers */
+        url('noto-sans-kr-v13-latin_korean-700.ttf') format('truetype'), /* Safari, Android, iOS */
+        url('noto-sans-kr-v13-latin_korean-700.svg#NotoSansKR') format('svg'); /* Legacy iOS */
+    font-weight: normal;
+    font-style: normal;
+
+}

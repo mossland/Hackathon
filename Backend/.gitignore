@@ -1,0 +1,7 @@
+node_modules
+dist
+.env
+.env.*
+
+coverage/*
+manual_script.ts

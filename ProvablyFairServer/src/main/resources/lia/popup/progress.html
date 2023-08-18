@@ -1,0 +1,60 @@
+<style type="text/css">
+    .progress_popup .progress_container {
+        padding: 15px;
+        background-color: #f3f3f3;
+        border-radius: 9px;
+    }
+
+    .progress_popup .progress {
+        width: 300px;
+        height: 30px;
+        font-size:13px;
+        background-color: #666666;
+        border-radius: 9px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .2);
+    }
+
+    @media screen and (max-width: 320px) {
+
+        .progress_popup .progress {
+            width: 240px;
+        }
+
+    }
+
+    .progress_popup .progress_bar {
+        background: #2DACF7;
+        background: -moz-linear-gradient(top, #2DACF7 0%, #2897d9 100%);
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2DACF7), color-stop(100%, #2897d9));
+        background: -webkit-linear-gradient(top, #2DACF7 0%, #2897d9 100%);
+        background: -o-linear-gradient(top, #2DACF7 0%, #2897d9 100%);
+        background: -ms-linear-gradient(top, #2DACF7 0%, #2897d9 100%);
+        background: linear-gradient(to bottom, #2DACF7 0%, #2897d9 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#2DACF7', endColorstr='#2897d9', GradientType=0);
+        border-radius: 9px;
+        width: 0;
+        height: 100%;
+    }
+
+    .progress_popup .progress_text {
+        position: relative;
+        top: -27px;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        font-family: notokr-medium, NanumGothicBold;
+        color: #ffffff;
+        line-height: 30px;
+    }
+
+</style>
+<div class="progress_dim dim" data-lia-popup="{next-popup}"></div>
+<div class="progress_popup popup" data-lia-dim="{prev-dim}">
+    <div class="progress_container">
+        <div class="progress">
+            <div class="progress_bar" id="uploading_progress"></div>
+            <div class="progress_text"></div>
+        </div>
+    </div>
+</div>
+
