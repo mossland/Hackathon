@@ -3171,6 +3171,7 @@ Triton.DatetimePicker.prototype.init = function (options) {
     var secondDisabled = this.secondDisabled = Lia.pd(Triton.DatetimePicker.secondDisabled, options, 'secondDisabled');
     var hhmmssByInputBox = Lia.pd(Triton.DatetimePicker.hhmmssByInputBox, options, 'hhmmssByInputBox');
     var hhmmssByInputBoxAtOnce = Lia.pd(Triton.DatetimePicker.hhmmssByInputBoxAtOnce, options, 'hhmmssByInputBoxAtOnce');
+    var disabled = Lia.pd(false, options, 'disabled');
 
     var maxYear = Lia.pcd(Triton.DatetimePicker.maxYear, options, 'maxYear');
 
@@ -4552,9 +4553,7 @@ Triton.DatetimePicker.prototype.init = function (options) {
             //e.data.datetimePicker.setValue('');
             jQuery.datepicker._clearDate(e.data.jValue);
         });
-
     }
-
 
     this.jView = j;
     this.jContent = Triton.findTritonContent(this.jView);
@@ -18378,7 +18377,7 @@ Triton.Field.Type = {
         attachHeaderToList: function (listTable, listComponent) {
         },
 
-        attachToList: function (listTable, item, data, listComponent) {
+        attachToList: function (listTable, item, index, data, listComponent) {
         },
 
         attachToWrite: function (detailTable, item, writeComponent) {
@@ -18408,7 +18407,7 @@ Triton.Field.Type = {
         this.attachHeaderToList = function (listTable, listComponent) {
         };
 
-        this.attachToList = function (listTable, item, data, listComponent) {
+        this.attachToList = function (listTable, item, index, data, listComponent) {
         };
 
         this.attachToWrite = function (detailTable, item, writeComponent) {
@@ -18469,7 +18468,7 @@ Triton.Field.Type = {
             }
         };
 
-        this.attachToList = function (listTable, item, data, listComponent) {
+        this.attachToList = function (listTable, item, index, data, listComponent) {
 
             var page = this;
 
@@ -18481,7 +18480,7 @@ Triton.Field.Type = {
 
             var content = null;
             if (typeof key == "function") {
-                content = key(item);
+                content = key(item, index, data);
             } else {
                 content = Lia.p(item, key);
             }
@@ -18509,6 +18508,7 @@ Triton.Field.Type = {
             var key = Lia.p(options, 'key');
             var placeholder = Lia.p(options, 'placeholder');
             var required = Lia.p(options, 'required');
+            var digitonly = Lia.p(options, 'digitonly');
             var disabled = Lia.p(options, 'disabled');
 
             detailTable.appendRow({});
@@ -18526,6 +18526,7 @@ Triton.Field.Type = {
             detailTable.appendValueColumn({
                 content: page.component = new Triton.TextInput({
                     theme: Triton.TextInput.Theme.Full,
+                    digitonly : digitonly,
                     disabled : disabled,
                     attr: {
                         placeholder: placeholder
@@ -18640,7 +18641,7 @@ Triton.Field.Type = {
         this.attachHeaderToList = function (listTable, listComponent) {
         };
 
-        this.attachToList = function (listTable, item, data, listComponent) {
+        this.attachToList = function (listTable, item, index, data, listComponent) {
         };
 
         this.attachToWrite = function (detailTable, item, writeComponent) {
@@ -18779,7 +18780,7 @@ Triton.Field.Type = {
         this.attachHeaderToList = function (listTable, listComponent) {
         };
 
-        this.attachToList = function (listTable, item, data, listComponent) {
+        this.attachToList = function (listTable, item, index, data, listComponent) {
         };
 
         this.attachToWrite = function (detailTable, item, writeComponent) {
@@ -18937,7 +18938,7 @@ Triton.Field.Type = {
             });
         };
 
-        this.attachToList = function (listTable, item, data, listComponent) {
+        this.attachToList = function (listTable, item, index, data, listComponent) {
 
             var checkBox = new Triton.CheckBox({
                 addClass: 'triton_field_list_check_box',
@@ -19109,7 +19110,7 @@ Triton.Field.Type = {
             });
         };
 
-        this.attachToList = function (listTable, item, data, listComponent) {
+        this.attachToList = function (listTable, item, index, data, listComponent) {
 
             var radioButton = new Triton.RadioButton({
                 addClass: 'triton_field_list_radio_button',
@@ -19168,7 +19169,7 @@ Triton.Field.Type = {
         this.attachHeaderToList = function (listTable, listComponent) {
         };
 
-        this.attachToList = function (listTable, item, data, listComponent) {
+        this.attachToList = function (listTable, item, index, data, listComponent) {
         };
 
         this.attachToWrite = function (detailTable, item, writeComponent) {
@@ -19309,7 +19310,7 @@ Triton.Field.Type = {
         this.attachHeaderToList = function (listTable, listComponent) {
         };
 
-        this.attachToList = function (listTable, item, data, listComponent) {
+        this.attachToList = function (listTable, item, index, data, listComponent) {
         };
 
         this.attachToWrite = function (detailTable, item, writeComponent) {
@@ -19349,10 +19350,12 @@ Triton.Field.Type = {
             detailTable.appendValueColumn({
                 content: this.component = new Triton.DatetimePeriodPicker({
                     startOptions : {
+                        disabled : Lia.p(options, 'start', 'disabled'),
                         value : startContent,
                         mode : mode
                     },
                     endOptions : {
+                        disabled : Lia.p(options, 'end', 'disabled'),
                         value : endContent,
                         mode : mode
                     }
@@ -19404,7 +19407,7 @@ Triton.Field.Type = {
 
             detailTable.appendValueColumn({
                 content: content,
-                attr: {colspan: writeComponent.getColspan() - 1}
+                attr: {colspan: detailComponent.getColspan() - 1}
             });
         };
 
@@ -19501,7 +19504,7 @@ Triton.Field.Type = {
         this.attachHeaderToList = function (listTable, listComponent) {
         };
 
-        this.attachToList = function (listTable, item, data, listComponent) {
+        this.attachToList = function (listTable, item, index, data, listComponent) {
         };
 
         this.attachToWrite = function (detailTable, item, writeComponent) {
@@ -19853,7 +19856,7 @@ Triton.FieldList.prototype.apply = function (data, parameterMap) {
 
                 var type = typeList[i2];
                 type.attachToList(
-                    listTable, item, data, listComponent
+                    listTable, item, i, data, listComponent
                 );
             }
         }
