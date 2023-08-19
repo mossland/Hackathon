@@ -13,7 +13,7 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ssm get-parameter --with-decryption --name mossverse-game-backend-$NODE_ENV --region $AWS_DEFAULT_REGION | jq '.Parameter.Value' | sed 's/^.//;s/.$//' | perl -pe 's/\\n/\n/g' > ./Backend/.env.$NODE_ENV
-      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email --region $AWS_DEFAULT_REGION)
+      - aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email --region $AWS_DEFAULT_REGION
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
       - echo $NODE_ENV
