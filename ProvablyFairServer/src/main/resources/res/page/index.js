@@ -1,4 +1,14 @@
 
+
+var ApiUrl = {
+    generateResult : '/api/generateResult'
+}
+
+var Code = {
+    SUCCESS : 'SUCCESS'
+}
+
+
 Lia.Strings.setLocale(Lia.Strings.Locale.EN);
 Triton.Responsive.init(false);
 
