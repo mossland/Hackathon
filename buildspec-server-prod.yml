@@ -23,13 +23,13 @@ phases:
     commands:    
       - echo Build started on `date`
       - echo Building the Backend Docker image...
-      - docker build --build-arg NODE_ENV=$NODE_ENV -t dev_mossverse_game_server ./Backend
-      - docker tag dev_mossverse_game_server:latest $SERVER_ECR_ADDR:latest
-      - docker tag dev_mossverse_game_server:latest $SERVER_ECR_ADDR:$IMAGE_TAG
+      - docker build --build-arg NODE_ENV=$NODE_ENV -t mossverse_game_server ./Backend
+      - docker tag mossverse_game_server:latest $SERVER_ECR_ADDR:latest
+      - docker tag mossverse_game_server:latest $SERVER_ECR_ADDR:$IMAGE_TAG
       - echo Building the NGINX Docker image...
-      - docker build --build-arg NODE_ENV=$NODE_ENV -t dev_mossverse_game_server_nginx ./Nginx
-      - docker tag dev_mossverse_game_server_nginx:latest $SERVER_NGINX_ECR_ADDR:latest
-      - docker tag dev_mossverse_game_server_nginx:latest $SERVER_NGINX_ECR_ADDR:$IMAGE_TAG
+      - docker build --build-arg NODE_ENV=$NODE_ENV -t mossverse_game_server_nginx ./Nginx
+      - docker tag mossverse_game_server_nginx:latest $SERVER_NGINX_ECR_ADDR:latest
+      - docker tag mossverse_game_server_nginx:latest $SERVER_NGINX_ECR_ADDR:$IMAGE_TAG
 
   post_build:
     commands:
