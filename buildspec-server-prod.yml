@@ -4,6 +4,7 @@ env:
   secrets-manager:
     DOCKER_ID: "common/docker:DOCKER_ID"
     DOCKER_PW: "common/docker:DOCKER_PW"
+    AWS_USER_ID: "common/docker:AWS_USER_ID"
 
 phases:  
   pre_build:
@@ -13,7 +14,7 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ssm get-parameter --with-decryption --name mossverse-game-backend-$NODE_ENV --region $AWS_DEFAULT_REGION | jq '.Parameter.Value' | sed 's/^.//;s/.$//' | perl -pe 's/\\n/\n/g' > ./Backend/.env.$NODE_ENV
-      - docker login --username AWS -p $(aws ecr get-login-password --region $AWS_DEFAULT_REGION) 314592090710.dkr.ecr.ap-northeast-2.amazonaws.com/
+      - docker login --username AWS -p $(aws ecr get-login-password --region $AWS_DEFAULT_REGION) $AWS_USER_ID.dkr.ecr.ap-northeast-2.amazonaws.com/
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
       - echo $NODE_ENV
