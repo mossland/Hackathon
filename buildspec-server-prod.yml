@@ -44,5 +44,5 @@ phases:
 
 artifacts:
   files:
-    - appspec-server-dev.yaml
-    - taskdef-server.dev.json
+    - appspec-server-prod.yaml
+    - taskdef-server.prod.json

@@ -19,7 +19,7 @@ phases:
       - echo Building the Game - RPS
       - cd ./GameBuild
       - yarn install
-      - yarn build:dev:rsp
+      - yarn build:prod:rsp
 
   post_build:
     commands:
