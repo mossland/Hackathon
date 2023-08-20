@@ -74,7 +74,7 @@ export const generateHashString = async (trx: Knex.Transaction, gameId: number) 
         console.error(err);
         reject(err);
       } else {
-        const rawHashList: any = await data.get('hash');
+        const rawHashList: any = await (data as any).get('hash');
         resolve(rawHashList);
       }
     });
@@ -93,7 +93,7 @@ export const generateHashString = async (trx: Knex.Transaction, gameId: number) 
           console.error(err);
           reject(err);
         } else {
-          const rawHashList: any = await data.get('hash');
+          const rawHashList: any = await (data as any).get('hash');
           resolve(rawHashList);
         }
       });
