@@ -1,7 +1,6 @@
 FROM node:lts-buster
 
 ARG NODE_ENV
-ARG COMMIT
 
 RUN mkdir -p /usr/src/metaverse_game
 COPY . /usr/src/metaverse_game

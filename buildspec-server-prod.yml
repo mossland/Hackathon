@@ -18,6 +18,7 @@ phases:
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
       - echo $NODE_ENV
+      - cp ./Backend/.env.$NODE_ENV ./Backend/.env
 
   build:
     commands:    
