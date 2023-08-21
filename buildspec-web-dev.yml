@@ -27,7 +27,7 @@ phases:
       - docker tag dev_mossverse_game_web:latest $WEB_ECR_ADDR:latest
       - docker tag dev_mossverse_game_web:latest $WEB_ECR_ADDR:$IMAGE_TAG
       - echo Building the NGINX Docker image...
-      - docker build --build-arg NODE_ENV=$NODE_ENV -t dev_mossverse_game_web_nginx -f web.Dockerfile ./Nginx
+      - docker build --build-arg NODE_ENV=$NODE_ENV -t dev_mossverse_game_web_nginx -f ./Nginx/web.Dockerfile ./Nginx
       - docker tag dev_mossverse_game_web_nginx:latest $WEB_NGINX_ECR_ADDR:latest
       - docker tag dev_mossverse_game_web_nginx:latest $WEB_NGINX_ECR_ADDR:$IMAGE_TAG
 
