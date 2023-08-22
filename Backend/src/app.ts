@@ -63,13 +63,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/ping', (req, res) => { res.status(200).json({ success: true, message: 'pong' }) });
-
-const apiRouter = express.Router();
-apiRouter.use('/user', userRouter);
-apiRouter.use('/rsp', rspRouter);
-apiRouter.use('/hg', hgRouter);
-
-app.use('/api', apiRouter);
+app.use('/user', userRouter);
+app.use('/rsp', rspRouter);
+app.use('/hg', hgRouter);
 app.use((err: ServerError, req: Request, res: Response, next: NextFunction) => {
   return res.status(err.code).json({
     success: false,
