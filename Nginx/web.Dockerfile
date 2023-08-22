@@ -11,4 +11,5 @@ COPY . /usr/src/nginx
 
 WORKDIR /usr/src/nginx
 RUN ["chmod", "+x", "./run.sh"]
+EXPOSE 80
 CMD ./run.sh
