@@ -11,6 +11,9 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
   }
 
   try {
+    console.log(`${process.env.MOSSVERSE_PLATFORM_BASE}/user/whoAmI
+
+${bearerToken}`);
     const { data } = await axios.get(
       `${process.env.MOSSVERSE_PLATFORM_BASE}/user/whoAmI`,
       {
