@@ -1,102 +1,106 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:314592090710:task-definition/mossverse-game-sever:1",
-  "containerDefinitions": [
-      {
-          "name": "nginx",
-          "image": "314592090710.dkr.ecr.ap-northeast-2.amazonaws.com/mossverse_game_server",
-          "cpu": 0,
-          "portMappings": [
-              {
-                  "name": "nginx-80-tcp",
-                  "containerPort": 80,
-                  "hostPort": 80,
-                  "protocol": "tcp",
-                  "appProtocol": "http"
-              }
-          ],
-          "essential": true,
-          "environment": [],
-          "environmentFiles": [],
-          "mountPoints": [],
-          "volumesFrom": [],
-          "ulimits": [],
-          "logConfiguration": {
-              "logDriver": "awslogs",
-              "options": {
-                  "awslogs-create-group": "true",
-                  "awslogs-group": "/ecs/mossverse-game-sever",
-                  "awslogs-region": "ap-northeast-2",
-                  "awslogs-stream-prefix": "ecs"
-              },
-              "secretOptions": []
-          }
-      },
-      {
-          "name": "server",
-          "image": "314592090710.dkr.ecr.ap-northeast-2.amazonaws.com/dev_mossverse_game_server",
-          "cpu": 0,
-          "portMappings": [
-              {
-                  "name": "server-3000-tcp",
-                  "containerPort": 3000,
-                  "hostPort": 3000,
-                  "protocol": "tcp",
-                  "appProtocol": "http"
-              }
-          ],
-          "essential": false,
-          "environment": [],
-          "environmentFiles": [],
-          "mountPoints": [],
-          "volumesFrom": []
-      }
-  ],
-  "family": "mossverse-game-sever",
-  "executionRoleArn": "arn:aws:iam::314592090710:role/ecsTaskExecutionRole",
-  "networkMode": "awsvpc",
-  "revision": 1,
-  "volumes": [],
-  "status": "ACTIVE",
-  "requiresAttributes": [
-      {
-          "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
-      },
-      {
-          "name": "ecs.capability.execution-role-awslogs"
-      },
-      {
-          "name": "com.amazonaws.ecs.capability.ecr-auth"
-      },
-      {
-          "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-      },
-      {
-          "name": "ecs.capability.execution-role-ecr-pull"
-      },
-      {
-          "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-      },
-      {
-          "name": "ecs.capability.task-eni"
-      },
-      {
-          "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
-      }
-  ],
-  "placementConstraints": [],
-  "compatibilities": [
-      "EC2",
-      "FARGATE"
-  ],
-  "requiresCompatibilities": [
-      "FARGATE"
-  ],
-  "cpu": "1024",
-  "memory": "3072",
-  "runtimePlatform": {
-      "cpuArchitecture": "X86_64",
-      "operatingSystemFamily": "LINUX"
-  },
-  "registeredAt": "2023-08-18T09:39:10.999Z",
-  "registeredBy": "arn:aws:iam::314592090710:root"
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:314592090710:task-definition/mossverse-game-web:1",
+    "containerDefinitions": [
+        {
+            "name": "nginx",
+            "image": "314592090710.dkr.ecr.ap-northeast-2.amazonaws.com/mossverse_game_web_nginx",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "entryPoint": [],
+            "command": [],
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/mossverse-game-web",
+                    "awslogs-region": "ap-northeast-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        },
+        {
+            "name": "web",
+            "image": "314592090710.dkr.ecr.ap-northeast-2.amazonaws.com/mossverse_game_web",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 3000,
+                    "hostPort": 3000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "entryPoint": [],
+            "command": [],
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/mossverse-game-web",
+                    "awslogs-region": "ap-northeast-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ],
+    "family": "mossverse-game-web",
+    "taskRoleArn": "arn:aws:iam::314592090710:role/ecsRocketRole",
+    "executionRoleArn": "arn:aws:iam::314592090710:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "revision": 1,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "2048",
+    "runtimePlatform": {
+        "operatingSystemFamily": "LINUX"
+    },
+    "registeredAt": "2023-08-21T06:06:54.081Z",
+    "registeredBy": "arn:aws:iam::314592090710:root",
+    "tags": []
 }
