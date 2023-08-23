@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
 
 @RestController
 @RequestMapping("/api", produces = ["application/json;charset=UTF-8"])
@@ -23,6 +22,7 @@ class ApiController : BaseApiController() {
         @RequestParam serverSeed: String,
         @RequestParam clientSeed: String,
         @RequestParam nonce: String,
+        @RequestParam size: Int,
 
         request: HttpServletRequest,
         response: HttpServletResponse
@@ -31,7 +31,8 @@ class ApiController : BaseApiController() {
         val item = apiService.generateResult(
             serverSeed,
             clientSeed,
-            nonce
+            nonce,
+            size
         )
 
         return createSuccessResponse(request, item)
