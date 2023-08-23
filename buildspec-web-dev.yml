@@ -1,0 +1,48 @@
+version: 0.2
+
+env:
+  secrets-manager:
+    DOCKER_ID: "common/docker:DOCKER_ID"
+    DOCKER_PW: "common/docker:DOCKER_PW"
+    AWS_USER_ID: "common/docker:AWS_USER_ID"
+
+phases:  
+  pre_build:
+    commands:
+      - echo Logging in to Docker Hub...
+      - docker login -u $DOCKER_ID -p $DOCKER_PW
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ssm get-parameter --with-decryption --name mossverse-game-web-$NODE_ENV --region $AWS_DEFAULT_REGION | jq '.Parameter.Value' | sed 's/^.//;s/.$//' | perl -pe 's/\\n/\n/g' > ./game-portal-web/.env.development
+      - docker login --username AWS -p $(aws ecr get-login-password --region $AWS_DEFAULT_REGION) $AWS_USER_ID.dkr.ecr.ap-northeast-2.amazonaws.com/
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - echo $NODE_ENV
+
+  build:
+    commands:    
+      - echo Build started on `date`
+      - echo Building the Web Docker image...
+      - docker build --build-arg NODE_ENV=$NODE_ENV -t dev_mossverse_game_web ./game-portal-web
+      - docker tag dev_mossverse_game_web:latest $WEB_ECR_ADDR:latest
+      - docker tag dev_mossverse_game_web:latest $WEB_ECR_ADDR:$IMAGE_TAG
+      - echo Building the NGINX Docker image...
+      - docker build --build-arg NODE_ENV=$NODE_ENV -t dev_mossverse_game_web_nginx -f ./Nginx/web.Dockerfile ./Nginx
+      - docker tag dev_mossverse_game_web_nginx:latest $WEB_NGINX_ECR_ADDR:latest
+      - docker tag dev_mossverse_game_web_nginx:latest $WEB_NGINX_ECR_ADDR:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Web Docker images...
+      - docker push $WEB_ECR_ADDR:latest
+      - docker push $WEB_ECR_ADDR:$IMAGE_TAG
+      - echo Pushing the Nginx Docker images...
+      - docker push $WEB_NGINX_ECR_ADDR:latest
+      - docker push $WEB_NGINX_ECR_ADDR:$IMAGE_TAG
+      
+
+artifacts:
+  files:
+    - appspec-web-dev.yaml
+    - taskdef-web.dev.json
