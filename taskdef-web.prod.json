@@ -38,10 +38,16 @@
                     "protocol": "tcp"
                 }
             ],
+            
             "essential": true,
             "entryPoint": [],
             "command": [],
-            "environment": [],
+            "environment": [
+                {
+                    "name": "HOSTNAME",
+                    "value": "localhost"
+                }
+            ],
             "mountPoints": [],
             "volumesFrom": [],
             "logConfiguration": {
