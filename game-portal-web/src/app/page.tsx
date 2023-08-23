@@ -14,17 +14,17 @@ export default function Home() {
   
   const gameList = [
     {
-      link: '/client/RockPaperScissors',
+      link: '/client/RockPaperScissors/index.html',
       name: 'Rock, Paper, Scissors',
       isAvailable: true,
     },
     {
-      link: '/client/HolyGali',
+      link: '/client/HolyGali/index.html',
       name: 'Holy Gali',
       isAvailable: false,
     },
     {
-      link: '/client/ryb',
+      link: '/client/ryb/index.html',
       name: 'Red, Yellow, Blue',
       isAvailable: false,
     },
