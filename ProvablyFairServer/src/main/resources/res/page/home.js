@@ -32,6 +32,11 @@
                     new Triton.Field.Type.Basic({
                         name : 'Nonce',
                         key : 'nonce'
+                    }),
+
+                    new Triton.Field.Type.Basic({
+                        name : 'Size',
+                        key : 'size'
                     })
                 ]
             });
@@ -49,8 +54,6 @@
 
                     var parameterMap = fieldWrite.extract();
 
-                    console.log(parameterMap);
-
                     if ( String.isBlank(parameterMap['serverSeed']) ) {
                         Triton.AlertManager.alert('Input Server Seed.');
                         return;
@@ -63,6 +66,11 @@
 
                     if ( String.isBlank(parameterMap['nonce']) ) {
                         Triton.AlertManager.alert('Input Nonce.');
+                        return;
+                    }
+
+                    if ( String.isBlank(parameterMap['size']) ) {
+                        Triton.AlertManager.alert('Input Size.');
                         return;
                     }
 
@@ -79,6 +87,11 @@
                                 new Triton.Field.Type.Basic({
                                     name : 'Result',
                                     key : 'result'
+                                }),
+
+                                new Triton.Field.Type.Basic({
+                                    name : 'Number',
+                                    key : 'number'
                                 })
                             ]
                         });

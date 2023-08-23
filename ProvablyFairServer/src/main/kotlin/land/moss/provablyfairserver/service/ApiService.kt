@@ -7,7 +7,7 @@ import javax.crypto.spec.SecretKeySpec
 
 @Service
 class ApiService  {
-    fun generateResult(serverSeed: String, clientSeed: String, nonce: String): ProvablyFairResult {
+    fun generateResult(serverSeed: String, clientSeed: String, nonce: String, size: Int): ProvablyFairResult {
 
         val serverSeedByteArray = serverSeed.toByteArray(Charsets.UTF_8);
 
@@ -21,8 +21,11 @@ class ApiService  {
 
         val resultString = hash.joinToString("") { "%02X".format(it) }.substring(0, 5)
 
-        val provablyFairResult = ProvablyFairResult(resultString)
-        return provablyFairResult
+        val resultNumber = resultString.toIntOrNull(16)!!
+
+        val number = ((size * ( resultNumber % 65535 ) ).div(65535))
+
+        return ProvablyFairResult(resultString, number)
     }
 
 }
