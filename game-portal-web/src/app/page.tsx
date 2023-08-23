@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import localFont from 'next/font/local';
 import { useState } from 'react';
 
@@ -10,21 +11,23 @@ import styles from './page.module.scss'
 const ka = localFont({ src: '../../public/font/ka1.ttf' });
 
 export default function Home() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token') || '';
   const [ curSelect, setCurSelect ] = useState(0);
   
   const gameList = [
     {
-      link: '/client/RockPaperScissors/index.html',
+      link: `/client/RockPaperScissors/index.html?token=${token}`,
       name: 'Rock, Paper, Scissors',
       isAvailable: true,
     },
     {
-      link: '/client/HolyGali/index.html',
+      link: `/client/HolyGali/index.html?token=${token}`,
       name: 'Holy Gali',
       isAvailable: false,
     },
     {
-      link: '/client/ryb/index.html',
+      link: `/client/ryb/index.html?token=${token}`,
       name: 'Red, Yellow, Blue',
       isAvailable: false,
     },
