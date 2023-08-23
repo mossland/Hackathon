@@ -48,7 +48,17 @@
             "environment": [],
             "environmentFiles": [],
             "mountPoints": [],
-            "volumesFrom": []
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/mossverse-game-sever",
+                    "awslogs-region": "ap-northeast-2",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
         }
     ],
     "family": "mossverse-game-sever",
