@@ -25,7 +25,7 @@ router.post('/result', createGameStateValidator(1), validateRSPGameInput, verify
       return next(new ServerError(StatusCodes.FORBIDDEN, 'Not enough point'));
     }
     
-    
+
     const ticket: ITicketModel = await spendByGameId(
       rspGameId,
       new Big(req.body.betAmount),
@@ -34,7 +34,7 @@ router.post('/result', createGameStateValidator(1), validateRSPGameInput, verify
         const N_BIT = 32;
         const computerHex = hash.slice(0, 32).slice(0, N_BIT / 4);
         const computerDecimal = parseInt(computerHex, 16);
-        const computerHashValue = new Big(computerDecimal).div(new Big(2).pow(N_BIT)).mul(81).round(0, 0).mod(3);
+        const computerHashValue = new Big(computerDecimal).mod(3);
         
         const multiplierHex = hash.slice(32).slice(0, N_BIT / 4);
         const multiplierDecimal = parseInt(multiplierHex, 16);
