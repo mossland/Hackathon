@@ -3,6 +3,35 @@ import StatusCodes from 'http-status-codes';
 import ServerError from '../util/serverError';
 import axios from 'axios';
 
+
+export const verifyRecaptcha = async (req: Request, res: Response, next: NextFunction) => {
+  const { recaptchaToken } = req.body;
+
+  if (!recaptchaToken) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'fail to verify recaptcha - token missing'));
+  }
+
+  try {
+    const { data } = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${recaptchaToken}`,
+      undefined,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+        }
+      }
+    );
+
+    if (!data.success) {
+      return next(new ServerError(StatusCodes.BAD_REQUEST, 'fail to verify recaptcha'));
+    }
+
+    return next();
+  } catch (e) {
+    console.error(e);
+    return next(new ServerError(StatusCodes.INTERNAL_SERVER_ERROR, 'fail to verify recaptcha'));
+  }
+};
 export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   const bearerToken = req.headers['authorization'];
 

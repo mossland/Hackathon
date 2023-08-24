@@ -25,7 +25,7 @@ export default class Platform {
     });
     return data;
   }
-  public async fetchUserPoint(userId: string) {
+  public async fetchUserPoint(userId: string): Promise<number> {
     let retryCount = 0;
     let isSuccess = false;
     let result;
@@ -58,7 +58,7 @@ export default class Platform {
       try {
         const { data } = await this.axiosInstance.post(`/point/${userId}`, {
           hash: ticketId,
-          num: pointDelta,
+          value: pointDelta,
         }, {
           headers: {
             Authorization: process.env.ADMIN_TOKEN,
@@ -67,7 +67,7 @@ export default class Platform {
         result = data;
         isSuccess = true;
       } catch (e) {
-        console.error(e);
+        console.error((e as any).message);
         if (retryCount > 10) {
           throw new Error(e as any);
         }
