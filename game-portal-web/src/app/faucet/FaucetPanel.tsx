@@ -11,7 +11,7 @@ import styles from './page.module.scss';
 export default function FaucetPanel() {
     const rcpRef = useRef(null);
 
-    const [ userPoint, setUserPoint ] = useState(1000);
+    const [ userPoint, setUserPoint ] = useState(0);
     const token = window.sessionStorage.getItem('token');
     const n = [
         zero, one, two, three, four, five, six, seven, eight, nine
@@ -41,16 +41,19 @@ export default function FaucetPanel() {
         setUserPoint(data.point);
     }
     useEffect(() => {
-        if (userPoint >= 1000) { return; }
-        if (!(window as any).grecaptcha) {
-            (window as any).onLoadRecaptcha = () => {
+        const init = async () => {
+            await fetchUserBalance();
+            if (userPoint >= 1000) { return; }
+            if (!(window as any).grecaptcha) {
+                (window as any).onLoadRecaptcha = () => {
+                    renderRecaptcha();
+                };
+            } else {
                 renderRecaptcha();
-            };
-        } else {
-            renderRecaptcha();
+            }
         }
-
-        fetchUserBalance();
+        init();
+        
 
         return () => {
             if (typeof rcpRef.current === typeof 0) {
