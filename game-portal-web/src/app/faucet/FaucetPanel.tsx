@@ -112,7 +112,6 @@ export default function FaucetPanel() {
         return (
             
             <div className={ styles.faucetPanel }>
-                <Script src={`https://www.google.com/recaptcha/api.js?onload=onLoadRecaptcha&render=explicit`} async defer></Script>
                 <pre className={ styles.figure }>
                     {
 `        @@         @@@@@         @@              
@@ -166,6 +165,7 @@ export default function FaucetPanel() {
                         null
                         :
                         <form onSubmit={requestFaucet} className={styles.requestForm}>
+                            <Script src={`https://www.google.com/recaptcha/api.js?onload=onLoadRecaptcha&render=explicit`} async defer></Script>
                             <div id={"g-recaptcha"}></div>
                             <button type={'submit'} className={styles.requestBtn}>Request</button>
                         </form>
