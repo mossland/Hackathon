@@ -8,7 +8,7 @@ export default function Storage({ token }: { token: string}) {
         if (token && window.sessionStorage.getItem('token') !== token) {
             window.sessionStorage.setItem('token', token);
         }
-    }, [token]);
+    }, [window.sessionStorage.getItem('token')]);
     
     return <></>;
 }
