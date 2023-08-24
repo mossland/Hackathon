@@ -11,6 +11,13 @@
  html {
   line-height: 1.15; /* 1 */
   -webkit-text-size-adjust: 100%; /* 2 */
+
+  @font-face {
+    font-family: 'DungGeunMo';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
 }
 
 /* Sections
@@ -149,6 +156,10 @@ img {
   border-style: none;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
 /* Forms
    ========================================================================== */
 

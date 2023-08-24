@@ -2,7 +2,7 @@
 
 const nextConfig = {
     output: 'standalone',
-    trailingSlash: true,
+    trailingSlash: false,
 }
 
 module.exports = nextConfig
