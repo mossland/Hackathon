@@ -1,5 +1,14 @@
+@import '../mixin';
+
 .faucetPanel {
     margin: 0 auto;
     background: rgb(0, 0, 66);
     width: 100%;
+}
+
+@include sm {
+    .faucetPanel {
+        box-sizing: border-box;
+        padding: 0 15px;
+    }
 }
