@@ -63,6 +63,31 @@
         }
 
         .requestForm {
+            .loading {
+                @keyframes blinkCursor {
+                    0% {
+                        border-right-color: #fff;
+                    }
+                    40% {
+                        border-right-color: #fff;
+                    }
+                    41% {
+                        border-right-color: transparent;
+                    }
+                    100% {
+                        border-right-color: transparent;
+                    }
+                }
+                &::after {
+                    content: "";
+                    display: inline-block;
+                    margin-left: 4px;
+                    transition: all 0.5s linear;
+                    animation: blinkCursor 0.8s linear infinite;
+                    border-right: 2px dotted #fff;
+                    height: 11px;
+                }
+            }
             .requestBtn {
                 cursor: pointer;
                 box-sizing: border-box;
@@ -75,7 +100,20 @@
                 &:hover {
                     background-color: #fff;
                     color: #000;
-                    box-shadow: 6px 6px 0 3px #000;    
+                    box-shadow: 6px 6px 0 3px #000;
+                }
+
+                &:disabled {
+                    cursor: not-allowed;
+                    border: 0;
+                    background-color: rgb(212, 212, 212);
+                    color: rgb(235, 235, 235);
+
+                    &:hover {
+                        background-color: rgb(212, 212, 212);
+                        color: rgb(235, 235, 235);
+                        box-shadow: none;
+                    }
                 }
             }
         }

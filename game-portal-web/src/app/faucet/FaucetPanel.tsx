@@ -12,7 +12,7 @@ export default function FaucetPanel() {
     const rcpRef = useRef(null);
 
     const [ userPoint, setUserPoint ] = useState(0);
-    const isRecaptchaRendered = useRef(false);
+    const [ isRecaptchaRendered, setIsRecaptchaRendered ] = useState(false);
     const token = window.sessionStorage.getItem('token');
     const n = [
         zero, one, two, three, four, five, six, seven, eight, nine
@@ -27,7 +27,7 @@ export default function FaucetPanel() {
                     theme: 'dark',
                 }
             );
-            isRecaptchaRendered.current = true;
+            setIsRecaptchaRendered(true);
         }
     };
 
@@ -51,7 +51,7 @@ export default function FaucetPanel() {
             };
 
             setTimeout(() => {
-                if (!isRecaptchaRendered.current) {
+                if (!isRecaptchaRendered) {
                     renderRecaptcha();
                 }
             }, 3000);
@@ -176,7 +176,13 @@ export default function FaucetPanel() {
                         <form onSubmit={requestFaucet} className={styles.requestForm}>
                             <Script src={`https://www.google.com/recaptcha/api.js?onload=onLoadRecaptcha&render=explicit`} async defer></Script>
                             <div id={"g-recaptcha"}></div>
-                            <button type={'submit'} className={styles.requestBtn}>Request</button>
+                            {
+                                !isRecaptchaRendered ?
+                                <div className={styles.loading}>Loading...</div>
+                                :
+                                null
+                            }
+                            <button type={'submit'} disabled={ !isRecaptchaRendered } className={styles.requestBtn}>Request</button>
                         </form>
                     }
                 </div>
