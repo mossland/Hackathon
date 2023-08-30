@@ -45,10 +45,14 @@ morgan.token('origin', function(req, res) {
 
 app.set('trust proxy', true);
 
-const corsWhitelist: any[] = [];
+const corsWhitelist: any[] = [
+  'https://meta.moss.land',
+  'https://metaverse-game.moss.land',
+];
 app.use(cors({
   origin: (origin, callback) => {
     if (process.env.NODE_ENV === 'production') {
+      console.log(origin);
       if (corsWhitelist.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
