@@ -67,6 +67,13 @@ app.use('/user', userRouter);
 app.use('/rsp', rspRouter);
 app.use('/hg', hgRouter);
 app.use((err: ServerError, req: Request, res: Response, next: NextFunction) => {
+  if (err.code === undefined) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
   return res.status(err.code).json({
     success: false,
     message: err.message,
