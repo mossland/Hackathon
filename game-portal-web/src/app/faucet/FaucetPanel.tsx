@@ -12,6 +12,7 @@ export default function FaucetPanel() {
     const rcpRef = useRef(null);
 
     const [ userPoint, setUserPoint ] = useState(0);
+    const isRecaptchaRendered = useRef(false);
     const token = window.sessionStorage.getItem('token');
     const n = [
         zero, one, two, three, four, five, six, seven, eight, nine
@@ -26,6 +27,7 @@ export default function FaucetPanel() {
                     theme: 'dark',
                 }
             );
+            isRecaptchaRendered.current = true;
         }
     };
 
@@ -44,13 +46,15 @@ export default function FaucetPanel() {
         const init = async () => {
             await fetchUserBalance();
             if (userPoint >= 1000) { return; }
-            if (!(window as any).grecaptcha) {
-                (window as any).onLoadRecaptcha = () => {
-                    renderRecaptcha();
-                };
-            } else {
+            (window as any).onLoadRecaptcha = () => {
                 renderRecaptcha();
-            }
+            };
+
+            setTimeout(() => {
+                if (!isRecaptchaRendered.current) {
+                    renderRecaptcha();
+                }
+            }, 3000);
         }
         init();
         
@@ -61,6 +65,8 @@ export default function FaucetPanel() {
             }
         };
     }, [ userPoint ]);
+
+    
 
     
     
