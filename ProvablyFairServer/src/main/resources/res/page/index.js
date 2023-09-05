@@ -131,7 +131,7 @@ PageManager.init({
 
     },
     onNormalizeParameter: function (data) {
-        data['m1'] = Lia.pcd('home', data, 'm1');
+        data['m1'] = Lia.pcd('generate', data, 'm1');
         return data;
     },
 

@@ -2308,6 +2308,12 @@ Lia.Strings = {
 
             'ko': '항목을 입력하여 주십시오.',
             'en': 'Enter the field.'
+        },
+
+        CANNOT_VIEW_THE_FILE: {
+
+            'ko': '파일을 표시할 수 없습니다.',
+            'en': 'Cannot view the file.'
         }
     },
 
@@ -10682,6 +10688,19 @@ Lia.DateHelper = {
      * @returns {Date}
      */
     parseDate: function (text) {
+
+        if ( String.isBlank(text) ) {
+            return undefined
+        }
+
+        if ( text.length == 10 ) {
+            text = text + ' 00:00:00.000';
+        } else if ( text.length == 7 ) {
+            text = text + '-01 00:00:00.000';
+        } else if ( text.length == 4 ) {
+            text = text + '-01-01 00:00:00.000';
+        }
+
         return new Date(Date.parse(text));
     },
 
@@ -11912,7 +11931,7 @@ Lia.FileHelper = {
      * @returns {boolean}
      */
     isImageFile: function (url) {
-        return Lia.FileHelper.isFile(url, ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'svg']);
+        return Lia.FileHelper.isFile(url, ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'webp']);
     },
 
     /**

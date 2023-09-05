@@ -12,7 +12,15 @@
 
             var title = new Triton.Title({
                 appendTo : container,
-                content : 'Provably Fair'
+                content : 'Provably Fair Generate',
+                rightFlatButtonList : [
+                    {
+                        content : 'Provably Fair Check',
+                        onClick : function() {
+                            PageManager.go('check');
+                        }
+                    }
+                ]
             });
 
             var fieldWrite = new Triton.FieldWrite({
