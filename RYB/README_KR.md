@@ -54,9 +54,6 @@
 
 ![image](https://github.com/mossland/Hackathon/assets/13128375/bd2785af-731f-4aac-9123-5ca92c637771)
 
-6. 결과 팝업을 통해 게임 결과를 다시 확인할 수 있습니다.
-
-![캡처_2023_08_29_19_00_26_13](https://github.com/mossland/Hackathon/assets/13128375/b62ad6cd-9dba-4361-9aff-d3b36a7eba07)
 
 # 실행
 
