@@ -57,7 +57,7 @@ app.use((err: ServerError, req: Request, res: Response, next: NextFunction) => {
     console.error(err);
     return res.status(500).json({
       success: false,
-      message: err.message,
+      message: '',
     });
   }
   return res.status(err.code).json({
