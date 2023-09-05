@@ -6938,6 +6938,7 @@ Triton.Title.prototype.init = function (options) {
 
     var theme = options['theme'];
 
+    Triton.applyOptions(this.jView.find('.triton_title_content'), Lia.p(theme, 'content'));
     Triton.applyOptions(this.jView.find('.triton_title_flag'), Lia.p(theme, 'flag'));
     Triton.applyOptions(this.jView.find('.triton_title_text'), Lia.p(theme, 'text'));
 
@@ -7008,7 +7009,7 @@ Triton.Title.prototype.setLeftButtonListHidden = function (v) {
 Triton.Title.NAME = 'triton_title';
 Triton.Title.HTML = '<div class="triton_title" style="line-height:25px;position:relative;vertical-align: center;text-align:left;">' +
     '<div class="triton_title_flag"></div>' +
-    '<div style="display:inline-block;">' +
+    '<div class="triton_title_content">' +
     '<div class="triton_title_text triton_content" style="display:inline-block;font-size:22px;font-family: notokr-medium, NanumGothicBold;color:' + TritonSettings.TITLE_TEXT_COLOR + ';letter-spacing:-0.3px;text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);text-align:left;"></div>' +
     '<div class="triton_title_button_left_list" style="display:inline-block;margin-left:10px;vertical-align: top;margin-top: 2px;"></div>' +
     '<div class="triton_title_button_right_list" style="float:right;display:inline-block;vertical-align: top;margin-top: 2px;"></div>' +
@@ -7022,6 +7023,13 @@ Triton.Title.Theme = {
         css: {
             'margin-bottom': '30px',
             'cursor': 'pointer'
+        },
+
+        content : {
+
+            css : {
+                'display' : 'inline-block'
+            }
         },
 
         flag: {
@@ -7053,6 +7061,13 @@ Triton.Title.Theme = {
             'margin-bottom': '30px'
         },
 
+        content : {
+
+            css : {
+                'display' : 'block'
+            }
+        },
+
         flag: {
 
             css: {
@@ -7077,6 +7092,13 @@ Triton.Title.Theme = {
 
         css: {
             'margin-bottom': 0
+        },
+
+        content : {
+
+            css : {
+                'display' : 'block'
+            }
         },
 
         flag: {
@@ -8641,7 +8663,7 @@ Triton.FileViewer.prototype.init = function (options) {
 
         new Triton.Section({
             appendTo: j,
-            content: '파일을 표시할 수 없습니다.',
+            content: Lia.Strings.getString(Lia.Strings.MESSAGE.CANNOT_VIEW_THE_FILE),
             css: {
                 'font-size': '14px',
                 'text-align': 'center',
@@ -14882,9 +14904,35 @@ Triton.Calendar.setUseMonthPicker = function (use) {
     Triton.Calendar.useMonthPicker = use;
 };
 
+Triton.Calendar.extractStartDateHandler = function (item) {
+    return Lia.p(item, 'startDate');
+};
+Triton.Calendar.extractEndDateHandler = function (item) {
+    return Lia.p(item, 'endDate');
+};
+Triton.Calendar.extractTitleHandler = function (item) {
+    return Lia.p(item, 'title');
+};
+Triton.Calendar.extractColorHandler = function (item) {
+    return Lia.p(item, 'color');
+};
+Triton.Calendar.extractBackgroundColorHandler = function (item) {
+    return Lia.p(item, 'backgroundColor');
+};
+
 Triton.Calendar.VIEW_MODE_MONTH = 1;
 Triton.Calendar.VIEW_MODE_WEEK = 2;
 Triton.Calendar.VIEW_MODE_DAY = 3;
+
+Triton.Calendar.Color = {
+    RED: 'rgba(255, 128, 128, 1)',
+    SKYBLUE: 'rgb(198, 223, 255)',
+    GREEN: 'rgb(193, 219, 49)',
+    PURPLE: 'rgb(228, 168, 238)',
+    BLUE: 'rgb(70, 41, 255)',
+    BLACK : '#000000',
+    WHITE : '#FFFFFF',
+};
 
 
 Triton.Calendar.getDaysLabelList = function() {
@@ -14914,6 +14962,13 @@ Triton.Calendar.prototype.init = function (options) {
     page.viewMode = Lia.pd(Triton.Calendar.VIEW_MODE_MONTH, options, 'viewMode');
     page.daysLabelList = Triton.Calendar.getDaysLabelList();
 
+    page.extractStartDateHandler = Lia.pcd(Triton.Calendar.extractStartDateHandler, options, 'extractStartDateHandler');
+    page.extractEndDateHandler = Lia.pcd(Triton.Calendar.extractEndDateHandler, options, 'extractEndDateHandler');
+    page.extractTitleHandler = Lia.pcd(Triton.Calendar.extractTitleHandler, options, 'extractTitleHandler');
+    page.extractColorHandler = Lia.pcd(Triton.Calendar.extractColorHandler, options, 'extractColorHandler');
+    page.extractBackgroundColorHandler = Lia.pcd(Triton.Calendar.extractBackgroundColorHandler, options, 'extractBackgroundColorHandler');
+
+
     page.onHeaderPrevButtonClick = Lia.pd(function (page) {
         page.movePrevMonth();
     }, options, 'onHeaderPrevButtonClick');
@@ -14924,7 +14979,6 @@ Triton.Calendar.prototype.init = function (options) {
     page.onMonthSelected = Lia.pd(function (page, date) {
         page.setDate(date);
     }, options, 'onMonthSelected');
-
 
     page.onItemClick = Lia.p(options, 'onItemClick');
     page.onItemMouseEnter = Lia.p(options, 'onItemMouseEnter');
@@ -15274,8 +15328,8 @@ Triton.Calendar.prototype.setList = function (list, withoutRender) {
 
         page.list.sort(function (item1, item2) {
 
-            var startDate1 = Lia.p(item1, 'start_date');
-            var startDate2 = Lia.p(item2, 'start_date');
+            var startDate1 = page.extractStartDateHandler(item1);
+            var startDate2 = page.extractStartDateHandler(item2);
 
             if (startDate1 > startDate2) {
                 return 1;
@@ -15381,8 +15435,8 @@ Triton.Calendar.prototype.renderDay = function () {
 
             var item = page.list[k];
 
-            var itemStartDate = Lia.DateHelper.parseDate(Lia.p(item, 'start_date'));
-            var itemEndDate = Lia.DateHelper.parseDate(Lia.p(item, 'end_date'));
+            var itemStartDate = Lia.DateHelper.parseDate(page.extractStartDateHandler(item));
+            var itemEndDate = Lia.DateHelper.parseDate(page.extractEndDateHandler(item));
 
             if (!(itemEndDate < startDate || endDate < itemStartDate)) {
                 page.itemList.push(item);
@@ -15413,9 +15467,12 @@ Triton.Calendar.prototype.renderDay = function () {
 
             var item = page.itemList[i3];
 
-            var itemStartDate = Lia.DateHelper.parseDate(Lia.p(item, 'start_date'));
-            var itemEndDate = Lia.DateHelper.parseDate(Lia.p(item, 'end_date'));
-
+            var itemStartDate = Lia.DateHelper.parseDate(
+                page.extractStartDateHandler(item)
+            );
+            var itemEndDate = Lia.DateHelper.parseDate(
+                page.extractEndDateHandler(item)
+            );
 
             var index = i3;
 
@@ -15442,12 +15499,12 @@ Triton.Calendar.prototype.renderDay = function () {
                 width -= 0.1;
             }
 
-            var backgroundColor = item['background_color'];
-            var color = item['color'];
-            var title = item['title'];
+            var backgroundColor = page.extractBackgroundColorHandler(item);
+            var color = page.extractColorHandler(item);
+            var title = page.extractTitleHandler(item);
 
-            var startDateObject = Lia.DateHelper.parseDate(Lia.p(item, 'start_date'));
-            var endDateObject = Lia.DateHelper.parseDate(Lia.p(item, 'end_date'));
+            var startDateObject = Lia.DateHelper.parseDate(page.extractStartDateHandler(item));
+            var endDateObject = Lia.DateHelper.parseDate(page.extractEndDateHandler(item));
 
             var startDateString = startDateObject.format('MM-dd');
             var endDateString = endDateObject.format('MM-dd');
@@ -15637,6 +15694,7 @@ Triton.Calendar.prototype.renderMonth = function () {
     if (baseDate == undefined) {
         baseDate = currentDate;
     }
+
     page.date = baseDate.clone();
 
     var month = parseInt(baseDate.format('MM'));
@@ -15757,8 +15815,8 @@ Triton.Calendar.prototype.renderMonth = function () {
 
                 var item = page.list[k];
 
-                var itemStartDate = Lia.DateHelper.parseDate(Lia.p(item, 'start_date'));
-                var itemEndDate = Lia.DateHelper.parseDate(Lia.p(item, 'end_date'));
+                var itemStartDate = Lia.DateHelper.parseDate(page.extractStartDateHandler(item));
+                var itemEndDate = Lia.DateHelper.parseDate(page.extractEndDateHandler(item));
 
                 while (itemStartDate <= itemEndDate) {
 
@@ -15793,13 +15851,12 @@ Triton.Calendar.prototype.renderMonth = function () {
             }
         }
 
-
         for (var j = 0; j < 7; j++) {
 
             var loopDate = startDate.clone();
             startDate.addDays(1);
 
-            var isToday = currentDate.equals(loopDate);
+            var isToday = currentDate.getTime() == loopDate.getTime();
             var inPrevMonth = firstDay > loopDate;
             var inNextMonth = lastDay < loopDate;
             var inMonth = (!inPrevMonth && !inNextMonth);
@@ -16036,9 +16093,9 @@ Triton.Calendar.prototype.renderMonth = function () {
 
                             currentIndex = index + 1;
 
-                            var backgroundColor = item['background_color'];
-                            var color = item['color'];
-                            var title = item['title'];
+                            var backgroundColor = page.extractBackgroundColorHandler(item);
+                            var color = page.extractColorHandler(item);
+                            var title = page.extractTitleHandler(item);
 
                             var options = {
                                 appendTo: dayPopupSection,
@@ -16153,8 +16210,10 @@ Triton.Calendar.prototype.renderMonth = function () {
 
                 var item = page.list[i3];
 
-                var itemStartDate = Lia.DateHelper.parseDate(Lia.p(item, 'start_date').substr(0, 10));
-                var itemEndDate = Lia.DateHelper.parseDate(Lia.p(item, 'end_date').substr(0, 10));
+                var itemStartDate = Lia.DateHelper.parseDate(
+                    page.extractStartDateHandler(item).substring(0, 10));
+                var itemEndDate = Lia.DateHelper.parseDate(
+                    page.extractEndDateHandler(item).substring(0, 10));
 
                 // 바깥에 걸치는게 아니면
                 if (!(itemEndDate < weekStartDate || weekEndDate < itemStartDate)) {
@@ -16199,9 +16258,9 @@ Triton.Calendar.prototype.renderMonth = function () {
                         width -= 0.1;
                     }
 
-                    var backgroundColor = item['background_color'];
-                    var color = item['color'];
-                    var title = item['title'];
+                    var backgroundColor = page.extractBackgroundColorHandler(item);
+                    var color = page.extractColorHandler(item);
+                    var title = page.extractTitleHandler(item);
 
                     var options = {
                         appendTo: calendarRowSection,
@@ -16488,8 +16547,12 @@ Triton.Calendar.prototype.renderWeek = function () {
 
                 var item = page.list[k];
 
-                var itemStartDate = Lia.DateHelper.parseDate(Lia.p(item, 'start_date'));
-                var itemEndDate = Lia.DateHelper.parseDate(Lia.p(item, 'end_date'));
+                var itemStartDate = Lia.DateHelper.parseDate(
+                    page.extractStartDateHandler(item)
+                );
+                var itemEndDate = Lia.DateHelper.parseDate(
+                    page.extractEndDateHandler(item)
+                );
 
                 while (itemStartDate <= itemEndDate) {
 
@@ -16523,8 +16586,12 @@ Triton.Calendar.prototype.renderWeek = function () {
 
                 var item = page.list[k];
 
-                var itemStartDate = Lia.DateHelper.parseDate(Lia.p(item, 'start_date'));
-                var itemEndDate = Lia.DateHelper.parseDate(Lia.p(item, 'end_date'));
+                var itemStartDate = Lia.DateHelper.parseDate(
+                    page.extractStartDateHandler(item)
+                );
+                var itemEndDate = Lia.DateHelper.parseDate(
+                    page.extractEndDateHandler(item)
+                );
 
                 while (itemStartDate <= itemEndDate) {
 
@@ -16567,8 +16634,12 @@ Triton.Calendar.prototype.renderWeek = function () {
 
                 var item = page.list[k];
 
-                var itemStartDate = Lia.DateHelper.parseDate(Lia.p(item, 'start_date'));
-                var itemEndDate = Lia.DateHelper.parseDate(Lia.p(item, 'end_date'));
+                var itemStartDate = Lia.DateHelper.parseDate(
+                    page.extractStartDateHandler(item)
+                );
+                var itemEndDate = Lia.DateHelper.parseDate(
+                    page.extractEndDateHandler(item)
+                );
 
                 while (itemStartDate <= itemEndDate) {
 
@@ -16653,8 +16724,10 @@ Triton.Calendar.prototype.renderWeek = function () {
 
                 var item = page.list[i3];
 
-                var itemStartDate = Lia.DateHelper.parseDate(Lia.p(item, 'start_date').substr(0, 10));
-                var itemEndDate = Lia.DateHelper.parseDate(Lia.p(item, 'end_date').substr(0, 10));
+                var itemStartDate = Lia.DateHelper.parseDate(
+                    page.extractStartDateHandler(item).substring(0, 10) + '00:00:00');
+                var itemEndDate = Lia.DateHelper.parseDate(
+                    page.extractEndDateHandler(item).substring(0, 10)  + '00:00:00');
 
                 // 바깥에 걸치는게 아니면
                 if (!(itemEndDate < weekStartDate || weekEndDate < itemStartDate)) {
@@ -16696,12 +16769,16 @@ Triton.Calendar.prototype.renderWeek = function () {
                         width -= 0.1;
                     }
 
-                    var backgroundColor = item['background_color'];
-                    var color = item['color'];
-                    var title = item['title'];
+                    var backgroundColor = page.extractBackgroundColorHandler(item);
+                    var color = page.extractColorHandler(item);
+                    var title = page.extractTitleHandler(item);
 
-                    var startDateObject = Lia.DateHelper.parseDate(Lia.p(item, 'start_date'));
-                    var endDateObject = Lia.DateHelper.parseDate(Lia.p(item, 'end_date'));
+                    var startDateObject = Lia.DateHelper.parseDate(
+                        page.extractStartDateHandler(item)
+                    );
+                    var endDateObject = Lia.DateHelper.parseDate(
+                        page.extractEndDateHandler(item)
+                    );
 
                     var startDateString = startDateObject.format('MM-dd');
                     var endDateString = endDateObject.format('MM-dd');
