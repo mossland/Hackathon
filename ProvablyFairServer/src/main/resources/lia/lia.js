@@ -2280,6 +2280,7 @@ Lia.Strings = {
             ko: '정말 삭제하시겠습니까?',
             en: 'Are you sure you want to delete this?',
         },
+
         CONFIRM_EDIT: {
             'ko': '이대로 저장하시겠습니까?',
             'en': 'Do you want to save changes?'
@@ -2291,7 +2292,6 @@ Lia.Strings = {
         },
 
         PDF_VIEWER_SUPPORT_WARNING: {
-
             'ko': '이 브라우저는 PDF 미리보기를 지원하지 않습니다.<BR/>' +
                 'PDF 뷰어 프로그램을 설치해주시기 바랍니다.',
             'en': 'This browser does not support inline PDFs.<BR/>' +
@@ -2299,21 +2299,28 @@ Lia.Strings = {
         },
 
         IFRAME_SUPPORT_WARNING: {
-
             'ko': '이 브라우저는 iframe을 지원하지 않습니다.',
             'en': 'This browser does not support iframe.'
         },
 
         ENTER_THE_FIELD: {
-
             'ko': '항목을 입력하여 주십시오.',
             'en': 'Enter the field.'
         },
 
         CANNOT_VIEW_THE_FILE: {
-
             'ko': '파일을 표시할 수 없습니다.',
             'en': 'Cannot view the file.'
+        },
+
+        DO_YOU_WANT_TO_LOG_OUT : {
+            'ko' : '로그아웃 하시겠습니까?',
+            'en' : 'Do you want to log out?'
+        },
+
+        PAGE_NOT_FOUND : {
+            'ko' : 'Page not found.',
+            'en' : '페이지를 찾을 수 없습니다.'
         }
     },
 

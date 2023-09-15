@@ -38,5 +38,29 @@ class ApiController : BaseApiController() {
         return createSuccessResponse(request, item)
     }
 
+    @PostMapping("/checkNumber")
+    fun checkNumber(
+
+        @RequestParam serverSeed: String,
+        @RequestParam clientSeed: String,
+        @RequestParam nonce: String,
+        @RequestParam size: Int,
+        @RequestParam number: Int,
+
+        request: HttpServletRequest,
+        response: HttpServletResponse
+    ) : Any? {
+
+        apiService.checkNumber(
+            serverSeed,
+            clientSeed,
+            nonce,
+            size,
+            number
+        )
+
+        return createSuccessResponse(request)
+    }
+
 
 }
