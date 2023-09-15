@@ -1,5 +1,7 @@
 package land.moss.provablyfairserver.service
 
+import land.moss.provablyfairserver.Code
+import land.moss.provablyfairserver.exception.CodedException
 import land.moss.provablyfairserver.model.ProvablyFairResult
 import org.springframework.stereotype.Service
 import javax.crypto.Mac
@@ -26,6 +28,14 @@ class ApiService  {
         val number = ((size * ( resultNumber % 65535 ) ).div(65535))
 
         return ProvablyFairResult(resultString, number)
+    }
+
+    fun checkNumber(serverSeed: String, clientSeed: String, nonce: String, size: Int, number: Int) {
+
+        val provablyFairResult = generateResult(serverSeed, clientSeed, nonce, size)
+        if ( provablyFairResult.number != number ) {
+            throw CodedException(Code.NOT_MATCHED_NUMBER)
+        }
     }
 
 }
