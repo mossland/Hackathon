@@ -14,12 +14,16 @@ import org.apache.hc.core5.http.HttpStatus
 
 class Bitgo (
     private val url:String,
+    private val expressUrl:String,
     private val accessToken:String
 ) {
 
     private val objectMapper = ObjectMapper()
 
-    fun request(method:String, url:String, httpParameterList: HttpParameterList? = null) : BitgoResult {
+    fun request(method:String, url:String,
+                httpParameterList: HttpParameterList? = null,
+                httpRequestBody: String? = null
+    ) : BitgoResult {
 
         val httpConnector = HttpConnector(method, url)
         httpConnector.httpHeaderList = HttpHeaderList(
@@ -28,6 +32,11 @@ class Bitgo (
 
         if ( httpParameterList != null ) {
             httpConnector.httpParameterList = httpParameterList
+        }
+
+        if ( httpRequestBody != null ) {
+            httpConnector.httpRequestBody = httpRequestBody
+            httpConnector.httpHeaderList!!.add("Content-Type", "application/json")
         }
 
         val httpResponse = httpConnector.request()
@@ -96,7 +105,7 @@ class Bitgo (
     }
 
     fun listWalletWebhooks(coin: String,
-                            walletId: String) : BitgoWebhooks {
+                           walletId: String) : BitgoWebhooks {
 
         val apiUrl = "$url/api/v2/$coin/wallet/$walletId/webhooks"
 
@@ -124,18 +133,19 @@ class Bitgo (
 
     fun sendCoins(coin: String, walletId: String, address: String, amount: Long, walletPassphrase: String?): BitgoCoinsSending {
 
-        val apiUrl = "$url/api/v2/$coin/wallet/$walletId/sendcoins"
+        val apiUrl = "$expressUrl/api/v2/$coin/wallet/$walletId/sendcoins"
 
-        val httpParameterList = HttpParameterList(
-            "address", address,
-            "amount", amount.toString()
-        )
+        val bitgoSendCoinsRequest = BitgoSendCoinsRequest()
+        bitgoSendCoinsRequest.address = address
+        bitgoSendCoinsRequest.amount = amount
 
         if ( walletPassphrase != null ) {
-            httpParameterList.add("walletPassphrase", walletPassphrase)
+            bitgoSendCoinsRequest.walletPassphrase = walletPassphrase
         }
 
-        val result = request(HttpMethod.POST, apiUrl)
+        val httpRequestBody = objectMapper.writeValueAsString(bitgoSendCoinsRequest)
+
+        val result = request(HttpMethod.POST, apiUrl, null, httpRequestBody)
 
         val response = result.body ?: throw CodedException(Code.BITGO_API_ERROR)
 
