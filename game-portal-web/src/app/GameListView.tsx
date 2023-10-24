@@ -10,6 +10,11 @@ const gameList = [
         isAvailable: true,
     },
     {
+      link: `/client/Lucky7Dice/index.html?token=`,
+      name: 'Lucky 7 Dice',
+      isAvailable: true,
+    },
+    {
         link: `/client/HolyGali/index.html?token=`,
         name: 'Holy Gali',
         isAvailable: false,
