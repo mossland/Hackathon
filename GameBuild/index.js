@@ -19,11 +19,13 @@ const projMeta = {
     id: process.env.RSP_PROJ_ID,
     scene: process.env.RSP_PROJ_SCENE,
     name: 'RpsGame',
+    distPath: './dist/rps',
   },
   l7d: {
     id: process.env.L7D_PROJ_ID,
     scene: process.env.L7D_PROJ_SCENE,
     name: 'L7DGame',
+    distPath: './dist/l7d',
   }
 };
 
@@ -92,12 +94,12 @@ const projMeta = {
       );
     });
 
-    if (!fs.existsSync(path.join(__dirname, './dist/rps'))) {
-      fs.mkdirSync(path.join(__dirname, './dist/rps'));
+    if (!fs.existsSync(path.join(__dirname, projMeta[options.game].distPath))) {
+      fs.mkdirSync(path.join(__dirname, projMeta[options.game].distPath));
     }
 
     fs.createReadStream(path.join(__dirname, `./dist/${projMeta[options.game].name}.zip`))
-    .pipe(unzipper.Extract({ path: path.join(__dirname, './dist/rps') }));
+    .pipe(unzipper.Extract({ path: path.join(__dirname, projMeta[options.game].distPath) }));
   } catch (e) {
     console.error(e);
   }
