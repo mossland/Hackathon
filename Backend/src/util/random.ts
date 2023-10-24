@@ -3,7 +3,7 @@ import uuidv7 from '../util/uuidv7';
 import db from '../db';
 import { Knex } from 'knex';
 import hashModel from '../model/hashModel';
-import { IRspMetadata, ITicketModel } from '../model/ticketModel';
+import { IRspMetadata, IL7DMetadata, ITicketModel } from '../model/ticketModel';
 import Platform from "../util/platform";
 import Big from 'big.js';
 
@@ -107,7 +107,7 @@ export const spendByGameId = async (
   gameId: number,
   betAmount: Big,
   userId: string,
-  resultGenerateFunc: (hash: string) => { meta: IRspMetadata ,payout: number }): Promise<ITicketModel> => {
+  resultGenerateFunc: (hash: string) => { meta: IRspMetadata | IL7DMetadata, payout: number }): Promise<ITicketModel> => {
   return new Promise((resolve, reject) => {
     db.transaction(async (trx) => {
       try {

@@ -19,6 +19,11 @@ const projMeta = {
     id: process.env.RSP_PROJ_ID,
     scene: process.env.RSP_PROJ_SCENE,
     name: 'RpsGame',
+  },
+  l7d: {
+    id: process.env.L7D_PROJ_ID,
+    scene: process.env.L7D_PROJ_SCENE,
+    name: 'L7DGame',
   }
 };
 
