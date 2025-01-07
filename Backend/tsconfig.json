@@ -101,6 +101,7 @@
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
   "exclude": [
-    "**/manual_script.ts"
+    "**/manual_script.ts",
+    "**/dist/**/*"
   ]
 }
