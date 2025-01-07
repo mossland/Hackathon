@@ -137,5 +137,4 @@ export const createGameStateValidator = (gameId: number): (req: Request, res: Re
       return next(new ServerError(StatusCodes.FORBIDDEN, 'the game is not available now'));
     }
   }
-  
 }
