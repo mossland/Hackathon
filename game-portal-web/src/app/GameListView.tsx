@@ -10,15 +10,25 @@ const gameList = [
         isAvailable: true,
     },
     {
-        link: `/client/HolyGali/index.html?token=`,
-        name: 'Holy Gali',
-        isAvailable: false,
+      link: `/client/HeadsOrTails/index.html?token=`,
+      name: 'Heads or Tails',
+      isAvailable: true,
     },
     {
-        link: `/client/ryb/index.html?token=`,
-        name: 'Red, Yellow, Blue',
-        isAvailable: false,
+      link: `/client/PizzaRevolution/index.html?token=`,
+      name: 'PizzaRevolution',
+      isAvailable: false,
     },
+    // {
+    //     link: `/client/HolyGali/index.html?token=`,
+    //     name: 'Holy Gali',
+    //     isAvailable: false,
+    // },
+    // {
+    //     link: `/client/ryb/index.html?token=`,
+    //     name: 'Red, Yellow, Blue',
+    //     isAvailable: false,
+    // },
 ];
 
 export function GameListViewLoading() {
