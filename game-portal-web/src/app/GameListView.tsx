@@ -16,7 +16,7 @@ const gameList = [
     },
     {
       link: `/client/PizzaRevolution/index.html?token=`,
-      name: 'PizzaRevolution',
+      name: 'Pizza Revolution',
       isAvailable: false,
     },
     // {

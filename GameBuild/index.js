@@ -19,13 +19,13 @@ const projMeta = {
     id: process.env.RSP_PROJ_ID,
     scene: process.env.RSP_PROJ_SCENE,
     name: 'RpsGame',
-    distPath: './dist/rps',
+    extractFolder: 'rps',
   },
-  l7d: {
-    id: process.env.L7D_PROJ_ID,
-    scene: process.env.L7D_PROJ_SCENE,
-    name: 'L7DGame',
-    distPath: './dist/l7d',
+  headsOrTails: {
+    id: process.env.HT_PROJ_ID,
+    scene: process.env.HT_PROJ_SCENE,
+    name: 'HeadsAndTails',
+    extractFolder: 'headsOrTails',
   }
 };
 
@@ -94,12 +94,12 @@ const projMeta = {
       );
     });
 
-    if (!fs.existsSync(path.join(__dirname, projMeta[options.game].distPath))) {
-      fs.mkdirSync(path.join(__dirname, projMeta[options.game].distPath));
+    if (!fs.existsSync(path.join(__dirname, `./dist/${projMeta[options.game].extractFolder}`))) {
+      fs.mkdirSync(path.join(__dirname, `./dist/${projMeta[options.game].extractFolder}`));
     }
 
     fs.createReadStream(path.join(__dirname, `./dist/${projMeta[options.game].name}.zip`))
-    .pipe(unzipper.Extract({ path: path.join(__dirname, projMeta[options.game].distPath) }));
+    .pipe(unzipper.Extract({ path: path.join(__dirname, `./dist/${projMeta[options.game].extractFolder}`) }));
   } catch (e) {
     console.error(e);
   }
