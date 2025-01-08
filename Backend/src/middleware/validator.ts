@@ -116,9 +116,9 @@ export const createGameStateValidator = (gameId: number): (req: Request, res: Re
   };
 
   if (Object.keys(gameIdObj).indexOf(gameId.toString()) === -1) {
-    return async function(req: Request, res: Response, next: NextFunction) {
-      const game = (await db('game').select('*').where('gameId', gameId))[0];
-      if (game.isAvailable) {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const selectGame = (await db('game').select('*').where('gameId', gameId))[0];
+      if (selectGame.isAvailable) {
         next();
       } else {
         return next(new ServerError(StatusCodes.FORBIDDEN, 'the game is not available now'));
