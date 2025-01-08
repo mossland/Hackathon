@@ -5,7 +5,6 @@ require('dotenv').config({
 
 const { program } = require('commander');
 program.option('-g, --game <char>');
-program.option('-e, --env <char>');
 program.parse();
 const options = program.opts();
 
@@ -101,13 +100,6 @@ const projMeta = {
 
     fs.createReadStream(path.join(__dirname, `./dist/${projMeta[options.game].name}.zip`))
     .pipe(unzipper.Extract({ path: path.join(__dirname, `./dist/${projMeta[options.game].extractFolder}`) }));
-
-    if (options.env === 'production') {
-      const gameScriptsPath = path.join(__dirname, `./dist/${projMeta[options.game].extractFolder}/__game-scripts.js`);
-      const content = fs.readFileSync(gameScriptsPath, 'utf8');
-      const updatedContent = content.replace(/\"development\"/g, '"production"');
-      fs.writeFileSync(gameScriptsPath, updatedContent);
-    }
   } catch (e) {
     console.error(e);
   }
