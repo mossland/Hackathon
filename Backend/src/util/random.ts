@@ -66,27 +66,47 @@ export const generateHashString = async (trx: Knex.Transaction, gameId: number) 
   let currentHashes = await trx('current_hash').select('*').where({
     gameId,
   }).forUpdate();
+
   let currentHash = currentHashes[0];
+  let hashList: string[] = [];
 
-  let hashList: string[] = await new Promise((resolve, reject) => {
-    hashModel.get({id: currentHash.hashId}, async (err, data) => {
-      if (err) {
-        console.error(err);
-        reject(err);
-      } else {
-        const rawHashList: any = await (data as any).get('hash');
-        resolve(rawHashList);
-      }
+  if (currentHash.hashId >= 0) {
+    hashList = await new Promise((resolve, reject) => {
+      hashModel.get({id: currentHash.hashId}, async (err, data) => {
+        if (err) {
+          console.error(err);
+          reject(err);
+        } else {
+          const rawHashList: any = await (data as any).get('hash');
+          resolve(rawHashList);
+        }
+      });
     });
-  });
-
-  if (currentHash.hashIdx >= hashList.length) {
+    if (currentHash.hashIdx >= hashList.length) {
+      await generateSeed(gameId, trx);
+      currentHashes = await trx('current_hash').select('*').where({
+        gameId,
+      }).forUpdate();
+      currentHash = currentHashes[0];
+  
+      hashList = await new Promise((resolve, reject) => {
+        hashModel.get({id: currentHash.hashId}, async (err, data) => {
+          if (err) {
+            console.error(err);
+            reject(err);
+          } else {
+            const rawHashList: any = await (data as any).get('hash');
+            resolve(rawHashList);
+          }
+        });
+      });
+    }
+  } else {
     await generateSeed(gameId, trx);
     currentHashes = await trx('current_hash').select('*').where({
       gameId,
     }).forUpdate();
     currentHash = currentHashes[0];
-
     hashList = await new Promise((resolve, reject) => {
       hashModel.get({id: currentHash.hashId}, async (err, data) => {
         if (err) {
