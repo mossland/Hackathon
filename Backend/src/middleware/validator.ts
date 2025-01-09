@@ -89,7 +89,7 @@ export const validatePizzaRevolutionGameInput = async (req: Request, res: Respon
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
 
-  if (userPickNumber <= 0 || userPickNumber > 8) {
+  if (userPickNumber < 0 || userPickNumber > 8) {
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
 
