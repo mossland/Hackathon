@@ -79,7 +79,7 @@ router.post('/result', createGameStateValidator(pizzaRevolutionGameId), validate
 						hash,
 						userPickNumber: userPickNumber,
 						userPickColor: userPickColor,
-						deckHashValue: deckHashValue.toNumber(),
+						resultNumber: deckHashValue.toNumber(),
 						multiplier: payoutBig.toNumber(),
 					}
 				};

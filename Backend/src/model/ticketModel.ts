@@ -29,7 +29,7 @@ export interface IPizzaRevolutionMetadata {
 	hash: string;
 	userPickNumber: number;
 	userPickColor: number;
-	deckHashValue: number;
+	resultNumber: number;
 	multiplier: number;
 }
 
