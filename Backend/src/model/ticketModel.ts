@@ -24,6 +24,23 @@ export interface IRspMetadata {
   multiplier: number;
 }
 
+export interface IHeadsOrTailsMetadata extends IRspMetadata {}
+export interface IPizzaRevolutionMetadata {
+	hash: string;
+	userPickNumber: number;
+	userPickColor: number;
+	resultNumber: number;
+	multiplier: number;
+}
+
+export interface IL7DMetadata {
+	hash: string;
+	userPick: string;
+	openCard: number;
+	hiddenCard: number;
+	result: 'over' | 'under' | 'seven';
+}
+
 export interface IHgMetadata {
   hash: string;
   userPick: number;

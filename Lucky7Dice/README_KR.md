@@ -1,4 +1,4 @@
-![image](https://github.com/mossland/Hackathon/assets/13128375/1c4fa0e4-aaa6-4bb8-9fc8-ebb6543acb9f)![hackathon](https://user-images.githubusercontent.com/109493423/196602490-c73a44f0-16f8-4321-9538-244b3e6fc09d.png)
+![hackathon](https://user-images.githubusercontent.com/109493423/196602490-c73a44f0-16f8-4321-9538-244b3e6fc09d.png)
 
 # Lucky7Dice
 

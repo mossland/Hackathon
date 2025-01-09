@@ -19,6 +19,19 @@ const projMeta = {
     id: process.env.RSP_PROJ_ID,
     scene: process.env.RSP_PROJ_SCENE,
     name: 'RpsGame',
+    extractFolder: 'rps',
+  },
+  headsOrTails: {
+    id: process.env.HT_PROJ_ID,
+    scene: process.env.HT_PROJ_SCENE,
+    name: 'HeadsAndTails',
+    extractFolder: 'headsOrTails',
+  },
+  pizzaRevolution: {
+    id: process.env.PR_PROJ_ID,
+    scene: process.env.PR_PROJ_SCENE,
+    name: 'PizzaRevolution',
+    extractFolder: 'pizzaRevolution',
   }
 };
 
@@ -87,12 +100,12 @@ const projMeta = {
       );
     });
 
-    if (!fs.existsSync(path.join(__dirname, './dist/rps'))) {
-      fs.mkdirSync(path.join(__dirname, './dist/rps'));
+    if (!fs.existsSync(path.join(__dirname, `./dist/${projMeta[options.game].extractFolder}`))) {
+      fs.mkdirSync(path.join(__dirname, `./dist/${projMeta[options.game].extractFolder}`));
     }
 
     fs.createReadStream(path.join(__dirname, `./dist/${projMeta[options.game].name}.zip`))
-    .pipe(unzipper.Extract({ path: path.join(__dirname, './dist/rps') }));
+    .pipe(unzipper.Extract({ path: path.join(__dirname, `./dist/${projMeta[options.game].extractFolder}`) }));
   } catch (e) {
     console.error(e);
   }

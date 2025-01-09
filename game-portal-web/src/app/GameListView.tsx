@@ -10,15 +10,25 @@ const gameList = [
         isAvailable: true,
     },
     {
-        link: `/client/HolyGali/index.html?token=`,
-        name: 'Holy Gali',
-        isAvailable: false,
+      link: `/client/HeadsOrTails/index.html?token=`,
+      name: 'Heads or Tails',
+      isAvailable: true,
     },
     {
-        link: `/client/ryb/index.html?token=`,
-        name: 'Red, Yellow, Blue',
-        isAvailable: false,
+      link: `/client/PizzaRevolution/index.html?token=`,
+      name: 'Pizza Revolution',
+      isAvailable: true,
     },
+    // {
+    //     link: `/client/HolyGali/index.html?token=`,
+    //     name: 'Holy Gali',
+    //     isAvailable: false,
+    // },
+    // {
+    //     link: `/client/ryb/index.html?token=`,
+    //     name: 'Red, Yellow, Blue',
+    //     isAvailable: false,
+    // },
 ];
 
 export function GameListViewLoading() {
@@ -61,7 +71,7 @@ export default function GameListView() {
                   <li key={game.link} onMouseEnter={() => { hovering(index) }} className={`${styles.gameEle} ${game.isAvailable ? '' : styles.disable} ${index === curSelect ? styles.select : ''}`}>
                     {
                       game.isAvailable ?
-                        <Link className={styles.gameLink} href={`${game.link}${token}`}><span className={styles.gameName}>{ game.name }</span></Link>
+                        <Link className={styles.gameLink} href={`${game.link}${token}${!token || token === 'null' ? '&isLocal=true' : ''}`}><span className={styles.gameName}>{ game.name }</span></Link>
                         :
                         <div className={styles.gameLink}><span className={styles.gameName}>{ game.name }</span></div>
                     }

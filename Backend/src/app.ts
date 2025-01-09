@@ -9,7 +9,11 @@ Big.NE = -1000000;
 Big.PE = 1000000;
 
 import rspRouter from './route/rsp';
-import hgRouter from './route/hg';
+import headsOrTailsRouter from './route/headsOrTails';
+import pizzaRevolutionRouter from './route/pizzaRevolution';
+// import l7dRouter from './route/l7d';
+// import hgRouter from './route/hg';
+
 import userRouter from './route/user';
 
 import ServerError from './util/serverError';
@@ -51,7 +55,11 @@ app.use(bodyParser.json());
 app.use('/ping', (req, res) => { res.status(200).json({ success: true, message: 'pong' }) });
 app.use('/user', userRouter);
 app.use('/rsp', rspRouter);
-app.use('/hg', hgRouter);
+app.use('/headsOrTails', headsOrTailsRouter);
+app.use('/pizzaRevolution', pizzaRevolutionRouter);
+// app.use('/l7d', l7dRouter);
+// app.use('/hg', hgRouter);
+
 app.use((err: ServerError, req: Request, res: Response, next: NextFunction) => {
   if (err.code === undefined) {
     console.error(err);
