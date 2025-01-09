@@ -53,7 +53,7 @@ router.post('/result', createGameStateValidator(pizzaRevolutionGameId), validate
 				const N_BIT = 32;
 				const deckHex = hash.slice(0, 32).slice(0, N_BIT / 4);
 				const deckDecimal = parseInt(deckHex, 16);
-				const deckHashValue = new Big(deckDecimal).mod(8);
+				const deckHashValue = new Big(deckDecimal).mod(8).add(1);
 
                 let payoutBig = Big(0);
                 if (userPickNumber) {

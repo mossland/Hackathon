@@ -71,7 +71,7 @@ export default function GameListView() {
                   <li key={game.link} onMouseEnter={() => { hovering(index) }} className={`${styles.gameEle} ${game.isAvailable ? '' : styles.disable} ${index === curSelect ? styles.select : ''}`}>
                     {
                       game.isAvailable ?
-                        <Link className={styles.gameLink} href={`${game.link}${token}`}><span className={styles.gameName}>{ game.name }</span></Link>
+                        <Link className={styles.gameLink} href={`${game.link}${token}${!token || token === 'null' ? '&isLocal=true' : ''}`}><span className={styles.gameName}>{ game.name }</span></Link>
                         :
                         <div className={styles.gameLink}><span className={styles.gameName}>{ game.name }</span></div>
                     }
