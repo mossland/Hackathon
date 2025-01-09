@@ -3,7 +3,7 @@ import uuidv7 from '../util/uuidv7';
 import db from '../db';
 import { Knex } from 'knex';
 import hashModel from '../model/hashModel';
-import { IRspMetadata, IL7DMetadata, ITicketModel } from '../model/ticketModel';
+import { IRspMetadata, IL7DMetadata, ITicketModel, IHeadsOrTailsMetadata, IPizzaRevolutionMetadata } from '../model/ticketModel';
 import Platform from "../util/platform";
 import Big from 'big.js';
 
@@ -15,7 +15,7 @@ export const generateSeed = async (gameId: number, trx: Knex.Transaction) => {
   if (lastHashIds.length > 0) {
     hashId = lastHashIds[0].hashId + 1;
   }
-  const seed = uuidv7();
+  const seed = crypto.randomBytes(32).toString('hex');;
   const hashList: string[] = [];
 
   let prevHash: string = '';
@@ -127,7 +127,7 @@ export const spendByGameId = async (
   gameId: number,
   betAmount: Big,
   userId: string,
-  resultGenerateFunc: (hash: string) => { meta: IRspMetadata | IL7DMetadata, payout: number }): Promise<ITicketModel> => {
+  resultGenerateFunc: (hash: string) => { meta: IRspMetadata | IL7DMetadata | IHeadsOrTailsMetadata | IPizzaRevolutionMetadata, payout: number }): Promise<ITicketModel> => {
   return new Promise((resolve, reject) => {
     db.transaction(async (trx) => {
       try {
