@@ -3,6 +3,7 @@ import StatusCodes from 'http-status-codes';
 import ServerError from '../util/serverError';
 import db from '../db';
 import Big from 'big.js';
+import { expression } from 'joi';
 
 Big.RM = 0;
 
@@ -47,6 +48,55 @@ export const validateRSPGameInput = async (req: Request, res: Response, next: Ne
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
   
+  next();
+}
+
+export const validatePizzaRevolutionGameInput = async (req: Request, res: Response, next: NextFunction) => {
+  const pizzaRevolutionGameId = 5;
+  if (req.body.gameId !== pizzaRevolutionGameId) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  try {
+    const betAmount = new Big(req.body.betAmount);
+    if (isNaN(betAmount.toNumber())) {
+      return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+    }
+
+    if (betAmount.lte(0)) {
+      return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+    }
+
+    if (betAmount.gt(100000)) {
+      return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+    }
+
+    if (betAmount.gt(100000)) {
+      return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+    }
+  } catch (e) { 
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  const userPickNumber = parseInt(req.body.userPickNumber);
+  const userPickColor = parseInt(req.body.userPickColor);
+
+  if (!userPickNumber && !userPickColor) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (userPickNumber !== 0 && userPickColor !== 0) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (userPickNumber < 1 || userPickNumber > 8) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (userPickColor !== 1 && userPickColor !== 2) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
   next();
 }
 
@@ -113,6 +163,7 @@ export const createGameStateValidator = (gameId: number): (req: Request, res: Re
     '2': 'hg',
     '3': 'l7d',
     '4': 'headsOrTails',
+    '5': 'pizzaRevolution',
   };
 
   if (Object.keys(gameIdObj).indexOf(gameId.toString()) !== -1) {

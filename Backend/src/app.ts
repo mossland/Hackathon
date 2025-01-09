@@ -10,6 +10,7 @@ Big.PE = 1000000;
 
 import rspRouter from './route/rsp';
 import headsOrTailsRouter from './route/headsOrTails';
+import pizzaRevolutionRouter from './route/pizzaRevolution';
 // import l7dRouter from './route/l7d';
 // import hgRouter from './route/hg';
 
@@ -55,6 +56,7 @@ app.use('/ping', (req, res) => { res.status(200).json({ success: true, message: 
 app.use('/user', userRouter);
 app.use('/rsp', rspRouter);
 app.use('/headsOrTails', headsOrTailsRouter);
+app.use('/pizzaRevolution', pizzaRevolutionRouter);
 // app.use('/l7d', l7dRouter);
 // app.use('/hg', hgRouter);
 

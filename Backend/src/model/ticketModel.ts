@@ -24,6 +24,15 @@ export interface IRspMetadata {
   multiplier: number;
 }
 
+export interface IHeadsOrTailsMetadata extends IRspMetadata {}
+export interface IPizzaRevolutionMetadata {
+	hash: string;
+	userPickNumber: number;
+	userPickColor: number;
+	deckHashValue: number;
+	multiplier: number;
+}
+
 export interface IL7DMetadata {
 	hash: string;
 	userPick: string;
