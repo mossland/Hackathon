@@ -93,7 +93,7 @@ export const validatePizzaRevolutionGameInput = async (req: Request, res: Respon
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
 
-  if (userPickColor !== 1 && userPickColor !== 2) {
+  if (userPickColor !== 0 && userPickColor !== 1 && userPickColor !== 2) {
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
 
