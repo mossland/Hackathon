@@ -26,6 +26,12 @@ const projMeta = {
     scene: process.env.HT_PROJ_SCENE,
     name: 'HeadsAndTails',
     extractFolder: 'headsOrTails',
+  },
+  pizzaRevolution: {
+    id: process.env.PR_PROJ_ID,
+    scene: process.env.PR_PROJ_SCENE,
+    name: 'PizzaRevolution',
+    extractFolder: 'pizzaRevolution',
   }
 };
 
