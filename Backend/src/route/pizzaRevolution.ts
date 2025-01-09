@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { spendByGameId } from "../util/random";
 import Big from 'big.js';
-import { validatePizzaRevolutionGameInput, createGameStateValidator } from '../middleware/validator';
+import { validatePizzaRevolutionGameInput, createGameStateValidator, validateBetAmount } from '../middleware/validator';
 import { verifyToken } from '../middleware/auth';
 import StatusCodes from 'http-status-codes';
 import ServerError from '../util/serverError';
@@ -23,7 +23,7 @@ function isRedNumber(num: number){
     }
 }
 
-router.post('/result', createGameStateValidator(pizzaRevolutionGameId), validatePizzaRevolutionGameInput, verifyToken, async (req, res, next) => {
+router.post('/result', createGameStateValidator(pizzaRevolutionGameId), validateBetAmount, validatePizzaRevolutionGameInput, verifyToken, async (req, res, next) => {
 	try {
         // number  0 - user not select, 1-8
         // color  0 - user not select, 1 - red, 2 - black		

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { spendByGameId } from "../util/random";
 import Big from 'big.js';
-import { validateHeadsOrTailsGameInput, createGameStateValidator } from '../middleware/validator';
+import { validateHeadsOrTailsGameInput, createGameStateValidator, validateBetAmount } from '../middleware/validator';
 import { verifyToken } from '../middleware/auth';
 import StatusCodes from 'http-status-codes';
 import ServerError from '../util/serverError';
@@ -11,7 +11,7 @@ import { ITicketModel } from "../model/ticketModel";
 const router = Router();
 const headsOrTailsGameId = 4;
 
-router.post('/result', createGameStateValidator(headsOrTailsGameId), validateHeadsOrTailsGameInput, verifyToken, async (req, res, next) => {
+router.post('/result', createGameStateValidator(headsOrTailsGameId), validateBetAmount, validateHeadsOrTailsGameInput, verifyToken, async (req, res, next) => {
 	try {
 		// 0 heads, 1 tails
 		const userPick = parseInt(req.body.pick);
