@@ -21,8 +21,7 @@ Here, you can propose innovative AI-related ideas to enhance and expand the Moss
 3. **Submit a Pull Request (PR)** to the main branch of the repository.
 
 ### 🚀 Benefits of Participation:
-
-- Opportunity to receive funding for development from Mossland.
+- Opportunity to receive funding for development from [Mossland Developer Support Program](https://github.com/mossland/MosslandDeveloperSupportProgram).
 - Potential for DAO-based funding decisions via community voting.
 - Recognition and direct contribution to Mossverse's growth.
 
@@ -55,8 +54,7 @@ Check `example_ai_idea.md` for reference.
 3. **메인 브랜치에 Pull Request (PR)** 제출하기
 
 ### 🚀 참여 혜택:
-
-- 모스랜드에서 개발 비용 지원을 받을 수 있는 기회 제공
+- [Mossland 개발 지원 프로그램](https://github.com/mossland/MosslandDeveloperSupportProgram)을 통한 개발비 지원 기회 제공
 - 모스랜드 DAO에서 아이디어 개발 자금 지원 투표로 연결될 수 있음
 - 모스버스 생태계 발전에 직접적인 기여와 공헌으로 인정받을 수 있음
 
