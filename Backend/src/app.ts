@@ -11,6 +11,7 @@ Big.PE = 1000000;
 import rspRouter from './route/rsp';
 import headsOrTailsRouter from './route/headsOrTails';
 import pizzaRevolutionRouter from './route/pizzaRevolution';
+import gemQuestRouter from './route/gemQuest';
 // import l7dRouter from './route/l7d';
 // import hgRouter from './route/hg';
 
@@ -57,6 +58,7 @@ app.use('/user', userRouter);
 app.use('/rsp', rspRouter);
 app.use('/headsOrTails', headsOrTailsRouter);
 app.use('/pizzaRevolution', pizzaRevolutionRouter);
+app.use('/gemQuest', gemQuestRouter);
 // app.use('/l7d', l7dRouter);
 // app.use('/hg', hgRouter);
 

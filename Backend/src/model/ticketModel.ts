@@ -33,6 +33,13 @@ export interface IPizzaRevolutionMetadata {
 	multiplier: number;
 }
 
+export interface IGemQuestMetadata {
+	hash: string;
+	gems: number[];
+	multiplier: number;
+	gemResultCount: number[];
+}
+
 export interface IL7DMetadata {
 	hash: string;
 	userPick: string;

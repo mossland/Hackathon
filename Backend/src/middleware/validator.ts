@@ -156,6 +156,28 @@ export const validateHeadsOrTailsGameInput = async (req: Request, res: Response,
   next();
 }
 
+export const validateGemQuestGameInput = async (req: Request, res: Response, next: NextFunction) => {
+  const gemQuestGameId = 6;
+  if (req.body.gameId !== gemQuestGameId) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  const betAmount = new Big(req.body.betAmount);
+
+  if (isNaN(betAmount.toNumber())) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (betAmount.lte(0)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  if (betAmount.gt(100000)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  next();
+}
+
 export const createGameStateValidator = (gameId: number): (req: Request, res: Response, next: NextFunction)=> any => {
   const gameIdObj = {
     '1': 'rsp',
@@ -163,6 +185,7 @@ export const createGameStateValidator = (gameId: number): (req: Request, res: Re
     '3': 'l7d',
     '4': 'headsOrTails',
     '5': 'pizzaRevolution',
+    '6': 'gemQuest',
   };
 
   if (Object.keys(gameIdObj).indexOf(gameId.toString()) !== -1) {
