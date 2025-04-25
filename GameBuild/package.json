@@ -10,7 +10,9 @@
     "build:dev:ht": "node index.js -g headsOrTails",
     "build:prod:ht": "node index.js -g headsOrTails",
     "build:dev:pr": "node index.js -g pizzaRevolution",
-    "build:prod:pr": "node index.js -g pizzaRevolution"
+    "build:prod:pr": "node index.js -g pizzaRevolution",
+    "build:dev:gq": "node index.js -g gemQuest",
+    "build:prod:gq": "node index.js -g gemQuest"
   },
   "dependencies": {
     "axios": "^1.1.3",
