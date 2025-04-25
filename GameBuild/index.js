@@ -32,6 +32,12 @@ const projMeta = {
     scene: process.env.PR_PROJ_SCENE,
     name: 'PizzaRevolution',
     extractFolder: 'pizzaRevolution',
+  },
+  gemQuest: {
+    id: process.env.GQ_PROJ_ID,
+    scene: process.env.GQ_PROJ_SCENE,
+    name: 'GemQuest',
+    extractFolder: 'gemQuest',
   }
 };
 
