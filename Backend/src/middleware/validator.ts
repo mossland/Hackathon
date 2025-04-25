@@ -185,6 +185,7 @@ export const createGameStateValidator = (gameId: number): (req: Request, res: Re
     '3': 'l7d',
     '4': 'headsOrTails',
     '5': 'pizzaRevolution',
+    '6': 'gemQuest',
   };
 
   if (Object.keys(gameIdObj).indexOf(gameId.toString()) !== -1) {
