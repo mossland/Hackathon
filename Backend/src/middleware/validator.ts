@@ -3,7 +3,6 @@ import StatusCodes from 'http-status-codes';
 import ServerError from '../util/serverError';
 import db from '../db';
 import Big from 'big.js';
-import { expression } from 'joi';
 
 Big.RM = 0;
 
@@ -150,6 +149,28 @@ export const validateHeadsOrTailsGameInput = async (req: Request, res: Response,
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
 
+  if (betAmount.gt(100000)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  next();
+}
+
+export const validateGemQuestGameInput = async (req: Request, res: Response, next: NextFunction) => {
+  const gemQuestGameId = 6;
+  if (req.body.gameId !== gemQuestGameId) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  const betAmount = new Big(req.body.betAmount);
+
+  if (isNaN(betAmount.toNumber())) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (betAmount.lte(0)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
   if (betAmount.gt(100000)) {
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
