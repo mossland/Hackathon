@@ -19,6 +19,11 @@ const gameList = [
       name: 'Pizza Revolution',
       isAvailable: true,
     },
+    {
+      link: `/client/GemQuest/index.html?token=`,
+      name: 'Gem Quest',
+      isAvailable: true,
+    },
     // {
     //     link: `/client/HolyGali/index.html?token=`,
     //     name: 'Holy Gali',
