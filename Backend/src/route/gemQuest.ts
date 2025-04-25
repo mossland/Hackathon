@@ -13,33 +13,33 @@ const gemQuestGameId = 6;
 
 
 function getMatchCount(arr: number[]) {
-    let typeCount = new Array(7);
-    typeCount.fill(0);
+	let typeCount = new Array(7);
+	typeCount.fill(0);
 
-    arr.forEach(e => {
-        typeCount[e]++;
-    });
+	arr.forEach(e => {
+		typeCount[e]++;
+	});
 
-    return typeCount;
+	return typeCount;
 };
 
 function getResult(arr: number[]) {
-    let result = arr.filter(element => element >= 2);
-    let sortedResult = result.sort((a, b) => b - a);
+	let result = arr.filter(element => element >= 2);
+	let sortedResult = result.sort((a, b) => b - a);
 
-    if (sortedResult.length === 0) {
+	if (sortedResult.length === 0) {
 		return 0;
 	} else if (sortedResult.length === 1) {
-        if (sortedResult[0] === 2) return 0.1;
-        if (sortedResult[0] === 3) return 3;
-        if (sortedResult[0] === 4) return 5;
-        if (sortedResult[0] === 5) return 50;
+		if (sortedResult[0] === 2) return 0.1;
+		if (sortedResult[0] === 3) return 3;
+		if (sortedResult[0] === 4) return 5;
+		if (sortedResult[0] === 5) return 50;
 		return 0;
-    } else if (sortedResult.length === 2){
-        if (sortedResult[0] === 2) return 2;
-        if (sortedResult[0] === 3) return 4;
+	} else if (sortedResult.length === 2) {
+		if (sortedResult[0] === 2) return 2;
+		if (sortedResult[0] === 3) return 4;
 		return 0;
-    } else {
+	} else {
 		return 0;
 	}
 };
@@ -59,15 +59,15 @@ router.post('/result', createGameStateValidator(gemQuestGameId), validateBetAmou
 			(hash) => {
 				// Extract 5 numbers between 0-6 from the hash
 				const gemNumbers: number[] = [];
-				for (let i = 0; i < 5; i++) {
-					const sliceStart = i * 8;
-					const sliceEnd = sliceStart + 8;
-					const numberHex = hash.slice(sliceStart, sliceEnd);
-					const numberDecimal = parseInt(numberHex, 16);
-					const number = new Big(numberDecimal).mod(7).toNumber();
-					gemNumbers.push(number);
+				const mod = 7;
+				const count = 5;
+				for (let i = 0; i < count; i++) {
+					const sliceStart = (i * 8) % (hash.length - 8);
+					const numberHex = hash.slice(sliceStart, sliceStart + 8);
+					const numberBigInt = BigInt('0x' + numberHex);
+					const num = Number(numberBigInt % BigInt(mod));
+					gemNumbers.push(num);
 				}
-
 				let resultCount = getMatchCount(gemNumbers);
 				let multiplier = getResult(resultCount);
 				const payoutBig = new Big(multiplier);
