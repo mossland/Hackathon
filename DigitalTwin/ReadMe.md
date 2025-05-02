@@ -70,15 +70,15 @@ LED_SW_CONNECTION=your_led_connection_string
    1. First, configure the Type Mark in Revit to match the name of the Classification system to be uploaded to Tandem.
 
 
-| Code           | Description        | Level |
-|----------------|--------------------|-------|
-| StepLED        | StepLED System     | 1     |
-| StepLED.L.B.1  | Led 1 Red          | 2     |
-| StepLED.L.B.2  | Led 2 Green        | 2     |
-| StepLED.L.B.3  | Led 3 Blue         | 2     |
-| StepLED.Base   | Base Board         | 1     |
-| StepLED.C      | Control Component  | 2     |
-| StepLED.C.Sw   | Switch             | 2     |
+   | Code           | Description        | Level |
+   |----------------|--------------------|-------|
+   | StepLED        | StepLED System     | 1     |
+   | StepLED.L.B.1  | Led 1 Red          | 2     |
+   | StepLED.L.B.2  | Led 2 Green        | 2     |
+   | StepLED.L.B.3  | Led 3 Blue         | 2     |
+   | StepLED.Base   | Base Board         | 1     |
+   | StepLED.C      | Control Component  | 2     |
+   | StepLED.C.Sw   | Switch             | 2     |
    
    ![Screenshot 2025-05-02 at 10 21 45 AM](https://github.com/user-attachments/assets/b89f6ddc-58a5-4884-b95c-21759bc9cc96)
 
@@ -103,7 +103,8 @@ LED_SW_CONNECTION=your_led_connection_string
 
    ![Screenshot 2025-05-02 at 10 11 54 AM](https://github.com/user-attachments/assets/543779a4-1c6e-4aaa-a35d-1d0b8b955cd9)
 
-1. **Tandem Connection and Sensor Data Mocking**:
+---
+2. **Tandem Connection and Sensor Data Mocking**:
 
    * Create Tandem Connections.
    * Mock sensor data and stream it into Tandem.
@@ -122,7 +123,8 @@ LED_SW_CONNECTION=your_led_connection_string
    
    According to Tandem's official documentation, if no data is sent for over 15 minutes, the connection is considered inactive. It is recommended to include timestamps with your data.
 
-2. **Tandem Stream Data Visualization**:
+---
+3. **Tandem Stream Data Visualization**:
 
    * Visualize real-time Connection stream data as charts within the Tandem viewer.
 
