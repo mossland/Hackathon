@@ -1,5 +1,11 @@
 import axios from 'axios';
 
+export interface ScanModelResponse {
+    k: string; // external Id
+    "n:n": Array<string>; // Name - Common
+    "n:z": Array<string>; // Tandem Category - Common
+}
+
 export default class TandemClient {
     private static _instance: TandemClient;
     public static get instance() {
@@ -13,7 +19,7 @@ export default class TandemClient {
     private token: string;
 
     private constructor() {
-        this.token = import.meta.env.VITE_TANDEM_API_KEY;
+        this.token = import.meta.env.VITE_TANDEM_ACCESS_TOKEN;
     }
 
     public async getFacility(facilityUrn: string) {
@@ -24,5 +30,32 @@ export default class TandemClient {
             }
         });
         return response.data;
+    }
+
+    public async scanModel(modelUrn: string) {
+        console.log("scanmodel ", modelUrn);
+        const response = await axios.post(
+            `${this.baseUrl}/modeldata/${modelUrn}/scan`,
+            {
+                families: [
+                    "n",
+                    "l",
+                    "x",
+                    "r",
+                    "z",
+                    "t",
+                    "p",
+                    "m"
+                ],
+                includeHistory: false,
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            }
+        );
+        return response.data as ScanModelResponse[];
     }
 }
