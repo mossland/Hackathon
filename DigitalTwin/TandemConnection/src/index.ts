@@ -48,7 +48,7 @@ class SmoothRandomTimeSeriesInt {
 //     { url: led_sw, series: led_sw_series, key: 'led_sw_pr' },
 // ];
 
-const interval = 50000;
+const interval = 20000;
 
 (async () => {
     const rawConnections: any[] = await new Promise((resolve, reject) => {
@@ -66,10 +66,10 @@ const interval = 50000;
     const urlAndSeriese = rawConnections.map((connection) => {
         return {
             url: connection.ingestionUrl,
-            airFlowSeries: new SmoothRandomTimeSeriesInt(20, 0.5, 10, 30),
-            humiditySeries: new SmoothRandomTimeSeriesInt(40, 0.5, 25, 60),
+            airFlowSeries: new SmoothRandomTimeSeriesInt(20, 0.5, 15, 28),
+            humiditySeries: new SmoothRandomTimeSeriesInt(78, 0.5, 56, 100),
             occupancySeries: new SmoothRandomTimeSeriesInt(0, 1, 0, 2),
-            temperatureSeries: new SmoothRandomTimeSeriesInt(70, 0.1, 66, 82),
+            temperatureSeries: new SmoothRandomTimeSeriesInt(57, 0.1, 40, 72),
         }
     });
 
@@ -107,7 +107,7 @@ const interval = 50000;
                     console.error(error);
                 }
             },
-            { concurrency: 10 }
+            { concurrency: 45 }
         );
         console.log(`End ${dayjs().format('YYYY-MM-DD HH:mm:ss')}`);
         console.log(`Next run in ${interval / 1000} seconds`);
