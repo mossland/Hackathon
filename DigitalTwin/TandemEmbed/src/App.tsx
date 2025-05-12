@@ -2,19 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 
 import TandemClient from './util/TandemClient';
 import TandemViewer from './util/TandemViewer';
+import ConnectionConfigManager, { IConnectionConfig } from './util/ConnectionConfigManager';
 
 import styles from './App.module.scss';
 import './App.scss'
 
 
 function App() {
-	const classToStreamNameMap = new Map<string, string>();
-	classToStreamNameMap.set('StepLED.L.B.1', 'led_r_br');
-	classToStreamNameMap.set('StepLED.L.B.2', 'led_g_br');
-	classToStreamNameMap.set('StepLED.L.B.3', 'led_b_br');
-	classToStreamNameMap.set('StepLED.Sw', 'led_sw_pr');
-	
-
 	const [tandemViewer, setTandemViewer] = useState<TandemViewer | null>(null);
 	const viewerRef = useRef<HTMLDivElement>(null);
 	function corruptedStringToUint8Array(str: string) {
@@ -45,13 +39,14 @@ function App() {
 
 	useEffect(() => {
 		const initTandemViewer = async () => {
+			await ConnectionConfigManager.instance.loadData();
 			if (!tandemViewer) {
 				return;
 			}
 			await tandemViewer.initialize(viewerRef.current as HTMLElement);
 			const facilityList = await tandemViewer.fetchFacilities();
 			await tandemViewer.openFacility(facilityList[0]);
-			console.log(Object.keys(tandemViewer.viewer.listeners));
+			// console.log(Object.keys(tandemViewer.viewer.listeners));
 			tandemViewer.viewer.listeners['aggregateSelection'].push({
 				once: false,
 				priority: 0,
@@ -85,6 +80,33 @@ function App() {
 							}
 						});
 						console.log(scanData);
+						const conn = scanData.map((sd) => {
+							const connectionConfig: IConnectionConfig[] = [];
+							Object.values(sd).filter((sdv: any[]) => {
+								if (typeof sdv[0] === typeof 'string') {
+									const config = ConnectionConfigManager.instance.fetchDataFromName(sdv[0]);
+									if (config.length > 0) {
+										config.forEach((c) => {
+											connectionConfig.push(c);
+										});
+									};
+									return config.length > 0;
+								} else {
+									return false;
+								}
+							});
+							return connectionConfig;
+						});
+						const connList = conn.reduce((acc: IConnectionConfig[], c) => {
+							acc.push(...c);
+							return acc;
+						}, []);
+						
+						if (connList.length > 0) {
+							console.log(connList[0]);
+							const streamData = await TandemClient.instance.getStreamData(connList[0]);
+							console.log(streamData);
+						}
 					}
 				},
 			});

@@ -1,4 +1,6 @@
 import axios from 'axios';
+import dayjs from 'dayjs';
+import { IConnectionConfig } from './ConnectionConfigManager';
 
 export interface ScanModelResponse {
     k: string; // external Id
@@ -57,5 +59,48 @@ export default class TandemClient {
             }
         );
         return response.data as ScanModelResponse[];
+    }
+
+    public async getInlineTemplate(twinId: string) {
+        const response = await axios.get(
+            `${this.baseUrl}/twins/${twinId}/inlinetemplate`,
+            {
+                headers: {  
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            }
+        );
+        return response.data;
+    }
+
+    public async getStreamData(config: IConnectionConfig) {
+        const response = await axios.get(
+            // config.ingestionUrl,
+            `${this.baseUrl}/timeseries/models/${config.HostModelID}/streams/${config.HostElementID}`,
+            {
+                params: {
+                    from: `${dayjs().subtract(30, 'minutes').unix()}`,
+                    to: `${dayjs().unix()}`,
+                },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            }   
+        );
+        return response.data;
+    }
+    public async getModelSchema(modelUrn: string) {
+        const response = await axios.get(
+            `${this.baseUrl}/modeldata/${modelUrn}/schema`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            }
+        );
+        return response.data;
     }
 }
