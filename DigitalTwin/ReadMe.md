@@ -143,7 +143,8 @@ VITE_TANDEM_ACCESS_TOKEN=ACCESS_TOKEN_FROM_TANDEM_AUTH
    
 Below is an attached video demonstrating sending data via POST request using the code in the TandemConnection folder and viewing the resulting charts and values in Tandem.
 
-https://github.com/user-attachments/assets/454c43fb-7719-4806-8fc0-36f5020c5501
+https://github.com/user-attachments/assets/5c27d378-4563-49fd-93a0-113445b143da
+
 
 
 
