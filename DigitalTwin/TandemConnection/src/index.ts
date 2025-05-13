@@ -9,11 +9,6 @@ import dayjs from 'dayjs';
 import csvParser from 'csv-parser';
 import Big from 'big.js';
 
-// const led_b = process.env.LED_B_CONNECTION;
-// const led_g = process.env.LED_G_CONNECTION;
-// const led_r = process.env.LED_R_CONNECTION;
-// const led_sw = process.env.LED_SW_CONNECTION;
-
 class SmoothRandomTimeSeriesInt {
     private value: number;
     private readonly stepSize: number;
@@ -35,18 +30,6 @@ class SmoothRandomTimeSeriesInt {
         return Big(this.value).round(2, 0).toNumber();
     }
 }
-
-// const led_b_series = new SmoothRandomTimeSeriesInt(0, 1, 0, 100);
-// const led_g_series = new SmoothRandomTimeSeriesInt(0, 1, 0, 100);
-// const led_r_series = new SmoothRandomTimeSeriesInt(0, 1, 0, 100);
-// const led_sw_series = new SmoothRandomTimeSeriesInt(0, 1, 0, 100);
-
-// const urlAndSeries = [
-//     { url: led_b, series: led_b_series, key: 'led_b_brightness' },
-//     { url: led_g, series: led_g_series, key: 'led_g_brightness' },
-//     { url: led_r, series: led_r_series, key: 'led_r_brightness' },
-//     { url: led_sw, series: led_sw_series, key: 'led_sw_pr' },
-// ];
 
 const interval = 20000;
 
