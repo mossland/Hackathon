@@ -141,8 +141,8 @@ https://github.com/user-attachments/assets/454c43fb-7719-4806-8fc0-36f5020c5501
 
 ## Todo
 
-* [ ] **Tandem Embed Viewer WebUI Overlay**: Implement an overlay WebUI to allow sending sensor requests directly from the viewer interface and updating Tandem accordingly.
-* [ ] **Real-Time Stream Charting**: Enable stream data visualization directly within the Tandem Embed Viewer.
+* [x] **Tandem Embed Viewer WebUI Overlay**: Implement an overlay WebUI to allow sending sensor requests directly from the viewer interface and updating Tandem accordingly.
+* [x] **Real-Time Stream Charting**: Enable stream data visualization directly within the Tandem Embed Viewer.
 
 ## Development
 
