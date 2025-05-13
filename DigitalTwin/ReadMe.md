@@ -25,15 +25,22 @@ The project is organized into several main components:
 
 ## Configuration
 
-Create a `.env` file with the following variables:
+Create the `.env` file following the format below and a connections_export.csv file matching your Tandem project settings in the specified paths:
 
+/TandemAuth/.env
 ```env
-VITE_TANDEM_ACCESS_TOKEN=your_access_token
-VITE_TANDEM_API_KEY=your_api_key
-LED_B_CONNECTION=your_led_connection_string
-LED_G_CONNECTION=your_led_connection_string
-LED_R_CONNECTION=your_led_connection_string
-LED_SW_CONNECTION=your_led_connection_string
+PORT=1234
+BOX_CLIENT_ID=YOUR_APS_APPLICATION_CLIENT_ID
+BOX_CLIENT_SECRET=YOUR_APS_APPLICATION_SECRET
+```
+/TandemConnection/connections_export.csv
+```csv
+Name,Assembly Code,Classification,HostModelID,HostElementID,facility,fullId,ingestionUrl
+HRU110B,D20,G13,urn:adsk.dtm:ABC_abcdefg123,ABCDEFG,urn:adsk.dtt:ABCDEFG,AAAAAAAAAAAAAAAAA,https://:ABCDEFGHIJKLMNOP1234@tandem.autodesk.com/api/v1/timeseries/models/urn:adsk.dtm:MODELURN/streams/STREAMFINALID
+```
+/TandemEmbed/.env
+```env
+VITE_TANDEM_ACCESS_TOKEN=ACCESS_TOKEN_FROM_TANDEM_AUTH
 ```
 
 ## Installation
@@ -62,6 +69,9 @@ LED_SW_CONNECTION=your_led_connection_string
    ```
 
 ## Research Topics
+
+> This section refers to the following article:
+> [StepLED 프로젝트 센서 연결 전, Revit과 Tandem 세팅](https://velog.io/@yena121/StepLED-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%84%BC%EC%84%9C-%EC%97%B0%EA%B2%B0-%EC%A0%84-Revit%EA%B3%BC-Tandem-%EC%84%B8%ED%8C%85)
 
 1. **Revit Project Parameter Integration**:
 
@@ -139,10 +149,23 @@ https://github.com/user-attachments/assets/454c43fb-7719-4806-8fc0-36f5020c5501
 
 
 
-## Todo
+## Custom WebUI With Tandem Embed Viewer
+> This section refers to the following article:
+> [Revit Sample Project Files](https://help.autodesk.com/view/RVT/2025/ENU/?guid=GUID-61EF2F22-3A1F-4317-B925-1E85F138BE88)
 
 * [x] **Tandem Embed Viewer WebUI Overlay**: Implement an overlay WebUI to allow sending sensor requests directly from the viewer interface and updating Tandem accordingly.
 * [x] **Real-Time Stream Charting**: Enable stream data visualization directly within the Tandem Embed Viewer.
+
+1. Tandem Embed Viewer WebUI Overlay
+   
+![image](https://github.com/user-attachments/assets/8a6dfb4c-cb62-4593-b0fd-1d6de179c770)
+
+2. Real-Time Stream Charting
+   
+https://github.com/user-attachments/assets/a5577b71-de89-497d-b927-a0314fcd1235
+
+
+
 
 ## Development
 
