@@ -10,14 +10,20 @@
   },
   "dependencies": {
     "axios": "^1.9.0",
+    "big.js": "^7.0.1",
     "bluebird": "^3.7.2",
+    "chart.js": "^4.4.9",
     "dayjs": "^1.11.13",
+    "papaparse": "^5.5.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@types/big.js": "^6.2.2",
+    "@types/bluebird": "^3.5.42",
     "@types/node": "^22.15.3",
+    "@types/papaparse": "^5.3.16",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",

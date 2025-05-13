@@ -111,12 +111,12 @@ router.get('/forgeoauth',function(req,res){
 function startoAuth()
 {   
 
-  var url =
-    "https://developer.api.autodesk.com" +
-    '/authentication/v2/authorize?response_type=code' +
-    '&client_id=' + config.credentials.client_id +
-    '&redirect_uri=' + config.callbackURL +
-    '&scope=' + config.scope.join(" ");
+  var url = `https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${encodeURIComponent(config.credentials.client_id)}&redirect_uri=${encodeURIComponent(config.callbackURL)}&scope=${encodeURIComponent(config.scope.join(" "))}`;
+    // "https://developer.api.autodesk.com" +
+    // '/authentication/v2/authorize?response_type=code' +
+    // '&client_id=' + config.credentials.client_id +
+    // '&redirect_uri=' + config.callbackURL +
+    // '&scope=' + config.scope.join(" ");
   
   //pop out the dialog of use login and authorization 
     opn(url, function (err) {
