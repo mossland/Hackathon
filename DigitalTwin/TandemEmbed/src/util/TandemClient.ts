@@ -18,6 +18,7 @@ export default class TandemClient {
     }
 
     private baseUrl: string = 'https://developer.api.autodesk.com/tandem/v1';
+    private tandemBaseUrl: string = 'https://tandem.autodesk.com/api/v1';
     private token: string;
 
     private constructor() {
@@ -74,22 +75,26 @@ export default class TandemClient {
         return response.data;
     }
 
-    public async getStreamData(config: IConnectionConfig) {
-        const response = await axios.get(
-            // config.ingestionUrl,
-            `${this.baseUrl}/timeseries/models/${config.HostModelID}/streams/${config.HostElementID}`,
-            {
-                params: {
-                    from: `${dayjs().subtract(30, 'minutes').unix()}`,
-                    to: `${dayjs().unix()}`,
-                },
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.token}`
-                }
-            }   
-        );
-        return response.data;
+    public async getStreamData(config: IConnectionConfig, modelUrn?: string) {
+        try {
+            const response = await axios.get(
+                // config.ingestionUrl,
+                `${this.tandemBaseUrl}/timeseries/models/${modelUrn ? modelUrn : config.HostModelID}/streams/${config.fullId}`,
+                {
+                    params: {
+                        from: `${dayjs().subtract(30, 'minutes').unix()}000`,
+                        to: `${dayjs().unix()}000`,
+                    },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${this.token}`
+                    }
+                }   
+            );
+            return response.data;
+        } catch (e) {
+            return null;
+        }
     }
     public async getModelSchema(modelUrn: string) {
         const response = await axios.get(

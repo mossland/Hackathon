@@ -7,9 +7,18 @@ import ConnectionConfigManager, { IConnectionConfig } from './util/ConnectionCon
 import styles from './App.module.scss';
 import './App.scss'
 
+export interface IStreamData {
+	metadata: IConnectionConfig;
+	value: any[];
+}
+
 
 function App() {
 	const [tandemViewer, setTandemViewer] = useState<TandemViewer | null>(null);
+
+	const [showUi, setShowUi] = useState<boolean>(true);
+	const [streamData, setStreamData] = useState<IStreamData | null>(null);
+
 	const viewerRef = useRef<HTMLDivElement>(null);
 	function corruptedStringToUint8Array(str: string) {
 		const uint8Array = new Uint8Array(str.length * 2);
@@ -101,11 +110,17 @@ function App() {
 							acc.push(...c);
 							return acc;
 						}, []);
-						
+
 						if (connList.length > 0) {
 							console.log(connList[0]);
-							const streamData = await TandemClient.instance.getStreamData(connList[0]);
-							console.log(streamData);
+							const streamData = await TandemClient.instance.getStreamData(connList[0], model.modelFacets.modelUrn);
+							if (streamData) {
+								setStreamData({
+									metadata: connList[0],
+									value: streamData,
+								});
+								setShowUi(true);
+							}
 						}
 					}
 				},
@@ -122,7 +137,7 @@ function App() {
 		return () => {
 			if (tandemViewer) {
 				tandemViewer.viewer.listeners['aggregateSelection'].forEach((listener: any) => {
-					listener.callbackFn = () => {};
+					listener.callbackFn = () => { };
 				});
 			}
 		}
@@ -133,6 +148,35 @@ function App() {
 			<div className={styles.viewerContainer}>
 				<div id={styles.viewer} ref={viewerRef}></div>
 			</div>
+			{
+				showUi && (
+					<div className={styles.uiContainer}>
+						{
+							streamData ?
+								<div className={styles.uiCard}>
+									<div className={styles.cardHead}>
+										<h1>{streamData?.metadata.Name}</h1>
+										<div className={styles.subtitle}>
+											{streamData?.metadata["Assembly Code"]} / {streamData?.metadata["Classification"]} / {streamData?.metadata.fullId}
+										</div>
+									</div>
+									<div className={styles.cardBody}>
+										<div className={styles.cardBodyItem}>
+											<h2>Temperature</h2>
+											<p>
+												{JSON.stringify(streamData?.value)}
+											</p>
+										</div>
+									</div>
+								</div>
+							:
+								null
+						}
+
+					</div>
+				)
+			}
+
 		</>
 	)
 }
