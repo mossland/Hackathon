@@ -33,6 +33,14 @@ export interface IPizzaRevolutionMetadata {
 	multiplier: number;
 }
 
+export interface IDoubleDiceMetadata {
+	hash: string;
+	blue : number[];
+  red : number[];
+	multiplier: number;
+	winner :'blue' | 'tie' | 'red';
+}
+
 export interface IGemQuestMetadata {
 	hash: string;
 	gems: number[];

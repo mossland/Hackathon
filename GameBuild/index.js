@@ -38,6 +38,12 @@ const projMeta = {
     scene: process.env.GQ_PROJ_SCENE,
     name: 'GemQuest',
     extractFolder: 'gemQuest',
+  },
+  doubleDice: {
+    id: process.env.DD_PROJ_ID,
+    scene: process.env.DD_PROJ_SCENE,
+    name: 'DoubleDice',
+    extractFolder: 'doubleDice',
   }
 };
 
