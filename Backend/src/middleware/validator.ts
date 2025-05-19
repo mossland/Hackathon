@@ -178,6 +178,37 @@ export const validateGemQuestGameInput = async (req: Request, res: Response, nex
   next();
 }
 
+export const validateDoubleDiceGameInput = async (req: Request, res: Response, next: NextFunction) => {
+  const doubleDiceGameId = 7;
+  if (req.body.gameId !== doubleDiceGameId) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (typeof(req.body.pick) === typeof(undefined) || typeof(req.body.betAmount) === typeof(undefined)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  
+  if (!['blue', 'tie', 'red'].includes(req.body.pick) || !isInteger(req.body.betAmount)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  const pick = req.body.pick;
+  const betAmount = new Big(req.body.betAmount);
+
+  if (isNaN(betAmount.toNumber())) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (betAmount.lte(0)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  if (betAmount.gt(100000)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  
+  next();
+}
+
 export const createGameStateValidator = (gameId: number): (req: Request, res: Response, next: NextFunction)=> any => {
   const gameIdObj = {
     '1': 'rsp',
@@ -186,6 +217,7 @@ export const createGameStateValidator = (gameId: number): (req: Request, res: Re
     '4': 'headsOrTails',
     '5': 'pizzaRevolution',
     '6': 'gemQuest',
+    '7': 'doubleDice',
   };
 
   if (Object.keys(gameIdObj).indexOf(gameId.toString()) !== -1) {

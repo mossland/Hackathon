@@ -24,6 +24,11 @@ const gameList = [
       name: 'Gem Quest',
       isAvailable: true,
     },
+    {
+      link: `/client/DoubleDice/index.html?token=`,
+      name: 'Double Dice',
+      isAvailable: true,
+    },
     // {
     //     link: `/client/HolyGali/index.html?token=`,
     //     name: 'Holy Gali',
