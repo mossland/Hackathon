@@ -12,6 +12,7 @@ import rspRouter from './route/rsp';
 import headsOrTailsRouter from './route/headsOrTails';
 import pizzaRevolutionRouter from './route/pizzaRevolution';
 import gemQuestRouter from './route/gemQuest';
+import doubleDiceRouter from './route/doubleDice';
 // import l7dRouter from './route/l7d';
 // import hgRouter from './route/hg';
 
@@ -59,6 +60,7 @@ app.use('/rsp', rspRouter);
 app.use('/headsOrTails', headsOrTailsRouter);
 app.use('/pizzaRevolution', pizzaRevolutionRouter);
 app.use('/gemQuest', gemQuestRouter);
+app.use('/doubleDice', doubleDiceRouter);
 // app.use('/l7d', l7dRouter);
 // app.use('/hg', hgRouter);
 

@@ -12,7 +12,9 @@
     "build:dev:pr": "node index.js -g pizzaRevolution",
     "build:prod:pr": "node index.js -g pizzaRevolution",
     "build:dev:gq": "node index.js -g gemQuest",
-    "build:prod:gq": "node index.js -g gemQuest"
+    "build:prod:gq": "node index.js -g gemQuest",
+    "build:dev:dd": "node index.js -g doubleDice",
+    "build:prod:dd": "node index.js -g doubleDice"
   },
   "dependencies": {
     "axios": "^1.1.3",
