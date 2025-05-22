@@ -29,6 +29,11 @@ const gameList = [
       name: 'Double Dice',
       isAvailable: true,
     },
+    {
+      link: `/client/DiamondAndBomb/index.html?token=`,
+      name: 'Diamond and Bomb',
+      isAvailable: true,
+    },
     // {
     //     link: `/client/HolyGali/index.html?token=`,
     //     name: 'Holy Gali',

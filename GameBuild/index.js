@@ -44,6 +44,12 @@ const projMeta = {
     scene: process.env.DD_PROJ_SCENE,
     name: 'DoubleDice',
     extractFolder: 'doubleDice',
+  },
+  diamondAndBomb: {
+    id: process.env.DAB_PROJ_ID,
+    scene: process.env.DAB_PROJ_SCENE,
+    name: 'DiamondAndBomb',
+    extractFolder: 'diamondAndBomb',
   }
 };
 
