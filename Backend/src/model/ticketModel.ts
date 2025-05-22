@@ -33,6 +33,14 @@ export interface IPizzaRevolutionMetadata {
 	multiplier: number;
 }
 
+export interface IDianmondAndBombMetadata {
+	hash: string;
+	tileMap : boolean[];
+  userPick : number;
+  diaCount : number;
+	multiplier: number;
+}
+
 export interface IDoubleDiceMetadata {
 	hash: string;
 	blue : number[];
