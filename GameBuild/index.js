@@ -13,7 +13,7 @@ const https = require('https');
 const axios = require('axios');
 const unzipper = require('unzipper');
 
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 5;
 
 const projMeta = {
   rsp: {
@@ -132,7 +132,7 @@ async function downloadJob(options, projMeta, attempt = 1) {
 
     if (attempt < MAX_RETRIES) {
       console.log(`Retrying download job... (attempt ${attempt + 1})`);
-      await delay(2000);
+      await delay(5000);
       return downloadJob(options, projMeta, attempt + 1);
     } else {
       console.error('Maximum retry attempts reached. Download failed.');
