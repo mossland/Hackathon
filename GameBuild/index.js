@@ -128,11 +128,15 @@ async function downloadJob(options, projMeta, attempt = 1) {
       });
 
   } catch (error) {
-    console.error(`[ERROR] Attempt ${attempt}:`, error.message);
+     if (error.response?.status === 429) {
+      const retryAfter = error.response.headers['retry-after'];
+      const waitTime = (retryAfter ? parseInt(retryAfter, 10) * 1000 : 5000) + 1000;
+      console.warn(`[WARN] 429 Too Many Requests. Waiting ${waitTime / 1000}s before retry...`);
+      await delay(waitTime);
+    }
 
     if (attempt < MAX_RETRIES) {
       console.log(`Retrying download job... (attempt ${attempt + 1})`);
-      await delay(5000);
       return downloadJob(options, projMeta, attempt + 1);
     } else {
       console.error('Maximum retry attempts reached. Download failed.');
