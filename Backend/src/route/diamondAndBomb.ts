@@ -37,8 +37,8 @@ function createDiaTable(diaCount: number, length: number): boolean[] {
 
 router.post('/result', createGameStateValidator(diamondAndBombGameId), validateBetAmount, validateDianmondAndBombGameInput, verifyToken, async (req, res, next) => {
 	try {
-    const userPick: number = req.body.pick.toNumber();
-    const diaCount: number = req.body.pick.toNumber();
+    const userPick: number = Number(req.body.pick);
+    const diaCount: number = Number(req.body.diaCount);
 		const userPoint: number = await Platform.instance.fetchUserPoint(res.locals.user.id);
 
 		if (new Big(userPoint).lt(req.body.betAmount)) {
