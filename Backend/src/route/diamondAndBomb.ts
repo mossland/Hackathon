@@ -52,8 +52,9 @@ router.post('/result', createGameStateValidator(diamondAndBombGameId), validateB
 			(hash) => {
         const dia = new Big(diaCount);
         const total = new Big(25);
-        const multiplier = new Big(1).div(dia.div(total)).toFixed(2);  // 1 / (dia / total)
-				let payoutBig = new Big(multiplier);
+        const raw = new Big(1).div(dia.div(total));
+        const multiplier = raw.mul(100).round(0, 0).div(100).toNumber(); 
+        let payoutBig = new Big(multiplier);
 
         const table = createDiaTable(diaCount, 25);
         const shuffleTable = shuffleArrayWithHash(table, hash);
