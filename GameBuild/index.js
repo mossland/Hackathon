@@ -10,9 +10,10 @@ const options = program.opts();
 
 const fs = require('fs');
 const https = require('https');
-
 const axios = require('axios');
 const unzipper = require('unzipper');
+
+const MAX_RETRIES = 5;
 
 const projMeta = {
   rsp: {
@@ -44,18 +45,27 @@ const projMeta = {
     scene: process.env.DD_PROJ_SCENE,
     name: 'DoubleDice',
     extractFolder: 'doubleDice',
+  },
+  diamondAndBomb: {
+    id: process.env.DAB_PROJ_ID,
+    scene: process.env.DAB_PROJ_SCENE,
+    name: 'DiamondAndBomb',
+    extractFolder: 'diamondAndBomb',
   }
 };
 
-(async () => {
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+async function downloadJob(options, projMeta, attempt = 1) {
   try {
-    console.log('[START] DOWNLOAD JOB');
+    console.log(`[START] DOWNLOAD JOB (attempt ${attempt})`);
+
     const { data } = await axios.post(
       `${process.env.PC_API_BASE}/apps/download`,
       {
         project_id: parseInt(projMeta[options.game].id),
         name: projMeta[options.game].name,
-        scenes: [ parseInt(projMeta[options.game].scene) ],
+        scenes: [parseInt(projMeta[options.game].scene)],
         scripts_concatenate: true,
         scripts_minify: true,
         scripts_sourcemaps: false,
@@ -68,8 +78,8 @@ const projMeta = {
         }
       }
     );
-    const jobId = data.id;
 
+    const jobId = data.id;
     let status = 'running';
     let count = 0;
     let jobData;
@@ -82,43 +92,59 @@ const projMeta = {
           headers: {
             Authorization: `Bearer ${process.env.PC_TOKEN}`,
           },
-        },
+        }
       );
       jobData = jobStatusData;
       status = jobData.status;
-      await new Promise((resolve, reject) => {
-        setTimeout(resolve, 1000);
-      });
+      await delay(1000);
     }
-    
+
     const downloadUrl = jobData.data.download_url;
+    const distPath = path.join(__dirname, './dist');
+    const zipPath = path.join(distPath, `${projMeta[options.game].name}.zip`);
+    const extractPath = path.join(distPath, projMeta[options.game].extractFolder);
 
-    if (!fs.existsSync(path.join(__dirname, './dist'))) {
-      fs.mkdirSync(path.join(__dirname, './dist'));
-    }
+    if (!fs.existsSync(distPath)) fs.mkdirSync(distPath);
+    const file = fs.createWriteStream(zipPath);
 
-    const file = fs.createWriteStream(`./dist/${projMeta[options.game].name}.zip`);
-    await new Promise((downloadResolve, downloadReject) => {
-      https.get(
-        downloadUrl,
-        function(response) {
-          response.pipe(file);
-          file.on("finish", () => {
-              file.close();
-              console.log("Download Completed");
-              downloadResolve();
-          });
-        }
-      );
+    await new Promise((resolve, reject) => {
+      https.get(downloadUrl, response => {
+        response.pipe(file);
+        file.on('finish', () => {
+          file.close();
+          console.log('Download Completed');
+          resolve();
+        });
+        file.on('error', reject);
+      });
     });
 
-    if (!fs.existsSync(path.join(__dirname, `./dist/${projMeta[options.game].extractFolder}`))) {
-      fs.mkdirSync(path.join(__dirname, `./dist/${projMeta[options.game].extractFolder}`));
+    if (!fs.existsSync(extractPath)) fs.mkdirSync(extractPath);
+
+    fs.createReadStream(zipPath)
+      .pipe(unzipper.Extract({ path: extractPath }))
+      .on('close', () => {
+        console.log('Extraction Completed');
+      });
+
+  } catch (error) {
+     if (error.response?.status === 429) {
+      const retryAfter = error.response.headers['retry-after'];
+      const waitTime = (retryAfter ? parseInt(retryAfter, 10) * 1000 : 5000) + 1000;
+      console.warn(`[WARN] 429 Too Many Requests. Waiting ${waitTime / 1000}s before retry...`);
+      await delay(waitTime);
     }
 
-    fs.createReadStream(path.join(__dirname, `./dist/${projMeta[options.game].name}.zip`))
-    .pipe(unzipper.Extract({ path: path.join(__dirname, `./dist/${projMeta[options.game].extractFolder}`) }));
-  } catch (e) {
-    console.error(e);
+    if (attempt < MAX_RETRIES) {
+      console.log(`Retrying download job... (attempt ${attempt + 1})`);
+      return downloadJob(options, projMeta, attempt + 1);
+    } else {
+      console.error('Maximum retry attempts reached. Download failed.');
+      process.exit(1);
+    }
   }
+}
+
+(async () => {
+  await downloadJob(options, projMeta);
 })();

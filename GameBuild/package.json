@@ -14,7 +14,9 @@
     "build:dev:gq": "node index.js -g gemQuest",
     "build:prod:gq": "node index.js -g gemQuest",
     "build:dev:dd": "node index.js -g doubleDice",
-    "build:prod:dd": "node index.js -g doubleDice"
+    "build:prod:dd": "node index.js -g doubleDice",
+    "build:dev:dnb": "node index.js -g diamondAndBomb",
+    "build:prod:dnb": "node index.js -g diamondAndBomb"
   },
   "dependencies": {
     "axios": "^1.1.3",
