@@ -14,6 +14,7 @@ import pizzaRevolutionRouter from './route/pizzaRevolution';
 import gemQuestRouter from './route/gemQuest';
 import doubleDiceRouter from './route/doubleDice';
 import diamondAndBombRouter from './route/diamondAndBomb';
+import horseRaceRouter from './route/horseRace';
 // import l7dRouter from './route/l7d';
 // import hgRouter from './route/hg';
 
@@ -63,6 +64,7 @@ app.use('/pizzaRevolution', pizzaRevolutionRouter);
 app.use('/gemQuest', gemQuestRouter);
 app.use('/doubleDice', doubleDiceRouter);
 app.use('/diamondAndBomb', diamondAndBombRouter);
+app.use('/horseRace', horseRaceRouter);
 
 // app.use('/l7d', l7dRouter);
 // app.use('/hg', hgRouter);
