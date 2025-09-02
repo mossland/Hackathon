@@ -34,6 +34,11 @@ const gameList = [
       name: 'Diamond and Bomb',
       isAvailable: true,
     },
+    {
+      link: `/client/HorseRace/index.html?token=`,
+      name: 'Horse Race',
+      isAvailable: true,
+    },
     // {
     //     link: `/client/HolyGali/index.html?token=`,
     //     name: 'Holy Gali',

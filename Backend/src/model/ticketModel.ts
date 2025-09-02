@@ -5,7 +5,6 @@ import db from '../db';
 import { generateHashString } from "../util/random";
 import Platform from "../util/platform";
 
-
 export interface ITicketModel {
   gameId: number;
   hashId: number;
@@ -31,6 +30,14 @@ export interface IPizzaRevolutionMetadata {
 	userPickColor: number;
 	resultNumber: number;
 	multiplier: number;
+}
+
+export interface IHorseRaceMetadata {
+  hash: string;
+  raceCards : {type : number, number:number}[];
+  playerHorse : number;
+  winner : number;
+  multiplier: number;
 }
 
 export interface IDianmondAndBombMetadata {
@@ -72,9 +79,6 @@ export interface IHgMetadata {
   hiddenCardType: number;
   hiddenCardNumber: number;
 }
-
-
-
 
 export default class TicketModel {
 	public static async createHgTicket(betAmount: Big, userId: string): Promise<ITicketModel> {
