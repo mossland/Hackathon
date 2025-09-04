@@ -80,6 +80,15 @@ export interface IHgMetadata {
   hiddenCardNumber: number;
 }
 
+export interface IOneTwoThreeMetadata {
+  hash: string;
+  winNumber: number;
+  tieNumber: number;
+  resultNumber : number;
+  multiplier: number;
+}
+
+
 export default class TicketModel {
 	public static async createHgTicket(betAmount: Big, userId: string): Promise<ITicketModel> {
 		const cardType = {
