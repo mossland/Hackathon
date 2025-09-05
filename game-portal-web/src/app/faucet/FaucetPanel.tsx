@@ -12,6 +12,7 @@ export default function FaucetPanel() {
     const rcpRef = useRef(null);
 
     const [ userPoint, setUserPoint ] = useState(0);
+    const [ displayUserPoint , setDisplayUserPoint ] = useState(0);
     const [ isRecaptchaRendered, setIsRecaptchaRendered ] = useState(false);
     const token = window.sessionStorage.getItem('token');
     const n = [
@@ -42,9 +43,13 @@ export default function FaucetPanel() {
         );
         setUserPoint(data.point);
     }
+
     useEffect(() => {
         const init = async () => {
             await fetchUserBalance();
+
+            setDisplayUserPoint(Math.floor(userPoint * 100) / 100);
+
             if (userPoint >= 1000) { return; }
             (window as any).onLoadRecaptcha = () => {
                 renderRecaptcha();
@@ -153,13 +158,13 @@ export default function FaucetPanel() {
                 </pre>
                 <div className={ styles.request }>
                     Your current points are
-                    <div className={[styles.bigNumber, userPoint.toString().length > 6 ? styles.scroll : ''].join(' ')}>
+                    <div className={[styles.bigNumber, displayUserPoint.toString().length > 6 ? styles.scroll : ''].join(' ')}>
                     {
-                        Array.from({length: userPoint.toString().length}).map((_, idx) => {
-                            if (userPoint.toString().charAt(idx) === '.') {
+                        Array.from({length: displayUserPoint.toString().length}).map((_, idx) => {
+                            if (displayUserPoint.toString().charAt(idx) === '.') {
                                 return dot(idx);
                             } else {
-                                return n[parseInt(userPoint.toString().charAt(idx))](idx);
+                                return n[parseInt(displayUserPoint.toString().charAt(idx))](idx);
                             }
                         })
                     }
