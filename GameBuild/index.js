@@ -51,7 +51,13 @@ const projMeta = {
     scene: process.env.DAB_PROJ_SCENE,
     name: 'DiamondAndBomb',
     extractFolder: 'diamondAndBomb',
-  }
+  },
+  horseRace: {
+    id: process.env.HR_PROJ_ID,
+    scene: process.env.HR_PROJ_SCENE,
+    name: "HorseRace",
+    extractFolder: "horseRace",
+  },
 };
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));

@@ -3,7 +3,7 @@ import uuidv7 from '../util/uuidv7';
 import db from '../db';
 import { Knex } from 'knex';
 import hashModel from '../model/hashModel';
-import { IRspMetadata, IL7DMetadata, ITicketModel, IHeadsOrTailsMetadata, IPizzaRevolutionMetadata, IGemQuestMetadata, IDoubleDiceMetadata, IDianmondAndBombMetadata } from '../model/ticketModel';
+import { IRspMetadata, IL7DMetadata, ITicketModel, IHeadsOrTailsMetadata, IPizzaRevolutionMetadata, IGemQuestMetadata, IDoubleDiceMetadata, IDianmondAndBombMetadata, IHorseRaceMetadata } from '../model/ticketModel';
 import Platform from "../util/platform";
 import Big from 'big.js';
 
@@ -127,7 +127,7 @@ export const spendByGameId = async (
   gameId: number,
   betAmount: Big,
   userId: string,
-  resultGenerateFunc: (hash: string) => { meta: IRspMetadata | IL7DMetadata | IHeadsOrTailsMetadata | IPizzaRevolutionMetadata | IGemQuestMetadata | IDoubleDiceMetadata | IDianmondAndBombMetadata, payout: number }): Promise<ITicketModel> => {
+  resultGenerateFunc: (hash: string) => { meta: IRspMetadata | IL7DMetadata | IHeadsOrTailsMetadata | IPizzaRevolutionMetadata | IGemQuestMetadata | IDoubleDiceMetadata | IDianmondAndBombMetadata | IHorseRaceMetadata, payout: number }): Promise<ITicketModel> => {
   return new Promise((resolve, reject) => {
     db.transaction(async (trx) => {
       try {

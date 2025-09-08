@@ -209,7 +209,6 @@ export const validateDoubleDiceGameInput = async (req: Request, res: Response, n
   next();
 }
 
-
 export const validateDianmondAndBombGameInput = async (req: Request, res: Response, next: NextFunction) => {
   const dianmondAndBombGameId = 8;
   if (req.body.gameId !== dianmondAndBombGameId) {
@@ -244,6 +243,56 @@ export const validateDianmondAndBombGameInput = async (req: Request, res: Respon
   next();
 }
 
+
+export const validateHorseRaceGameInput = async (req: Request, res: Response, next: NextFunction) => {
+  const horseRaceGameId = 9;
+  if (req.body.gameId !== horseRaceGameId) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (typeof(req.body.pick) === typeof(undefined) || typeof(req.body.betAmount) === typeof(undefined)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  
+  if ( (req.body.pick < 0 || req.body.pick > 3) || !isInteger(req.body.betAmount)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if ( !Array.isArray(req.body.topCards) || req.body.topCards.length !== 7) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  const typeCount = [0, 0, 0, 0];
+  for (let i = 0; i < req.body.topCards.length; i++) {
+    const t = req.body.topCards[i]?.type;
+
+    if (!Number.isInteger(t) || t < 0 || t > 3) {
+      return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+    }
+
+    typeCount[t] += 1;
+
+    if (typeCount[t] > 4) {
+      return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+    }
+  }
+
+  const betAmount = new Big(req.body.betAmount);
+
+  if (isNaN(betAmount.toNumber())) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (betAmount.lte(0)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  if (betAmount.gt(100000)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  
+  next();
+}
+
 export const createGameStateValidator = (gameId: number): (req: Request, res: Response, next: NextFunction)=> any => {
   const gameIdObj = {
     '1': 'rsp',
@@ -254,6 +303,7 @@ export const createGameStateValidator = (gameId: number): (req: Request, res: Re
     '6': 'gemQuest',
     '7': 'doubleDice',
     '8': 'diamondAndBomb',
+    '9': 'horseRace',
   };
 
   if (Object.keys(gameIdObj).indexOf(gameId.toString()) !== -1) {
