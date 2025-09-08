@@ -21,7 +21,6 @@
     "build:prod:dnb": "node index.js -g diamondAndBomb",
     "build:dev:hr": "node index.js -g horseRace",
     "build:prod:hr": "node index.js -g horseRace"
-    
   },
   "dependencies": {
     "axios": "^1.1.3",
