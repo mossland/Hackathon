@@ -16,12 +16,6 @@ const unzipper = require('unzipper');
 const MAX_RETRIES = 5;
 
 const projMeta = {
-  oneTwoThree: {
-    id: process.env.OTT_PROJ_ID,
-    scene: process.env.OTT_PROJ_SCENE,
-    name: 'OneTwoThree',
-    extractFolder: 'oneTwoThree',
-  },
   rsp: {
     id: process.env.RSP_PROJ_ID,
     scene: process.env.RSP_PROJ_SCENE,
@@ -64,6 +58,12 @@ const projMeta = {
     name: "HorseRace",
     extractFolder: "horseRace",
   },
+  oneTwoThree: {
+    id: process.env.OTT_PROJ_ID,
+    scene: process.env.OTT_PROJ_SCENE,
+    name: 'OneTwoThree',
+    extractFolder: 'oneTwoThree',
+  }
 };
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
