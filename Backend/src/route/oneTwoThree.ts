@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { spendByGameId } from "../util/random";
 import Big from 'big.js';
-import { validateDianmondAndBombGameInput, createGameStateValidator, validateBetAmount } from '../middleware/validator';
+import { validateOneTwoThreeGameInput, createGameStateValidator, validateBetAmount } from '../middleware/validator';
 import { verifyToken } from '../middleware/auth';
 import StatusCodes from 'http-status-codes';
 import ServerError from '../util/serverError';
@@ -9,9 +9,9 @@ import Platform from "../util/platform";
 import { ITicketModel } from "../model/ticketModel";
 
 const router = Router();
-const oneTwoThreeGameId = 8;
+const oneTwoThreeGameId = 10;
 
-router.post('/result', createGameStateValidator(oneTwoThreeGameId), validateBetAmount, validateDianmondAndBombGameInput, verifyToken, async (req, res, next) => {
+router.post('/result', createGameStateValidator(oneTwoThreeGameId), validateBetAmount, validateOneTwoThreeGameInput, verifyToken, async (req, res, next) => {
 	try {
     const winNumber: number = Number(req.body.winNumber);
     const tieNumber: number = Number(req.body.tieNumber);
