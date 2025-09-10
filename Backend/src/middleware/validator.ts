@@ -209,6 +209,40 @@ export const validateDoubleDiceGameInput = async (req: Request, res: Response, n
   next();
 }
 
+
+export const validateOneTwoThreeGameInput = async (req: Request, res: Response, next: NextFunction) => {
+  const oneTwoThreeGameId = 10;
+  if (req.body.gameId !== oneTwoThreeGameId) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (typeof(req.body.winNumber) === typeof(undefined) || typeof(req.body.tieNumber) === typeof(undefined) || typeof(req.body.betAmount) === typeof(undefined)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  
+  if ( (req.body.winNumber < 0 || req.body.winNumber > 3) ||
+       (req.body.tieNumber < 0 || req.body.tieNumber > 3) || 
+       (req.body.winNumber === req.body.tieNumber) ||
+      !isInteger(req.body.betAmount)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  const betAmount = new Big(req.body.betAmount);
+
+  if (isNaN(betAmount.toNumber())) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (betAmount.lte(0)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  if (betAmount.gt(100000)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  
+  next();
+}
+
+
 export const validateDianmondAndBombGameInput = async (req: Request, res: Response, next: NextFunction) => {
   const dianmondAndBombGameId = 8;
   if (req.body.gameId !== dianmondAndBombGameId) {
@@ -304,6 +338,8 @@ export const createGameStateValidator = (gameId: number): (req: Request, res: Re
     '7': 'doubleDice',
     '8': 'diamondAndBomb',
     '9': 'horseRace',
+
+    '10': 'diamondAndBomb',
   };
 
   if (Object.keys(gameIdObj).indexOf(gameId.toString()) !== -1) {

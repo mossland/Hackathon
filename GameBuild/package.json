@@ -5,6 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build-window:dev:rsp": "set NODE_ENV=development&node index.js -g rsp",
+    "build:dev:ott": "node index.js -g oneTwoThree",
+    "build:prod:ott": "node index.js -g oneTwoThree",
     "build:dev:rsp": "node index.js -g rsp",
     "build:prod:rsp": "node index.js -g rsp",
     "build:dev:ht": "node index.js -g headsOrTails",

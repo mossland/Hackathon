@@ -58,12 +58,19 @@ const projMeta = {
     name: "HorseRace",
     extractFolder: "horseRace",
   },
+  oneTwoThree: {
+    id: process.env.OTT_PROJ_ID,
+    scene: process.env.OTT_PROJ_SCENE,
+    name: 'OneTwoThree',
+    extractFolder: 'oneTwoThree',
+  }
 };
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function downloadJob(options, projMeta, attempt = 1) {
   try {
+    console.log(`game : ${options.game}, id :${projMeta[options.game].id}, scene : ${projMeta[options.game].scene}, name : scene : ${projMeta[options.game].name}`);
     console.log(`[START] DOWNLOAD JOB (attempt ${attempt})`);
 
     const { data } = await axios.post(

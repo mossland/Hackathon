@@ -39,6 +39,11 @@ const gameList = [
       name: 'Horse Race',
       isAvailable: true,
     },
+    {
+      link: `/client/OneTwoThree/index.html?token=`,
+      name: 'One Two Three',
+      isAvailable: true,
+    },
     // {
     //     link: `/client/HolyGali/index.html?token=`,
     //     name: 'Holy Gali',
