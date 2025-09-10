@@ -16,12 +16,6 @@ const unzipper = require('unzipper');
 const MAX_RETRIES = 5;
 
 const projMeta = {
-  oneTwoThree: {
-    id: process.env.OTT_PROJ_ID,
-    scene: process.env.OTT_PROJ_SCENE,
-    name: 'OneTwoThree',
-    extractFolder: 'oneTwoThree',
-  },
   rsp: {
     id: process.env.RSP_PROJ_ID,
     scene: process.env.RSP_PROJ_SCENE,
@@ -64,13 +58,19 @@ const projMeta = {
     name: "HorseRace",
     extractFolder: "horseRace",
   },
+  oneTwoThree: {
+    id: process.env.OTT_PROJ_ID,
+    scene: process.env.OTT_PROJ_SCENE,
+    name: 'OneTwoThree',
+    extractFolder: 'oneTwoThree',
+  }
 };
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function downloadJob(options, projMeta, attempt = 1) {
   try {
-    console.log(`id :${projMeta[options.game].id}), scene : ${projMeta[options.game].scene})`);
+    console.log(`id :${projMeta[options.game].id}, scene : ${projMeta[options.game].scene}`);
     console.log(`[START] DOWNLOAD JOB (attempt ${attempt})`);
 
     const { data } = await axios.post(
