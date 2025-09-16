@@ -88,6 +88,13 @@ export interface IOneTwoThreeMetadata {
   multiplier: number;
 }
 
+export interface IKenoMetadata {
+  hash: string;
+  winNumbers: number[];
+  userNumbers: number[];
+  matchResult : number[];
+  multiplier: number;
+}
 
 export default class TicketModel {
 	public static async createHgTicket(betAmount: Big, userId: string): Promise<ITicketModel> {

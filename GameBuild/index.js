@@ -63,6 +63,12 @@ const projMeta = {
     scene: process.env.OTT_PROJ_SCENE,
     name: 'OneTwoThree',
     extractFolder: 'oneTwoThree',
+  },
+  keno: {
+    id: process.env.KENO_PROJ_ID,
+    scene: process.env.KENO_PROJ_SCENE,
+    name: 'Keno',
+    extractFolder: 'keno',
   }
 };
 

@@ -44,6 +44,11 @@ const gameList = [
       name: 'One Two Three',
       isAvailable: true,
     },
+    {
+      link: `/client/Keno/index.html?token=`,
+      name: 'Keno',
+      isAvailable: true,
+    },
     // {
     //     link: `/client/HolyGali/index.html?token=`,
     //     name: 'Holy Gali',
