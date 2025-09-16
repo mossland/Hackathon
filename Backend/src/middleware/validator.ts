@@ -327,6 +327,41 @@ export const validateHorseRaceGameInput = async (req: Request, res: Response, ne
   next();
 }
 
+
+export const validateKenoGameInput = async (req: Request, res: Response, next: NextFunction) => {
+  const kenoGameId = 11;
+  if (req.body.gameId !== kenoGameId) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (typeof(req.body.pick) === typeof(undefined) || typeof(req.body.diaCount) === typeof(undefined) || typeof(req.body.betAmount) === typeof(undefined)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  
+  if ( (req.body.pick < 0 || req.body.pick > 24) || !isInteger(req.body.betAmount)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if ( req.body.diaCount < 1 || req.body.diaCount > 24 || !isInteger(req.body.diaCount)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  const betAmount = new Big(req.body.betAmount);
+
+  if (isNaN(betAmount.toNumber())) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+
+  if (betAmount.lte(0)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  if (betAmount.gt(100000)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
+  }
+  
+  next();
+}
+
 export const createGameStateValidator = (gameId: number): (req: Request, res: Response, next: NextFunction)=> any => {
   const gameIdObj = {
     '1': 'rsp',
@@ -338,8 +373,8 @@ export const createGameStateValidator = (gameId: number): (req: Request, res: Re
     '7': 'doubleDice',
     '8': 'diamondAndBomb',
     '9': 'horseRace',
-
     '10': 'diamondAndBomb',
+    '11': 'keno',
   };
 
   if (Object.keys(gameIdObj).indexOf(gameId.toString()) !== -1) {
