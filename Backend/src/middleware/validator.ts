@@ -334,15 +334,11 @@ export const validateKenoGameInput = async (req: Request, res: Response, next: N
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
 
-  if (typeof(req.body.pick) === typeof(undefined) || typeof(req.body.diaCount) === typeof(undefined) || typeof(req.body.betAmount) === typeof(undefined)) {
-    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
-  }
-  
-  if ( (req.body.pick < 0 || req.body.pick > 24) || !isInteger(req.body.betAmount)) {
+  if (typeof(req.body.userNumers) === typeof(undefined) || typeof(req.body.betAmount) === typeof(undefined)) {
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
 
-  if ( req.body.diaCount < 1 || req.body.diaCount > 24 || !isInteger(req.body.diaCount)) {
+   if ( !Array.isArray(req.body.userNumbers) || req.body.userNumbers.length <= 0 || req.body.userNumbers.length > 8) {
     return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid input'));
   }
 
