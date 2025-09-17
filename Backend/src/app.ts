@@ -17,6 +17,7 @@ import diamondAndBombRouter from './route/diamondAndBomb';
 import horseRaceRouter from './route/horseRace';
 
 import oneTwoThreeRouter from './route/oneTwoThree';
+import kenoRouter from './route/keno';
 // import l7dRouter from './route/l7d';
 // import hgRouter from './route/hg';
 
@@ -67,8 +68,8 @@ app.use('/gemQuest', gemQuestRouter);
 app.use('/doubleDice', doubleDiceRouter);
 app.use('/diamondAndBomb', diamondAndBombRouter);
 app.use('/horseRace', horseRaceRouter);
-
 app.use('/oneTwoThree', oneTwoThreeRouter);
+app.use('/keno', kenoRouter);
 
 // app.use('/l7d', l7dRouter);
 // app.use('/hg', hgRouter);

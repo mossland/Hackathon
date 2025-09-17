@@ -327,6 +327,39 @@ export const validateHorseRaceGameInput = async (req: Request, res: Response, ne
   next();
 }
 
+
+export const validateKenoGameInput = async (req: Request, res: Response, next: NextFunction) => {
+  const kenoGameId = 11;
+
+  if (req.body.gameId !== kenoGameId) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Invalid gameId'));
+  }
+
+  if (typeof (req.body.userNumbers) === typeof (undefined) || typeof (req.body.betAmount) === typeof (undefined)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'Missing required fields: userNumbers or betAmount'));
+  }
+
+  if (!Array.isArray(req.body.userNumbers) || req.body.userNumbers.length <= 0 || req.body.userNumbers.length > 8) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'userNumbers must be an array with 1–8 items'));
+  }
+
+  const betAmount = new Big(req.body.betAmount);
+
+  if (isNaN(betAmount.toNumber())) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'betAmount must be a valid number'));
+  }
+
+  if (betAmount.lte(0)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'betAmount must be greater than 0'));
+  }
+
+  if (betAmount.gt(100000)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, 'betAmount must be ≤ 100000'));
+  }
+
+  next();
+};
+
 export const createGameStateValidator = (gameId: number): (req: Request, res: Response, next: NextFunction)=> any => {
   const gameIdObj = {
     '1': 'rsp',
@@ -338,8 +371,8 @@ export const createGameStateValidator = (gameId: number): (req: Request, res: Re
     '7': 'doubleDice',
     '8': 'diamondAndBomb',
     '9': 'horseRace',
-
     '10': 'diamondAndBomb',
+    '11': 'keno',
   };
 
   if (Object.keys(gameIdObj).indexOf(gameId.toString()) !== -1) {
