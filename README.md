@@ -58,6 +58,18 @@ and then proposed to the DAO (Agora) for longer-term MOC grants.
 
 ---
 
+### ⭐ Special Hackathon: Seoul:ution 2025 Official Sponsorship
+
+Mossland is participating as an **official sponsor and judging panel member**  
+for the first hackathon **“Seoul:ution 2025”** hosted by the University of Seoul.
+
+- **Event:** Seoul:ution 2025 (Seoul + Solution)  
+- **Theme:** Developing startup services to solve Seoul’s social problems  
+- **Schedule:** November 28, 2025, 14:00 – November 29, 2025, 15:00  
+- **Venue:** Seoul Impact Arena, University of Seoul  
+
+---
+
 ## 🚀 How to Participate
 
 > The exact process may be slightly customized per event,  
@@ -242,6 +254,18 @@ You can:
 정기 해커톤과 비정기 기여 모두,  
 유망한 프로젝트는 [`MosslandDeveloperSupportProgram`](https://github.com/mossland/MosslandDeveloperSupportProgram) 으로 승격되어  
 DAO(Agora)를 통한 장기적인 MOC 지원금 심사로 이어질 수 있습니다.
+
+---
+
+### ⭐ 특별 해커톤: Seoul:ution 2025 공식 후원
+
+모스랜드는 서울시립대학교 주최 제1회 해커톤 **“Seoul:ution 2025”** 의  
+**공식 후원사이자 심사위원단**으로 참여합니다.
+
+- **행사명:** Seoul:ution 2025 (Seoul + Solution)  
+- **주제:** 서울시 사회문제를 해결하는 창업 서비스 개발  
+- **일정:** 2025년 11월 28일 14:00 ~ 2025년 11월 29일 15:00  
+- **장소:** 서울시립대학교 서울 임팩트 아레나
 
 ---
 
