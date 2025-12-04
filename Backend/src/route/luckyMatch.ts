@@ -1,11 +1,7 @@
 import { Router } from "express";
 import { spendByGameId } from "../util/random";
 import Big from "big.js";
-import {
-  validateHorseRaceGameInput,
-  createGameStateValidator,
-  validateBetAmount,
-} from "../middleware/validator";
+import { validateLuckyMatchGameInput, createGameStateValidator, validateBetAmount } from "../middleware/validator";
 import { verifyToken } from "../middleware/auth";
 import StatusCodes from "http-status-codes";
 import ServerError from "../util/serverError";
@@ -13,7 +9,7 @@ import Platform from "../util/platform";
 import { ITicketModel } from "../model/ticketModel";
 
 const router = Router();
-const horseRaceGameId = 12;
+const luckyMatchGameId = 12;
 
 const CardType = { Clubs: 0, Spades: 1, Diamonds: 2, Hearts: 3 } as const;
 type Suit = (typeof CardType)[keyof typeof CardType];
@@ -35,30 +31,48 @@ const CardNumber = {
 } as const;
 type Rank = (typeof CardNumber)[keyof typeof CardNumber];
 
+const MatchType = {
+  Inside: "inside",
+  Outside: "outside",
+  Range_1: "range_1",
+  Range_2: "range_2",
+  Range_3: "range_3",
+  Range_4: "range_4",
+} as const;
+
+type MatchType = (typeof MatchType)[keyof typeof MatchType];
+
 interface Card {
-  type: Suit;
-  number: Rank;
+  suit: Suit;
+  rank: Rank;
+}
+
+interface MatchRange {
+  type: MatchType;
+  min: number;
+  max: number;
+  payout: number;
+}
+
+interface MatchResult {
+  joker: Card;
+  matchCard: Card | null;
+  matchIndex: number | null;
+  matchType: MatchType;
+  payout: number;
+  ioType: MatchType | null;
 }
 
 const ODDS_BY_COUNT = [3.7, 3.9, 4.2, 4.2] as const;
-const WIN_THRESHOLD = 8 as const;
 
-function shuffleArrayWithHashKeepTop(
-  array: Card[],
-  topCards: Card[],
-  hash: string
-): Card[] {
+function shuffleArrayWithHashKeepTop(array: Card[], jokerCard: Card, hash: string): Card[] {
   const pool = array.slice();
   const keptTop: Card[] = [];
 
-  for (const t of topCards) {
-    const idx = pool.findIndex(
-      (c) => c.type === t.type && c.number === t.number
-    );
-    if (idx !== -1) {
-      keptTop.push(t);
-      pool.splice(idx, 1);
-    }
+  const idx = pool.findIndex((c) => c.suit === jokerCard.suit && c.rank === jokerCard.rank);
+  if (idx !== -1) {
+    keptTop.push(jokerCard);
+    pool.splice(idx, 1);
   }
 
   let bytes = new TextEncoder().encode(hash);
@@ -72,21 +86,14 @@ function shuffleArrayWithHashKeepTop(
   return keptTop.concat(pool);
 }
 
-export function getGameOdds(
-  topCards: Card[]
-): [number, number, number, number] {
+export function getGameOdds(topCards: Card[]): [number, number, number, number] {
   const counts: [number, number, number, number] = [0, 0, 0, 0];
 
-  for (const { type } of topCards) {
+  for (const { suit: type } of topCards) {
     counts[type] += 1;
   }
 
-  const odds = counts.map((c) => ODDS_BY_COUNT[c] ?? 100) as [
-    number,
-    number,
-    number,
-    number
-  ];
+  const odds = counts.map((c) => ODDS_BY_COUNT[c] ?? 100) as [number, number, number, number];
   return odds;
 }
 
@@ -98,7 +105,7 @@ function createDeck(): Card[] {
 
   for (const type of cardTypes) {
     for (const number of cardNumbers) {
-      const card: Card = { type, number };
+      const card: Card = { suit: type, rank: number };
       deck.push(card);
     }
   }
@@ -106,86 +113,100 @@ function createDeck(): Card[] {
   return deck;
 }
 
-function getWinner(raceResult: number[], threshold = WIN_THRESHOLD): number {
-  for (let i = 0; i < raceResult.length; i++) {
-    if (raceResult[i] >= threshold) return i;
-  }
-  return -1;
-}
+const matchRanges: MatchRange[] = [
+  { type: MatchType.Range_1, min: 1, max: 5, payout: 3.7 }, // 공정보다 약간 낮게
+  { type: MatchType.Range_2, min: 6, max: 11, payout: 3.9 },
+  { type: MatchType.Range_3, min: 12, max: 19, payout: 4.2 },
+  { type: MatchType.Range_4, min: 20, max: 49, payout: 4.2 },
+];
 
-function runRace(
-  shuffledDeck: Card[],
-  topCardsCount: number,
-  threshold = WIN_THRESHOLD
-) {
-  const raceResult = [0, 0, 0, 0] as [number, number, number, number];
-  let winner = -1;
+function getMatchResult(deck: Card[]): MatchResult {
+  const joker = deck[0];
+  const targetRank = joker.rank;
 
-  for (let i = topCardsCount; i < shuffledDeck.length; i++) {
-    const t = shuffledDeck[i].type;
-    raceResult[t]++;
+  let matchIndex: number | null = null;
+  let matchCard: Card | null = null;
 
-    if (raceResult[t] >= threshold) {
-      winner = t;
+  for (let i = 1; i < deck.length; i++) {
+    if (deck[i].rank === targetRank) {
+      matchIndex = i;
+      matchCard = deck[i];
       break;
     }
   }
 
-  return { winner, raceResult };
+  const position = matchIndex !== null ? matchIndex : deck.length;
+  const oneBased = matchIndex !== null ? matchIndex : null;
+
+  const matchedRange = matchRanges.find((r) => {
+    return position >= r.min && position <= r.max;
+  });
+
+  const matchType: MatchType = matchedRange ? matchedRange.type : MatchType.Range_4;
+
+  const payout: number = matchedRange ? matchedRange.payout : matchRanges[matchRanges.length - 1].payout;
+
+  let ioType: MatchType | null = null;
+  if (matchIndex !== null) {
+    const sequencePosition = matchIndex;
+    ioType = sequencePosition % 2 === 1 ? MatchType.Inside : MatchType.Outside;
+  }
+
+  return {
+    joker,
+    matchCard,
+    matchIndex: oneBased,
+    matchType,
+    payout,
+    ioType,
+  };
 }
 
 router.post(
   "/result",
-  createGameStateValidator(horseRaceGameId),
+  createGameStateValidator(luckyMatchGameId),
   validateBetAmount,
-  validateHorseRaceGameInput,
+  validateLuckyMatchGameInput,
   verifyToken,
   async (req, res, next) => {
     try {
       const userPick: number = Number(req.body.pick);
-      const topCards: Card[] = req.body.topCards as Card[];
-      const userPoint: number = await Platform.instance.fetchUserPoint(
-        res.locals.user.id
-      );
+      const jokerCard: Card = req.body.jokerCard as Card;
+      const matchType: MatchType = req.body.matchType as MatchType;
+      const userPoint: number = await Platform.instance.fetchUserPoint(res.locals.user.id);
 
       if (new Big(userPoint).lt(req.body.betAmount)) {
         return next(new ServerError(StatusCodes.FORBIDDEN, "Not enough point"));
       }
 
-      const ticket: ITicketModel = await spendByGameId(
-        horseRaceGameId,
-        new Big(req.body.betAmount),
-        res.locals.user.id,
-        (hash) => {
-          const odds = getGameOdds(topCards);
-          const multiplier = odds[userPick];
-          let payoutBig = new Big(multiplier);
+      const ticket: ITicketModel = await spendByGameId(luckyMatchGameId, new Big(req.body.betAmount), res.locals.user.id, (hash) => {
+        const deck = createDeck();
+        const shuffledDeck = shuffleArrayWithHashKeepTop(deck, jokerCard, hash);
 
-          const deck = createDeck();
-          const shuffledDeck = shuffleArrayWithHashKeepTop(
-            deck,
-            topCards,
-            hash
-          );
+        const gameResult: MatchResult = getMatchResult(shuffledDeck);
 
-          const { winner, raceResult } = runRace(shuffledDeck, topCards.length);
+        let isWin: boolean = false;
+        let multiplier: Big = new Big(0);
 
-          if (userPick !== winner) {
-            payoutBig = new Big(0);
+        if (gameResult.matchType === matchType || gameResult.ioType === matchType) {
+          isWin = true;
+          multiplier = new Big(gameResult.payout);
+          if (matchType === MatchType.Inside || matchType === MatchType.Outside) {
+            multiplier = new Big(2.0);
           }
-
-          return {
-            payout: payoutBig.toNumber(),
-            meta: {
-              hash,
-              raceCards: shuffledDeck,
-              playerHorse: userPick,
-              winner: winner,
-              multiplier: payoutBig.toNumber(),
-            },
-          };
         }
-      );
+
+        return {
+          payout: multiplier.toNumber(),
+          meta: {
+            hash,
+            raceCards: shuffledDeck,
+            userMatchType: matchType as string,
+            isWin: isWin,
+            multiplier: multiplier.toNumber(),
+          },
+        };
+      });
 
       return res.status(200).send({
         success: true,
@@ -193,12 +214,7 @@ router.post(
       });
     } catch (e) {
       console.error(e);
-      return next(
-        new ServerError(
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          "internal server error"
-        )
-      );
+      return next(new ServerError(StatusCodes.INTERNAL_SERVER_ERROR, "internal server error"));
     }
   }
 );
