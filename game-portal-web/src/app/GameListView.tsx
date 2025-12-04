@@ -51,7 +51,7 @@ const gameList = [
   },
   {
     link: `/client/LuckyMatch/index.html?token=`,
-    name: "LuckyMatch",
+    name: "Lucky Match",
     isAvailable: true,
   },
   // {
