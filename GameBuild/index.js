@@ -74,7 +74,7 @@ const projMeta = {
     id: process.env.LUCKY_MATCH_PROJ_ID,
     scene: process.env.LUCKY_MATCH_PROJ_SCENE,
     name: "LuckyMatch",
-    extractFolder: "luckyMatch",
+    extractFolder: "LuckyMatch",
   },
 };
 
