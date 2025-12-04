@@ -70,7 +70,7 @@ const projMeta = {
     name: "Keno",
     extractFolder: "keno",
   },
-  keno: {
+  luckyMatch: {
     id: process.env.LUCKY_MATCH_PROJ_ID,
     scene: process.env.LUCKY_MATCH_PROJ_SCENE,
     name: "LuckyMatch",
