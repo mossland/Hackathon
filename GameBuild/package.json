@@ -23,8 +23,8 @@
     "build:prod:hr": "node index.js -g horseRace",
     "build:dev:keno": "node index.js -g keno",
     "build:prod:keno": "node index.js -g keno",
-    "build:dev:luckyMatch": "node index.js -g luckyMatch",
-    "build:prod:luckyMatch": "node index.js -g luckyMatch"
+    "build:dev:LuckyMatch": "node index.js -g luckyMatch",
+    "build:prod:LuckyMatch": "node index.js -g luckyMatch"
   },
   "dependencies": {
     "axios": "^1.1.3",
