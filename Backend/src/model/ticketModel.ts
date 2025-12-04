@@ -98,7 +98,7 @@ export interface IKenoMetadata {
 
 export interface ILuckyMatchMetadata {
   hash: string;
-  raceCards: { type: number; number: number }[];
+  raceCards: { suit: number; rank: number }[];
   userMatchType: string;
   isWin: boolean;
   multiplier: number;
