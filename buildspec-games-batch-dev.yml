@@ -14,10 +14,7 @@ phases:
   pre_build:
     commands:
       - aws --version
-      - aws ssm get-parameter --with-decryption --name mossverse-game-$NODE_ENV --region $AWS_DEFAULT_REGION \
-        | jq '.Parameter.Value' \
-        | sed 's/^.//;s/.$//' \
-        | perl -pe 's/\\n/\n/g' > ./GameBuild/.env.$NODE_ENV
+      - aws ssm get-parameter --with-decryption --name mossverse-game-$NODE_ENV --region $AWS_DEFAULT_REGION | jq '.Parameter.Value'| sed 's/^.//;s/.$//' | perl -pe 's/\\n/\n/g' > ./GameBuild/.env.$NODE_ENV
       - export COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - echo "NODE_ENV = $NODE_ENV"
       - echo "COMMIT_HASH = $COMMIT_HASH"
