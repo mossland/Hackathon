@@ -76,6 +76,12 @@ const projMeta = {
     name: "LuckyMatch",
     extractFolder: "LuckyMatch",
   },
+  rangeRush: {
+    id: process.env.RANGE_RUSH_PROJ_ID,
+    scene: process.env.RANGE_RUSH_PROJ_SCENE,
+    name: "RangeRush",
+    extractFolder: "RangeRush",
+  },
 };
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

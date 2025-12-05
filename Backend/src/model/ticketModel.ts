@@ -104,6 +104,13 @@ export interface ILuckyMatchMetadata {
   multiplier: number;
 }
 
+export interface ILuckyMatchMetadata {
+  hash: string;
+  raceCards: { suit: number; rank: number }[];
+  isWin: boolean;
+  multiplier: number;
+}
+
 export default class TicketModel {
   public static async createHgTicket(betAmount: Big, userId: string): Promise<ITicketModel> {
     const cardType = {

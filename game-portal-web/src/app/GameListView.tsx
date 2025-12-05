@@ -54,6 +54,11 @@ const gameList = [
     name: "Lucky Match",
     isAvailable: true,
   },
+  {
+    link: `/client/RangeRush/index.html?token=`,
+    name: "Range Rush",
+    isAvailable: true,
+  },
   // {
   //     link: `/client/HolyGali/index.html?token=`,
   //     name: 'Holy Gali',
