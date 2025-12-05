@@ -104,7 +104,7 @@ export interface ILuckyMatchMetadata {
   multiplier: number;
 }
 
-export interface ILuckyMatchMetadata {
+export interface IRangeRushMetadata {
   hash: string;
   raceCards: { suit: number; rank: number }[];
   isWin: boolean;
