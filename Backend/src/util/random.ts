@@ -16,6 +16,7 @@ import {
   IOneTwoThreeMetadata,
   IKenoMetadata,
   ILuckyMatchMetadata,
+  IRangeRushMetadata,
 } from "../model/ticketModel";
 import Platform from "../util/platform";
 import Big from "big.js";
@@ -166,7 +167,8 @@ export const spendByGameId = async (
       | IHorseRaceMetadata
       | IOneTwoThreeMetadata
       | IKenoMetadata
-      | ILuckyMatchMetadata;
+      | ILuckyMatchMetadata
+      | IRangeRushMetadata;
     payout: number;
   }
 ): Promise<ITicketModel> => {

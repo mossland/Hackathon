@@ -412,6 +412,41 @@ export const validateLuckyMatchGameInput = async (req: Request, res: Response, n
   next();
 };
 
+export const validateRangeRushGameInput = async (req: Request, res: Response, next: NextFunction) => {
+  const rangeRushGameId = 13;
+
+  if (req.body.gameId !== rangeRushGameId) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, "Invalid gameId"));
+  }
+
+  if (typeof req.body.low === typeof undefined || typeof req.body.low === typeof undefined) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, "Missing required fields: userNumbers or betAmount"));
+  }
+  if (typeof req.body.high === typeof undefined || typeof req.body.high === typeof undefined) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, "Missing required fields: userNumbers or betAmount"));
+  }
+
+  if (typeof req.body.invert === typeof undefined || typeof req.body.invert === typeof undefined) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, "Missing required fields: userNumbers or betAmount"));
+  }
+
+  const betAmount = new Big(req.body.betAmount);
+
+  if (isNaN(betAmount.toNumber())) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, "betAmount must be a valid number"));
+  }
+
+  if (betAmount.lte(0)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, "betAmount must be greater than 0"));
+  }
+
+  if (betAmount.gt(100000)) {
+    return next(new ServerError(StatusCodes.BAD_REQUEST, "betAmount must be ≤ 100000"));
+  }
+
+  next();
+};
+
 export const createGameStateValidator = (gameId: number): ((req: Request, res: Response, next: NextFunction) => any) => {
   const gameIdObj = {
     "1": "rsp",
@@ -426,6 +461,7 @@ export const createGameStateValidator = (gameId: number): ((req: Request, res: R
     "10": "diamondAndBomb",
     "11": "keno",
     "12": "luckyMatch",
+    "13": "rangeRush",
   };
 
   if (Object.keys(gameIdObj).indexOf(gameId.toString()) !== -1) {

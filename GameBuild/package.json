@@ -24,7 +24,9 @@
     "build:dev:keno": "node index.js -g keno",
     "build:prod:keno": "node index.js -g keno",
     "build:dev:LuckyMatch": "node index.js -g luckyMatch",
-    "build:prod:LuckyMatch": "node index.js -g luckyMatch"
+    "build:prod:LuckyMatch": "node index.js -g luckyMatch",
+    "build:dev:RangeRush": "node index.js -g rangeRush",
+    "build:prod:RangeRush": "node index.js -g rangeRush"
   },
   "dependencies": {
     "axios": "^1.1.3",

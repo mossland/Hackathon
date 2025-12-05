@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    GAME_LIST: "LuckyMatch"
+    GAME_LIST: "LuckyMatch RangeRush"
 
 phases:
   install:
